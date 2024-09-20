@@ -11,16 +11,17 @@ const Login = () => {
 
           <div className="h-2/4 px-[70px]">
             <input
-              type="text"
+              type="email"
               className="w-full h-[55px] bg-[#EDEDED] pl-5 rounded-[10px] text-[18px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
               placeholder="Email"
+              required
             />
 
             <input
-              id="hs-toggle-password"
               type="password"
               className="mt-4 w-full h-[55px] bg-[#EDEDED] pl-5 rounded-[10px] text-[18px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
               placeholder="Password"
+              required
             />
 
             <p className="text-end text-[18px] mt-2 text-[#6e6e6e]">
