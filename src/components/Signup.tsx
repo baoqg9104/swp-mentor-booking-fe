@@ -46,7 +46,7 @@ const Signup = () => {
               <input
                 id="hs-toggle-password"
                 type="password"
-                className="mt-4 w-full h-[50px] bg-[#EDEDED] pl-5 rounded-[10px] text-[18px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
+                className="mt-4 w-full h-[50px] bg-[#EDEDED] pl-5 rounded-[10px] text-[16px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
                 placeholder="Password"
                 required
               />
@@ -105,7 +105,7 @@ const Signup = () => {
               <input
                 id="hs-toggle-password-confirm"
                 type="password"
-                className="mt-4 w-full h-[50px] bg-[#EDEDED] pl-5 rounded-[10px] text-[18px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
+                className="mt-4 w-full h-[50px] bg-[#EDEDED] pl-5 rounded-[10px] text-[16px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
                 placeholder="Confirm password"
                 required
               />
