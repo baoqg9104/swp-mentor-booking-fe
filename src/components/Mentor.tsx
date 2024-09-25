@@ -1,17 +1,17 @@
 import {
   faBell,
+  faCalendarCheck,
+  faCalendarDays,
   faHouse,
   faUser,
-  faUserGraduate,
-  faUserTie,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import AdminDashboard from "./AdminDashboard";
 import { useState } from "react";
-import ManageMentors from "./ManageMentors";
-import ManageStudents from "./ManageStudents";
+import MentorDashboard from "./MentorDashboard";
+import ManageAvailability from "./ManageAvailability";
+import ManageAppointments from "./ManageAppointments";
 
-const Admin = () => {
+const Mentor = () => {
   const [navLink, setNavLink] = useState<string>("dashboard");
 
   return (
@@ -59,7 +59,7 @@ const Admin = () => {
                       <FontAwesomeIcon className="text-[22px]" icon={faUser} />
                     </div>
                     <div className="text-[18px] text-gray-800 font-semibold">
-                      Admin
+                      Mentor
                     </div>
                   </div>
                   <div className="p-1.5 space-y-0.5">
@@ -68,23 +68,15 @@ const Admin = () => {
                       href="#"
                     >
                       <svg
-                        className="shrink-0 size-4"
+                        className="size-4"
                         xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                        viewBox="0 0 512 512"
                       >
-                        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
-                        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                        <path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z" />
                       </svg>
-                      Newsletter
+                      Edit Profile
                     </a>
-                    <a
+                    {/* <a
                       className="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
                       href="#"
                     >
@@ -150,7 +142,7 @@ const Admin = () => {
                         <path d="M16 3.13a4 4 0 0 1 0 7.75" />
                       </svg>
                       Team Account
-                    </a>
+                    </a> */}
                   </div>
                 </div>
               </div>
@@ -247,7 +239,7 @@ const Admin = () => {
               className="hs-accordion-group p-3 w-full flex flex-col flex-wrap"
               data-hs-accordion-always-open
             >
-              <ul className="flex flex-col text-[17px]">
+              <ul className="flex flex-col text-[15px]">
                 <li>
                   <button
                     onClick={() => setNavLink("dashboard")}
@@ -271,10 +263,10 @@ const Admin = () => {
                     } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
                   >
                     <FontAwesomeIcon
-                      icon={faUserTie}
+                      icon={faCalendarDays}
                       className="text-[18px] mt-[1px]"
                     />
-                    Mentors
+                    Manage Availability
                   </button>
                 </li>
 
@@ -286,10 +278,10 @@ const Admin = () => {
                     } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
                   >
                     <FontAwesomeIcon
-                      icon={faUserGraduate}
+                      icon={faCalendarCheck}
                       className="text-[18px] mt-[1px]"
                     />
-                    Students
+                    Manage Appointments
                   </button>
                 </li>
 
@@ -443,12 +435,12 @@ const Admin = () => {
 
       {/* Body */}
       <div className="w-full lg:ps-64 bg-[#F9FAFB]">
-        {navLink === "dashboard" && <AdminDashboard />}
-        {navLink === "mentors" && <ManageMentors />}
-        {navLink === "students" && <ManageStudents />}
+        {navLink === "dashboard" && <MentorDashboard />}
+        {navLink === "availability" && <ManageAvailability />}
+        {navLink === "appointments" && <ManageAppointments />}
       </div>
     </>
   );
 };
 
-export default Admin;
+export default Mentor;
