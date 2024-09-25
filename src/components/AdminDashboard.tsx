@@ -4,8 +4,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const AdminDashboard = () => {
   return (
     <>
-      <div className="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-7 lg:py-7 mx-auto">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-7 lg:py-7 mx-auto h-[90vh]">
+        <div className="grid sm:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6">
           <div className="flex flex-col bg-white border shadow-sm rounded-xl">
             <div className="p-4 md:p-5">
               <div className="flex items-center gap-x-2">
@@ -71,7 +71,7 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          <div className="flex flex-col bg-white border shadow-sm rounded-xl">
+          {/* <div className="flex flex-col bg-white border shadow-sm rounded-xl">
             <div className="p-4 md:p-5">
               <div className="flex items-center gap-x-2">
                 <p className="text-xs uppercase tracking-wide text-gray-500">
@@ -85,7 +85,7 @@ const AdminDashboard = () => {
                 </h3>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </>

@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import Signup from "./components/Signup";
 import ForgotPassword from "./components/ForgotPassword";
 import Admin from "./components/Admin";
+import Mentor from "./components/Mentor";
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/mentor" element={<Mentor />} />
         </Routes>
       </BrowserRouter>
     </>
