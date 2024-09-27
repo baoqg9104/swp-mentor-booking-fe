@@ -140,7 +140,7 @@ const MentorDashboard = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-end">
                             {/* <span className="size-2 inline-block bg-green-500 rounded-full me-2"></span> */}
-                            NVH.601
+                            601
                           </td>
                         </tr>
 
@@ -162,7 +162,7 @@ const MentorDashboard = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-end">
                             {/* <span className="size-2 inline-block bg-green-500 rounded-full me-2"></span> */}
-                            NVH.603
+                            603
                           </td>
                         </tr>
                       </tbody>
