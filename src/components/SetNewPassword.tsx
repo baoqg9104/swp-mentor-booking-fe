@@ -33,7 +33,7 @@ const SetNewPassword = () => {
               <input
                 id="hs-toggle-password"
                 type="password"
-                className="mt-4 w-full h-[55px] bg-[#EDEDED] pl-5 rounded-[10px] text-[18px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
+                className="mt-4 w-full h-[55px] bg-[#f7f7f7] pl-5 rounded-[10px] text-[18px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
                 placeholder="New password"
                 required
               />
@@ -92,7 +92,7 @@ const SetNewPassword = () => {
               <input
                 id="hs-toggle-password-confirm"
                 type="password"
-                className="mt-4 w-full h-[50px] bg-[#EDEDED] pl-5 rounded-[10px] text-[18px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
+                className="mt-4 w-full h-[50px] bg-[#f7f7f7] pl-5 rounded-[10px] text-[18px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
                 placeholder="Password"
                 required
               />
