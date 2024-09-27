@@ -23,7 +23,7 @@ const ForgotPassword = () => {
             <div className="h-2/4 px-[70px]">
               <input
                 type="email"
-                className="w-full h-[55px] bg-[#EDEDED] pl-5 rounded-[10px] text-[18px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
+                className="w-full h-[55px] bg-[#f7f7f7] pl-5 rounded-[10px] text-[18px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
                 placeholder="Email"
                 required
               />

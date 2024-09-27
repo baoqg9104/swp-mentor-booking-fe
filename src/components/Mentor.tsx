@@ -8,7 +8,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import MentorDashboard from "./MentorDashboard";
-import ManageAvailability from "./ManageAvailability";
+import ManageCalendar from "./ManageCalendar";
 import ManageAppointments from "./ManageAppointments";
 
 const Mentor = () => {
@@ -257,24 +257,24 @@ const Mentor = () => {
 
                 <li>
                   <button
-                    onClick={() => setNavLink("mentors")}
+                    onClick={() => setNavLink("calendar")}
                     className={`${
-                      navLink === "mentors" && "bg-gray-100"
+                      navLink === "calendar" && "bg-gray-100"
                     } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
                   >
                     <FontAwesomeIcon
                       icon={faCalendarDays}
                       className="text-[18px] mt-[1px]"
                     />
-                    Manage Availability
+                    Manage Calendar
                   </button>
                 </li>
 
                 <li>
                   <button
-                    onClick={() => setNavLink("students")}
+                    onClick={() => setNavLink("appointments")}
                     className={`${
-                      navLink === "students" && "bg-gray-100"
+                      navLink === "appointments" && "bg-gray-100"
                     } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
                   >
                     <FontAwesomeIcon
@@ -436,7 +436,7 @@ const Mentor = () => {
       {/* Body */}
       <div className="w-full lg:ps-64 bg-[#F9FAFB]">
         {navLink === "dashboard" && <MentorDashboard />}
-        {navLink === "availability" && <ManageAvailability />}
+        {navLink === "calendar" && <ManageCalendar />}
         {navLink === "appointments" && <ManageAppointments />}
       </div>
     </>

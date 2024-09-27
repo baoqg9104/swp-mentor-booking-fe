@@ -30,14 +30,14 @@ const Signup = () => {
           <div className="h-2/4 px-[70px]">
             <input
               type="text"
-              className="w-full h-[50px] bg-[#EDEDED] pl-5 rounded-[10px] text-[16px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
+              className="w-full h-[50px] bg-[#f7f7f7] pl-5 rounded-[10px] text-[16px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
               placeholder="Full name"
               required
             />
 
             <input
               type="email"
-              className="mt-4 w-full h-[50px] bg-[#EDEDED] pl-5 rounded-[10px] text-[16px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
+              className="mt-4 w-full h-[50px] bg-[#f7f7f7] pl-5 rounded-[10px] text-[16px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
               placeholder="Email"
               required
             />
@@ -46,7 +46,7 @@ const Signup = () => {
               <input
                 id="hs-toggle-password"
                 type="password"
-                className="mt-4 w-full h-[50px] bg-[#EDEDED] pl-5 rounded-[10px] text-[16px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
+                className="mt-4 w-full h-[50px] bg-[#f7f7f7] pl-5 rounded-[10px] text-[16px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
                 placeholder="Password"
                 required
               />
@@ -105,7 +105,7 @@ const Signup = () => {
               <input
                 id="hs-toggle-password-confirm"
                 type="password"
-                className="mt-4 w-full h-[50px] bg-[#EDEDED] pl-5 rounded-[10px] text-[16px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
+                className="mt-4 w-full h-[50px] bg-[#f7f7f7] pl-5 rounded-[10px] text-[16px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
                 placeholder="Confirm password"
                 required
               />
@@ -162,7 +162,7 @@ const Signup = () => {
 
             <div className="flex justify-between">
               <select
-                className="mt-4 w-[47%] h-[50px] bg-[#EDEDED] pl-3 rounded-[10px] text-[16px] text-[#5B5B5B]"
+                className="mt-4 w-[47%] h-[50px] bg-[#f7f7f7] pl-3 rounded-[10px] text-[16px] text-[#5B5B5B]"
                 defaultValue=""
                 required
                 onChange={(e) => setRole(e.target.value)}
@@ -175,7 +175,7 @@ const Signup = () => {
               </select>
 
               <select
-                className="mt-4 w-[47%] h-[50px] bg-[#EDEDED] pl-2 rounded-[10px] text-[16px] text-[#5B5B5B] disabled:text-[#888888]"
+                className="mt-4 w-[47%] h-[50px] bg-[#f7f7f7] pl-2 rounded-[10px] text-[16px] text-[#5B5B5B] disabled:text-[#888888]"
                 defaultValue=""
                 required
                 disabled={role === "mentor"}
