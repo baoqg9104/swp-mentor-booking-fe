@@ -26,14 +26,19 @@ const ManageCalendar = () => {
     {
       Id: 1,
       Subject: "Meeting",
-      StartTime: new Date(2024, 9, 26, 7, 0),
-      EndTime: new Date(2024, 9, 26, 9, 30),
+      StartTime: new Date(2024, 8, 26, 7, 0),
+      EndTime: new Date(2024, 8, 26, 9, 30),
     },
-    {},
+    {
+      Id: 2,
+      Subject: "Meeting",
+      StartTime: new Date(2024, 8, 26, 10, 0),
+      EndTime: new Date(2024, 8, 26, 12, 30),
+    },
   ];
 
   const [format, setFormat] = useState<string>("");
-  const [isShowForm, setIsShowForm] = useState<boolean>(false);
+  const [isShowForm, setIsShowForm] = useState<boolean>(true);
 
   const handleAddSlot = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -188,7 +193,10 @@ const ManageCalendar = () => {
               </form>
             )}
 
+
             <div className="flex flex-col mt-7">
+
+  
               <div className="-m-1.5 overflow-x-auto">
                 <div className="p-1.5 min-w-full inline-block align-middle">
                   <div className="overflow-hidden">
@@ -309,8 +317,9 @@ const ManageCalendar = () => {
           <ScheduleComponent
             readonly
             width="60%"
+            startHour="07:00"
             height={635}
-            selectedDate={new Date(2024, 9, 27)}
+            selectedDate={new Date(2024, 8, 27)}
             eventSettings={{
               dataSource: data,
             }}
