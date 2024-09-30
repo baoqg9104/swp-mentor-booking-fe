@@ -3,6 +3,7 @@ import {
   faCalendarCheck,
   faCalendarDays,
   faHouse,
+  faPenToSquare,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -10,6 +11,8 @@ import { useState } from "react";
 import MentorDashboard from "./MentorDashboard";
 import ManageCalendar from "./ManageCalendar";
 import ManageAppointments from "./ManageAppointments";
+import { Link } from "react-router-dom";
+import EditProfile from "./EditProfile";
 
 const Mentor = () => {
   const [navLink, setNavLink] = useState<string>("dashboard");
@@ -63,9 +66,9 @@ const Mentor = () => {
                     </div>
                   </div>
                   <div className="p-1.5 space-y-0.5">
-                    <a
+                    <Link
                       className="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
-                      href="#"
+                      to={`/edit-profile`}
                     >
                       <svg
                         className="size-4"
@@ -75,7 +78,7 @@ const Mentor = () => {
                         <path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z" />
                       </svg>
                       Edit Profile
-                    </a>
+                    </Link>
                     {/* <a
                       className="flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
                       href="#"
@@ -183,29 +186,14 @@ const Mentor = () => {
             </button>
 
             <ol className="ms-3 flex items-center whitespace-nowrap">
-              <li className="flex items-center text-sm text-gray-800">
-                Application Layout
-                <svg
-                  className="shrink-0 mx-3 overflow-visible size-2.5 text-gray-400"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M5 1L10.6869 7.16086C10.8637 7.35239 10.8637 7.64761 10.6869 7.83914L5 14"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                </svg>
-              </li>
               <li
                 className="text-sm font-semibold text-gray-800 truncate"
                 aria-current="page"
               >
-                Dashboard
+                {navLink === "dashboard" && "Dashboard"}
+                {navLink === "calendar" && "Manage Calendar"}
+                {navLink === "appointments" && "Manage Appointments"}
+                {navLink === "edit-profile" && "Edit Profile"}
               </li>
             </ol>
           </div>
@@ -282,6 +270,21 @@ const Mentor = () => {
                       className="text-[18px] mt-[1px]"
                     />
                     Manage Appointments
+                  </button>
+                </li>
+
+                <li>
+                  <button
+                    onClick={() => setNavLink("edit-profile")}
+                    className={`${
+                      navLink === "edit-profile" && "bg-gray-100"
+                    } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                  >
+                    <FontAwesomeIcon
+                      icon={faPenToSquare}
+                      className="text-[18px] mt-[1px]"
+                    />
+                    Edit Profile
                   </button>
                 </li>
 
@@ -438,6 +441,7 @@ const Mentor = () => {
         {navLink === "dashboard" && <MentorDashboard />}
         {navLink === "calendar" && <ManageCalendar />}
         {navLink === "appointments" && <ManageAppointments />}
+        {navLink === "edit-profile" && <EditProfile />}
       </div>
     </>
   );

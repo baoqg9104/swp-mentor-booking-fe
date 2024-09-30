@@ -19,7 +19,12 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronDown, faChevronUp, faPenToSquare, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChevronDown,
+  faChevronUp,
+  faPenToSquare,
+  faTrashCan,
+} from "@fortawesome/free-solid-svg-icons";
 
 const ManageCalendar = () => {
   const data = [
@@ -193,10 +198,9 @@ const ManageCalendar = () => {
               </form>
             )}
 
+            <div className="pl-5 pt-5 font-semibold text-[#6e6e6e]">Number of slots remaining: 7 </div>
 
             <div className="flex flex-col mt-7">
-
-  
               <div className="-m-1.5 overflow-x-auto">
                 <div className="p-1.5 min-w-full inline-block align-middle">
                   <div className="overflow-hidden">
@@ -245,13 +249,19 @@ const ManageCalendar = () => {
                               type="button"
                               className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                             >
-                              <FontAwesomeIcon icon={faPenToSquare} className="size-4" />
+                              <FontAwesomeIcon
+                                icon={faPenToSquare}
+                                className="size-4"
+                              />
                             </button>
                             <button
                               type="button"
                               className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                             >
-                              <FontAwesomeIcon icon={faTrashCan} className="size-4" />
+                              <FontAwesomeIcon
+                                icon={faTrashCan}
+                                className="size-4"
+                              />
                             </button>
                           </td>
                         </tr>
@@ -271,13 +281,19 @@ const ManageCalendar = () => {
                               type="button"
                               className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                             >
-                              <FontAwesomeIcon icon={faPenToSquare} className="size-4" />
+                              <FontAwesomeIcon
+                                icon={faPenToSquare}
+                                className="size-4"
+                              />
                             </button>
                             <button
                               type="button"
                               className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                             >
-                              <FontAwesomeIcon icon={faTrashCan} className="size-4" />
+                              <FontAwesomeIcon
+                                icon={faTrashCan}
+                                className="size-4"
+                              />
                             </button>
                           </td>
                         </tr>
@@ -297,13 +313,19 @@ const ManageCalendar = () => {
                               type="button"
                               className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                             >
-                              <FontAwesomeIcon icon={faPenToSquare} className="size-4" />
+                              <FontAwesomeIcon
+                                icon={faPenToSquare}
+                                className="size-4"
+                              />
                             </button>
                             <button
                               type="button"
                               className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
                             >
-                              <FontAwesomeIcon icon={faTrashCan} className="size-4" />
+                              <FontAwesomeIcon
+                                icon={faTrashCan}
+                                className="size-4"
+                              />
                             </button>
                           </td>
                         </tr>
