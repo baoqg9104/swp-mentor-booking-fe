@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircleCheck,
   faCircleXmark,
+  faSort,
 } from "@fortawesome/free-solid-svg-icons";
 registerLicense(
   "Ngo9BigBOggjHTQxAR8/V1NDaF5cWGNCf1NpR2ZGfV5ycEVHYVZTQHxcS00DNHVRdkdnWXZcdnRVRGBdV010V0M="
@@ -258,9 +259,10 @@ const ManageAppointments = () => {
                         <tr>
                           <th
                             scope="col"
-                            className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase"
+                            className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase flex items-center"
                           >
                             Book time
+                            <FontAwesomeIcon icon={faSort} className="ml-2 cursor-pointer" />
                           </th>
                           <th
                             scope="col"
@@ -280,12 +282,6 @@ const ManageAppointments = () => {
                           >
                             Skill
                           </th>
-                          <th
-                            scope="col"
-                            className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
-                          >
-                            Action
-                          </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
@@ -303,7 +299,11 @@ const ManageAppointments = () => {
                             Set up environment
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
-                            <input type="radio" name="booking" className="border-gray-300" />
+                            <input
+                              type="radio"
+                              name="booking"
+                              className="border-gray-300"
+                            />
                           </td>
                         </tr>
 
@@ -321,13 +321,15 @@ const ManageAppointments = () => {
                             Git & Deploy
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
-                            <input type="radio" name="booking" className="border-gray-300" />
+                            <input
+                              type="radio"
+                              name="booking"
+                              className="border-gray-300"
+                            />
                           </td>
                         </tr>
 
-                        <tr className="bg-blue-300"
-                        onClick={() => {}}
-                        >
+                        <tr className="bg-blue-300 font-medium" onClick={() => {}}>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                             {new Date().toLocaleString()}
                           </td>
@@ -341,7 +343,11 @@ const ManageAppointments = () => {
                             Review requirements
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
-                            <input type="radio" name="booking" className="border-gray-300" />
+                            <input
+                              type="radio"
+                              name="booking"
+                              className="border-gray-300"
+                            />
                           </td>
                         </tr>
                       </tbody>

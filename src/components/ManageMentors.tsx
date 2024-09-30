@@ -1,7 +1,7 @@
 
 const ManageMentors = () => {
   return (
-    <div>ManageMentor</div>
+    <div>abc</div>
   )
 }
 
