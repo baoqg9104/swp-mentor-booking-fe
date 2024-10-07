@@ -87,7 +87,7 @@ const MentorDashboard = () => {
                           </th>
                           <th
                             scope="col"
-                            className="px-6 py-3 text-start font-medium text-gray-500 uppercase"
+                            className="px-6 py-3 text-center font-medium text-gray-500 uppercase"
                           >
                             Subject
                           </th>
