@@ -5,6 +5,7 @@ import Signup from "./components/Signup";
 import ForgotPassword from "./components/ForgotPassword";
 import Admin from "./components/Admin";
 import Mentor from "./components/Mentor";
+import Student from "./components/Student";
 
 const App = () => {
   return (
@@ -18,6 +19,8 @@ const App = () => {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/mentor" element={<Mentor />} />
+          <Route path="/student" element={<Student />} />
+
         </Routes>
       </BrowserRouter>
     </>
