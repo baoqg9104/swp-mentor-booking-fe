@@ -6,6 +6,8 @@ import ForgotPassword from "./components/ForgotPassword";
 import Admin from "./components/Admin";
 import Mentor from "./components/Mentor";
 import Student from "./components/Student";
+import _404Page from "./components/_404Page";
+import { ToastContainer } from "react-toastify";
 
 const App = () => {
   return (
@@ -21,7 +23,9 @@ const App = () => {
           <Route path="/mentor" element={<Mentor />} />
           <Route path="/student" element={<Student />} />
 
+          <Route path="*" element={<_404Page />} />
         </Routes>
+        <ToastContainer />
       </BrowserRouter>
     </>
   );
