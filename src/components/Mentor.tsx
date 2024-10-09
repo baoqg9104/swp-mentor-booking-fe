@@ -15,7 +15,25 @@ import ManageAppointments from "./ManageAppointments";
 import EditProfile from "./EditProfile";
 import MentorTransactionHistory from "./MentorTransactionHistory";
 
+import "preline/preline";
+import { IStaticMethods } from "preline/preline";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
+declare global {
+  interface Window {
+    HSStaticMethods: IStaticMethods;
+  }
+}
+
 const Mentor = () => {
+
+  const location = useLocation();
+
+  useEffect(() => {
+    window.HSStaticMethods.autoInit();
+  }, [location.pathname]);
+
   const [navLink, setNavLink] = useState<string>("dashboard");
 
   return (

@@ -2,7 +2,10 @@ import { Link, useLocation } from "react-router-dom";
 
 import "preline/preline";
 import { IStaticMethods } from "preline/preline";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "./AuthContext";
 
 declare global {
   interface Window {
@@ -19,19 +22,35 @@ const Login = () => {
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const navigate = useNavigate();
+
+  const authContext = useContext(AuthContext);
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
+
     try {
       const data = {
         email,
         password,
       };
 
-      
+      if (authContext) {
+        const { login } = authContext;
+        const roleId = await login(data);
+        
+        if (roleId === "1") {
+          navigate("/student");
+        } else {
+          navigate("/mentor");
+        }
 
+      }
+
+      toast.success("Login successful!");
+      
     } catch (error) {
-      console.error("Error: ", error);
+      toast.error("Invalid email or password!");
     }
   };
 

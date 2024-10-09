@@ -162,7 +162,7 @@ const Signup = () => {
 
             <div className="flex justify-between">
               <select
-                className="mt-4 w-[47%] h-[50px] bg-[#f7f7f7] pl-3 rounded-[10px] text-[16px] text-[#5B5B5B]"
+                className="mt-4 w-full h-[50px] bg-[#f7f7f7] pl-3 rounded-[10px] text-[16px] text-[#5B5B5B]"
                 defaultValue=""
                 required
                 onChange={(e) => setRole(e.target.value)}
@@ -174,7 +174,7 @@ const Signup = () => {
                 <option value="student">Student</option>
               </select>
 
-              <select
+              {/* <select
                 className="mt-4 w-[47%] h-[50px] bg-[#f7f7f7] pl-2 rounded-[10px] text-[16px] text-[#5B5B5B] disabled:text-[#888888]"
                 defaultValue=""
                 required
@@ -189,7 +189,7 @@ const Signup = () => {
                 <option value="class-3">Class 3</option>
                 <option value="class-4">Class 4</option>
                 <option value="class-5">Class 5</option>
-              </select>
+              </select> */}
             </div>
 
             <button
