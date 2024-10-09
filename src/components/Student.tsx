@@ -3,6 +3,7 @@ import {
   faHouse,
   faPenToSquare,
   faUser,
+  faUserGroup,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
@@ -10,8 +11,25 @@ import EditProfileStudent from "./EditProfileStudent";
 import StudentDashboard from "./StudentDashboard";
 import StudentManageGroup from "./StudentManageGroup";
 
+import "preline/preline";
+import { IStaticMethods } from "preline/preline";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
+declare global {
+  interface Window {
+    HSStaticMethods: IStaticMethods;
+  }
+}
+
 const Student = () => {
   const [navLink, setNavLink] = useState<string>("dashboard");
+
+  const location = useLocation();
+
+  useEffect(() => {
+    window.HSStaticMethods.autoInit();
+  }, [location.pathname]);
 
   return (
     <>
@@ -129,7 +147,8 @@ const Student = () => {
                 className="text-sm font-semibold text-gray-800 truncate"
                 aria-current="page"
               >
-                {navLink === "dashboard" && "dashboard"}
+                {navLink === "dashboard" && "Dashboard"}
+                {navLink === "group" && "Group"}
                 {navLink === "edit-profile" && "Edit Profile"}
               </li>
             </ol>
@@ -181,16 +200,16 @@ const Student = () => {
                 </li>
                 <li>
                   <button
-                    onClick={() => setNavLink("manage-group")}
+                    onClick={() => setNavLink("group")}
                     className={`${
-                      navLink === "manage-group" && "bg-gray-100"
+                      navLink === "group" && "bg-gray-100"
                     } w-full  flex gap-x-2.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
                   >
                     <FontAwesomeIcon
-                      icon={faHouse}
+                      icon={faUserGroup}
                       className="text-[16px] mt-[3px]"
                     />
-                    Manage Group
+                    Group
                   </button>
                 </li>
 
@@ -217,7 +236,7 @@ const Student = () => {
       {/* Body */}
       <div className="w-full lg:ps-64 bg-[#F9FAFB]">
         {navLink === "dashboard" && <StudentDashboard />}
-        {navLink === "manage-group" && <StudentManageGroup />}
+        {navLink === "group" && <StudentManageGroup />}
         {navLink === "edit-profile" && <EditProfileStudent />}
       </div>
     </>
