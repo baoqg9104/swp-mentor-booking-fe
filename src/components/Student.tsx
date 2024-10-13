@@ -1,5 +1,6 @@
 import {
   faBell,
+  faCalendarPlus,
   faHouse,
   faPenToSquare,
   faUser,
@@ -15,6 +16,7 @@ import "preline/preline";
 import { IStaticMethods } from "preline/preline";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import BookingMentor from "./BookingMentor";
 
 declare global {
   interface Window {
@@ -215,6 +217,21 @@ const Student = () => {
 
                 <li>
                   <button
+                    onClick={() => setNavLink("booking-mentor")}
+                    className={`${
+                      navLink === "booking-mentor" && "bg-gray-100"
+                    } w-full  flex gap-x-2.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                  >
+                    <FontAwesomeIcon
+                      icon={faCalendarPlus}
+                      className="text-[16px] mt-[3px]"
+                    />
+                    Booking Mentor
+                  </button>
+                </li>
+
+                <li>
+                  <button
                     onClick={() => setNavLink("edit-profile")}
                     className={`${
                       navLink === "edit-profile" && "bg-gray-100"
@@ -237,6 +254,7 @@ const Student = () => {
       <div className="w-full lg:ps-64 bg-[#F9FAFB]">
         {navLink === "dashboard" && <StudentDashboard />}
         {navLink === "group" && <StudentGroup />}
+        {navLink === "booking-mentor" && <BookingMentor />}
         {navLink === "edit-profile" && <EditProfileStudent />}
       </div>
     </>
