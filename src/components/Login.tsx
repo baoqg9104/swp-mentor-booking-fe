@@ -22,6 +22,8 @@ const Login = () => {
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [role, setRole] = useState<string>("");
+
   const navigate = useNavigate();
 
   const authContext = useContext(AuthContext);
@@ -33,22 +35,23 @@ const Login = () => {
       const data = {
         email,
         password,
+        role,
       };
 
       if (authContext) {
         const { login } = authContext;
         const roleId = await login(data);
-        
+
         if (roleId === "1") {
           navigate("/student");
-        } else {
+        } else if (roleId === "2") {
           navigate("/mentor");
+        } else if (roleId === "3") {
+          navigate("/admin");
         }
-
       }
 
       toast.success("Login successful!");
-      
     } catch (error) {
       toast.error("Invalid email or password!");
     }
@@ -57,7 +60,7 @@ const Login = () => {
   return (
     <>
       <div className="container flex justify-center items-center h-svh text-[#5B5B5B] ">
-        <div className="h-[500px] w-[450px] rounded-[10px] border-black border-[1px] shadow-lg ">
+        <div className="h-[550px] w-[450px] rounded-[10px] border-black border-[1px] shadow-lg ">
           <div className="flex justify-center items-center h-1/4 font-semibold text-[40px] text-[#222222]">
             Login
           </div>
@@ -132,6 +135,18 @@ const Login = () => {
                   </svg>
                 </button>
               </div>
+
+              <select
+                defaultValue=""
+                required
+                className="mt-4 w-full h-[55px] bg-[#f7f7f7] pl-5 rounded-[10px] text-[18px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
+                onChange={(e) => setRole(e.target.value)}
+              >
+                <option value="" disabled>Login as</option>
+                <option value="student">Student</option>
+                <option value="mentor">Mentor</option>
+                <option value="admin">Admin</option>
+              </select>
 
               <Link
                 to={"/forgot-password"}

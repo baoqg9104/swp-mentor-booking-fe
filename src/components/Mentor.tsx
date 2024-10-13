@@ -42,7 +42,7 @@ const Mentor = () => {
         <nav className="px-4 sm:px-6 flex basis-full items-center w-full mx-auto">
           <div className="me-5 lg:me-0 lg:hidden">
             <div className="flex items-center font-bold text-[30px]">
-              <span className="text-[#ff7d2d]">F</span> Booking
+              <span className="text-[#ff7d2d]">SWP</span> Booking
             </div>
           </div>
 
@@ -181,7 +181,7 @@ const Mentor = () => {
         <div className="relative flex flex-col h-full max-h-full">
           <div className="px-6 pt-4">
             <div className="flex items-center font-bold text-[30px]">
-              <span className="text-[#ff7d2d]">F</span> Booking
+              <span className="text-[#ff7d2d]">SWP</span> Booking
             </div>
           </div>
 

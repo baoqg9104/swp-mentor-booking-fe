@@ -5,8 +5,8 @@ const Navbar = () => {
     <>
       {/* For Guest */}
       <div className="h-[70px] w-full flex text-[#333333] absolute">
-        <div className="w-2/12 flex items-center justify-end font-bold text-[40px]">
-          <span className="text-[#ff7d2d]">F</span> Booking
+        <div className="w-3/12 flex items-center justify-center font-bold text-[40px]">
+          <span className="text-[#ff7d2d]">SWP</span> Booking
         </div>
 
         <div className="w-6/12"></div>

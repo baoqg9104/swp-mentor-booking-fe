@@ -9,7 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import EditProfileStudent from "./EditProfileStudent";
 import StudentDashboard from "./StudentDashboard";
-import StudentManageGroup from "./StudentManageGroup";
+import StudentGroup from "./StudentGroup";
 
 import "preline/preline";
 import { IStaticMethods } from "preline/preline";
@@ -37,7 +37,7 @@ const Student = () => {
         <nav className="px-4 sm:px-6 flex basis-full items-center w-full mx-auto">
           <div className="me-5 lg:me-0 lg:hidden">
             <div className="flex items-center font-bold text-[30px]">
-              <span className="text-[#ff7d2d]">F</span> Booking
+              <span className="text-[#ff7d2d]">SWP</span> Booking
             </div>
           </div>
 
@@ -174,7 +174,7 @@ const Student = () => {
         <div className="relative flex flex-col h-full max-h-full">
           <div className="px-6 pt-4">
             <div className="flex items-center font-bold text-[30px]">
-              <span className="text-[#ff7d2d]">F</span> Booking
+              <span className="text-[#ff7d2d]">SWP</span> Booking
             </div>
           </div>
 
@@ -236,7 +236,7 @@ const Student = () => {
       {/* Body */}
       <div className="w-full lg:ps-64 bg-[#F9FAFB]">
         {navLink === "dashboard" && <StudentDashboard />}
-        {navLink === "group" && <StudentManageGroup />}
+        {navLink === "group" && <StudentGroup />}
         {navLink === "edit-profile" && <EditProfileStudent />}
       </div>
     </>

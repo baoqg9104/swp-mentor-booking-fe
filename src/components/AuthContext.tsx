@@ -6,6 +6,7 @@ import { jwtDecode, JwtPayload } from "jwt-decode";
 interface LoginDto {
   email: string;
   password: string;
+  role: string;
 }
 
 interface AuthData {
