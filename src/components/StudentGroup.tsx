@@ -331,6 +331,13 @@ const StudentGroup = () => {
             </div>
 
             <div className="mt-7">
+              <h1 className="text-[15px] font-semibold text-[#3c3c3c]">
+                Remaining points:{" "}
+                <span className="text-[#0c9eff]">10</span>
+              </h1>
+            </div>
+
+            <div className="mt-7">
               <h1 className="uppercase text-[13px] font-semibold text-[#4B6883]">
                 Current project
               </h1>
@@ -363,6 +370,8 @@ const StudentGroup = () => {
               <div className="-m-1.5 overflow-x-auto">
                 <div className="p-1.5 min-w-full inline-block align-middle">
                   <div className="overflow-hidden">
+                    <p className="text-center mb-3 font-medium">Member list</p>
+                    <hr />
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead>
                         <tr>
@@ -395,13 +404,13 @@ const StudentGroup = () => {
                       <tbody className="divide-y divide-gray-200">
                         <tr>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-                            John Brown
+                            Member 1
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                            45
+                            member1@gmail.com
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                            New York No. 1 Lake Park
+                            0123456789
                           </td>
                           {/* <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
                             <button
@@ -415,13 +424,13 @@ const StudentGroup = () => {
 
                         <tr>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-                            Jim Green
+                            Member 1
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                            27
+                            member1@gmail.com
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                            London No. 1 Lake Park
+                            0123456789
                           </td>
                           {/* <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
                             <button
@@ -435,13 +444,13 @@ const StudentGroup = () => {
 
                         <tr>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-                            Joe Black
+                            Member 1
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                            31
+                            member1@gmail.com
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                            Sidney No. 1 Lake Park
+                            0123456789
                           </td>
                           {/* <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
                             <button
@@ -451,7 +460,7 @@ const StudentGroup = () => {
                               Delete
                             </button>
                           </td> */}
-                        </tr> 
+                        </tr>
                       </tbody>
                     </table>
                   </div>
@@ -460,10 +469,7 @@ const StudentGroup = () => {
             </div>
           </div>
         </div>
-
-        <div>
-          <div></div>
-        </div>
+        
       </div>
 
       <Dialog open={open} onClose={setOpen} className="relative z-10">
