@@ -18,7 +18,7 @@ const StudentDashboard = () => {
               </div>
             </div>
             <div className=" text-[23px] mt-3 pl-1">No group yet</div>
-            <div className="text-[15px] pl-1 mt-2">SE1856</div>
+            <div className="text-[15px] pl-1 mt-2">No class yet</div>
           </div>
           <div className="bg-[#FFF4DE] p-4  rounded-[15px]">
             <div>
