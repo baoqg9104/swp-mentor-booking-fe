@@ -49,7 +49,7 @@ const ManageAppointments = () => {
   return (
     <>
       <div className="flex">
-        <div className="w-[50%]">
+        <div className="w-[55%]">
           <div className="-m-1.5 overflow-x-hidden">
             <div className="p-1.5 min-w-full inline-block align-middle">
               <div className="overflow-hidden">
@@ -106,16 +106,16 @@ const ManageAppointments = () => {
                         601
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
-                        3
+                        1 
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
-                        <FontAwesomeIcon
-                          icon={faCircleCheck}
-                          className="text-[#0fba0f]"
-                        />{" "}
+                        <span className="text-[#209526] font-medium">
+                          Approved
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
                         <button
+                          disabled
                           type="button"
                           className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent focus:outline-none disabled:opacity-50 disabled:pointer-events-none text-gray-500 hover:text-gray-700"
                           aria-haspopup="dialog"
@@ -142,13 +142,13 @@ const ManageAppointments = () => {
                         0
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-green-500 text-center">
-                        <FontAwesomeIcon
-                          icon={faCircleCheck}
-                          className="text-[#0fba0f]"
-                        />{" "}
+                        <span className="text-[#7c7c7c] font-medium">
+                          Completed
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
                         <button
+                          disabled
                           type="button"
                           className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent focus:outline-none disabled:opacity-50 disabled:pointer-events-none text-gray-500 hover:text-gray-700"
                           aria-haspopup="dialog"
@@ -175,7 +175,9 @@ const ManageAppointments = () => {
                         3
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                        <FontAwesomeIcon icon={faCircleXmark} />{" "}
+                        <span className="text-[#b7ba27] font-medium">
+                          Pending
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
                         <button
@@ -262,7 +264,10 @@ const ManageAppointments = () => {
                             className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase flex items-center"
                           >
                             Book time
-                            <FontAwesomeIcon icon={faSort} className="ml-2 cursor-pointer" />
+                            <FontAwesomeIcon
+                              icon={faSort}
+                              className="ml-2 cursor-pointer"
+                            />
                           </th>
                           <th
                             scope="col"
@@ -329,7 +334,10 @@ const ManageAppointments = () => {
                           </td>
                         </tr>
 
-                        <tr className="bg-blue-300 font-medium" onClick={() => {}}>
+                        <tr
+                          className="bg-blue-300 font-medium"
+                          onClick={() => {}}
+                        >
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                             {new Date().toLocaleString()}
                           </td>
