@@ -42,7 +42,7 @@ const ManageCalendar = () => {
     },
   ];
 
-  const [format, setFormat] = useState<string>("");
+  const [format, setFormat] = useState<string>("offline");
   const [isShowForm, setIsShowForm] = useState<boolean>(true);
 
   const handleAddSlot = (e: React.FormEvent<HTMLFormElement>) => {
@@ -201,7 +201,7 @@ const ManageCalendar = () => {
             <div className="pl-5 pt-5 font-semibold text-[#6e6e6e]">Number of slots remaining: 7 </div>
 
             <div className="flex flex-col mt-7">
-              <div className="-m-1.5 overflow-x-auto">
+              <div className="-m-1.5 overflow-x-auto bg-white shadow">
                 <div className="p-1.5 min-w-full inline-block align-middle">
                   <div className="overflow-hidden">
                     <table className="min-w-full divide-y divide-gray-200">
