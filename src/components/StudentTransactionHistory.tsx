@@ -1,5 +1,5 @@
 
-const MentorTransactionHistory = () => {
+const StudentTransactionHistory = () => {
   return (
     <>
       <div className="flex flex-col p-10 h-[90svh]">
@@ -84,10 +84,10 @@ const MentorTransactionHistory = () => {
                 <tbody className="divide-y-2 divide-gray-200 divide-">
                   <tr className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-                      Receive
+                      Booking
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-green-500 font-semibold">
-                      + 1
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-red-500 font-semibold">
+                      - 1
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                       07-10-2024
@@ -96,7 +96,7 @@ const MentorTransactionHistory = () => {
                       10:50:50
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                      Group 1 - SE1867
+                      TamPM
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 flex justify-center">
                       <span className="text-[#209526]  font-medium w-[80px] h-[35px] flex items-center justify-center bg-[#e7fae3] rounded-[20px]">
@@ -107,10 +107,10 @@ const MentorTransactionHistory = () => {
 
                   <tr className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
-                      Receive
+                      Booking
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-green-500 font-semibold">
-                      + 1
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-red-500 font-semibold">
+                      - 1
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                       07-10-2024
@@ -119,7 +119,7 @@ const MentorTransactionHistory = () => {
                       10:50:50
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                      Group 1 - SE1867
+                      TamPM
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 flex justify-center">
                       <span className="text-[#C81C15] font-medium w-[80px] h-[35px] flex items-center justify-center bg-[#FCE4E4] rounded-[20px]">
@@ -134,7 +134,7 @@ const MentorTransactionHistory = () => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default MentorTransactionHistory;
+export default StudentTransactionHistory
