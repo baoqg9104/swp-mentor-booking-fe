@@ -87,8 +87,8 @@ const MyAppointments = () => {
                     </td>
 
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 flex justify-center">
-                      <span className="text-[#209526]  font-medium w-[80px] h-[35px] flex items-center justify-center bg-[#e7fae3] rounded-[20px] shadow">
-                        Approve
+                      <span className="text-[#636363]  font-medium w-[100px] h-[35px] flex items-center justify-center bg-[#e6e6e6] rounded-[20px] shadow">
+                        Completed
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
@@ -117,8 +117,8 @@ const MyAppointments = () => {
                       Online
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 flex justify-center">
-                      <span className="text-[#209526]  font-medium w-[80px] h-[35px] flex items-center justify-center bg-[#e7fae3] rounded-[20px] shadow">
-                        Approve
+                      <span className="text-[#209526]  font-medium w-[100px] h-[35px] flex items-center justify-center bg-[#e7fae3] rounded-[20px] shadow">
+                        Approved
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
@@ -147,7 +147,7 @@ const MyAppointments = () => {
                       611
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 flex justify-center">
-                      <span className="text-[#aeb015] font-medium w-[80px] h-[35px] flex items-center justify-center bg-[#ffffc3] rounded-[20px] shadow">
+                      <span className="text-[#9d9f34] font-medium w-[100px] h-[35px] flex items-center justify-center bg-[#ffffc3] rounded-[20px] shadow">
                         Pending
                       </span>
                     </td>

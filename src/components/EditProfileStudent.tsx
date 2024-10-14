@@ -1,10 +1,28 @@
-import { faEnvelope, faGift, faPhone, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faCamera, faEnvelope, faGift, faPhone, faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+import "preline/preline";
+import { IStaticMethods } from "preline/preline";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+
+declare global {
+  interface Window {
+    HSStaticMethods: IStaticMethods;
+  }
+}
+
 const EditProfileStudent = () => {
+
+  const location = useLocation();
+
+  useEffect(() => {
+    window.HSStaticMethods.autoInit();
+  }, [location.pathname]);
+
   return (
     <>
-      <div className="p-14 pt-7">
+      <div className="p-14 pt-7 h-[90vh]">
         <div className="space-y-8">
           <div>
             <div className="mt-10">
@@ -111,6 +129,234 @@ const EditProfileStudent = () => {
                     </div>
                   </div>
                 </div> */}
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div
+        id="hs-scale-animation-modal"
+        className="hs-overlay hidden size-full fixed top-0 start-0 z-[80] overflow-x-hidden overflow-y-auto pointer-events-none"
+        role="dialog"
+        tabIndex={-1}
+        aria-labelledby="hs-scale-animation-modal-label"
+      >
+        <div className="hs-overlay-animation-target hs-overlay-open:scale-100 hs-overlay-open:opacity-100 scale-95 opacity-0 ease-in-out transition-all duration-200 sm:max-w-lg sm:w-full m-3 sm:mx-auto min-h-[calc(100%-3.5rem)] flex items-center">
+          <div className="w-full flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto">
+            <div className="flex justify-between items-center py-3 px-4 border-b">
+              <h2
+                id="hs-scale-animation-modal-label"
+                className="font-bold text-gray-800 text-[18px]"
+              >
+                Personal Information
+              </h2>
+              <button
+                type="button"
+                className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none"
+                aria-label="Close"
+                data-hs-overlay="#hs-scale-animation-modal"
+              >
+                <span className="sr-only">Close</span>
+                <svg
+                  className="shrink-0 size-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M18 6 6 18"></path>
+                  <path d="m6 6 12 12"></path>
+                </svg>
+              </button>
+            </div>
+            <div className="p-4 overflow-y-auto flex flex-col justify-center items-center">
+              <div className="w-full flex justify-center flex-col items-center">
+                <div className="size-[120px] border-[3px] border-white bg-gray-200 rounded-full shadow-lg"></div>
+
+                <div className="flex justify-center items-center w-[40%] mt-3">
+                  <div className="w-[50%] flex items-center justify-center cursor-pointer">
+                    <FontAwesomeIcon
+                      icon={faCamera}
+                      className="size-4 mr-1 text-gray-700"
+                    />
+                    Edit
+                  </div>
+                  <div className="w-[50%] flex items-center justify-center cursor-pointer">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 448 512"
+                      className="size-4 inline-block mr-1"
+                    >
+                      <path d="M170.5 51.6L151.5 80l145 0-19-28.4c-1.5-2.2-4-3.6-6.7-3.6l-93.7 0c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6L354.2 80 368 80l48 0 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-8 0 0 304c0 44.2-35.8 80-80 80l-224 0c-44.2 0-80-35.8-80-80l0-304-8 0c-13.3 0-24-10.7-24-24S10.7 80 24 80l8 0 48 0 13.8 0 36.7-55.1C140.9 9.4 158.4 0 177.1 0l93.7 0c18.7 0 36.2 9.4 46.6 24.9zM80 128l0 304c0 17.7 14.3 32 32 32l224 0c17.7 0 32-14.3 32-32l0-304L80 128zm80 64l0 208c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-208c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0l0 208c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-208c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0l0 208c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-208c0-8.8 7.2-16 16-16s16 7.2 16 16z" />
+                    </svg>
+                    Delete
+                  </div>
+                </div>
+              </div>
+              <div className="w-full mt-6">
+                <form className="flex flex-col gap-3">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+    focus:pt-6
+    focus:pb-2
+    [&:not(:placeholder-shown)]:pt-6
+    [&:not(:placeholder-shown)]:pb-2
+    autofill:pt-6
+    autofill:pb-2"
+                      placeholder="Full name"
+                    />
+                    <label
+                      className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
+      peer-focus:scale-90
+      peer-focus:translate-x-0.5
+      peer-focus:-translate-y-1.5
+      peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
+      peer-[:not(:placeholder-shown)]:scale-90
+      peer-[:not(:placeholder-shown)]:translate-x-0.5
+      peer-[:not(:placeholder-shown)]:-translate-y-1.5
+      peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+                    >
+                      Full name
+                    </label>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="relative">
+                      <select
+                        className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+    focus:pt-6
+    focus:pb-2
+    [&:not(:placeholder-shown)]:pt-6
+    [&:not(:placeholder-shown)]:pb-2
+    autofill:pt-6
+    autofill:pb-2"
+                      >
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="others">Others</option>
+                      </select>
+
+                      <label
+                        className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
+      peer-focus:scale-90
+      peer-focus:translate-x-0.5
+      peer-focus:-translate-y-1.5
+      peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
+      peer-[:not(:placeholder-shown)]:scale-90
+      peer-[:not(:placeholder-shown)]:translate-x-0.5
+      peer-[:not(:placeholder-shown)]:-translate-y-1.5
+      peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+                      >
+                        Gender
+                      </label>
+                    </div>
+
+                    <div className="relative">
+                      <input
+                        type="email"
+                        className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+    focus:pt-6
+    focus:pb-2
+    [&:not(:placeholder-shown)]:pt-6
+    [&:not(:placeholder-shown)]:pb-2
+    autofill:pt-6
+    autofill:pb-2"
+                        placeholder="Email"
+                      />
+                      <label
+                        className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
+      peer-focus:scale-90
+      peer-focus:translate-x-0.5
+      peer-focus:-translate-y-1.5
+      peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
+      peer-[:not(:placeholder-shown)]:scale-90
+      peer-[:not(:placeholder-shown)]:translate-x-0.5
+      peer-[:not(:placeholder-shown)]:-translate-y-1.5
+      peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+                      >
+                        Email
+                      </label>
+                    </div>
+
+                    <div className="relative">
+                      <input
+                        type="text"
+                        className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+    focus:pt-6
+    focus:pb-2
+    [&:not(:placeholder-shown)]:pt-6
+    [&:not(:placeholder-shown)]:pb-2
+    autofill:pt-6
+    autofill:pb-2"
+                        placeholder="Phone"
+                      />
+                      <label
+                        className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
+      peer-focus:scale-90
+      peer-focus:translate-x-0.5
+      peer-focus:-translate-y-1.5
+      peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
+      peer-[:not(:placeholder-shown)]:scale-90
+      peer-[:not(:placeholder-shown)]:translate-x-0.5
+      peer-[:not(:placeholder-shown)]:-translate-y-1.5
+      peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+                      >
+                        Phone
+                      </label>
+                    </div>
+
+                    <div className="relative">
+                      <input
+                        type="date"
+                        className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+    focus:pt-6
+    focus:pb-2
+    [&:not(:placeholder-shown)]:pt-6
+    [&:not(:placeholder-shown)]:pb-2
+    autofill:pt-6
+    autofill:pb-2"
+                        placeholder="Date of Birth"
+                      />
+                      <label
+                        className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
+      peer-focus:scale-90
+      peer-focus:translate-x-0.5
+      peer-focus:-translate-y-1.5
+      peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
+      peer-[:not(:placeholder-shown)]:scale-90
+      peer-[:not(:placeholder-shown)]:translate-x-0.5
+      peer-[:not(:placeholder-shown)]:-translate-y-1.5
+      peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+                      >
+                        Date of Birth
+                      </label>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t">
+              <button
+                type="button"
+                className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                data-hs-overlay="#hs-scale-animation-modal"
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+              >
+                Save changes
+              </button>
             </div>
           </div>
         </div>
