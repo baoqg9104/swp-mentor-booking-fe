@@ -50,7 +50,7 @@ const ManageAppointments = () => {
     <>
       <div className="flex">
         <div className="w-[50%]">
-          <div className="-m-1.5 overflow-x-auto">
+          <div className="-m-1.5 overflow-x-hidden">
             <div className="p-1.5 min-w-full inline-block align-middle">
               <div className="overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">

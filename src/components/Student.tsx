@@ -1,5 +1,6 @@
 import {
   faBell,
+  faCalendarCheck,
   faCalendarPlus,
   faHouse,
   faPenToSquare,
@@ -17,6 +18,7 @@ import { IStaticMethods } from "preline/preline";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import BookingMentor from "./BookingMentor";
+import MyAppointments from "./MyAppointments";
 
 declare global {
   interface Window {
@@ -151,6 +153,8 @@ const Student = () => {
               >
                 {navLink === "dashboard" && "Dashboard"}
                 {navLink === "group" && "Group"}
+                {navLink === "booking-mentor" && "Booking Mentor"}
+                {navLink === "my-appoinments" && "My Appointments"}
                 {navLink === "edit-profile" && "Edit Profile"}
               </li>
             </ol>
@@ -229,6 +233,20 @@ const Student = () => {
                     Booking Mentor
                   </button>
                 </li>
+                <li>
+                  <button
+                    onClick={() => setNavLink("my-appoinments")}
+                    className={`${
+                      navLink === "my-appoinments" && "bg-gray-100"
+                    } w-full  flex gap-x-2.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                  >
+                    <FontAwesomeIcon
+                      icon={faCalendarCheck}
+                      className="text-[16px] mt-[3px]"
+                    />
+                    My Appointments
+                  </button>
+                </li>
 
                 <li>
                   <button
@@ -255,6 +273,7 @@ const Student = () => {
         {navLink === "dashboard" && <StudentDashboard />}
         {navLink === "group" && <StudentGroup />}
         {navLink === "booking-mentor" && <BookingMentor />}
+        {navLink === "my-appoinments" && <MyAppointments />}
         {navLink === "edit-profile" && <EditProfileStudent />}
       </div>
     </>
