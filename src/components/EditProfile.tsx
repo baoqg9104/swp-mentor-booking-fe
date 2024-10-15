@@ -4,6 +4,7 @@ import {
   faGift,
   faUser,
   faCamera,
+  faLink,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -200,6 +201,13 @@ const EditProfile = () => {
                           className="size-4 mr-2 text-gray-500"
                         />
                         <span className="text-gray-500">Phone</span>
+                      </div>
+                      <div className="flex items-center">
+                        <FontAwesomeIcon
+                          icon={faLink}
+                          className="size-[18px] mr-2 text-gray-500"
+                        />
+                        <span className="text-gray-500">Meet URL</span>
                       </div>
                     </div>
                   </div>

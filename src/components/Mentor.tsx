@@ -2,6 +2,7 @@ import {
   faBell,
   faCalendarCheck,
   faCalendarDays,
+  faCommentDots,
   faHistory,
   faHouse,
   faPenToSquare,
@@ -19,6 +20,7 @@ import "preline/preline";
 import { IStaticMethods } from "preline/preline";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import MentorFeedback from "./MentorFeedback";
 
 declare global {
   interface Window {
@@ -27,7 +29,6 @@ declare global {
 }
 
 const Mentor = () => {
-
   const location = useLocation();
 
   useEffect(() => {
@@ -155,6 +156,7 @@ const Mentor = () => {
                 {navLink === "dashboard" && "Dashboard"}
                 {navLink === "calendar" && "Manage Calendar"}
                 {navLink === "appointments" && "Manage Appointments"}
+                {navLink === "feedback" && "Feedback"}
                 {navLink === "transaction-history" && "Transaction History"}
                 {navLink === "edit-profile" && "Edit Profile"}
               </li>
@@ -233,6 +235,20 @@ const Mentor = () => {
                       className="text-[18px] mt-[1px]"
                     />
                     Manage Appointments
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => setNavLink("feedback")}
+                    className={`${
+                      navLink === "feedback" && "bg-gray-100"
+                    } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                  >
+                    <FontAwesomeIcon
+                      icon={faCommentDots}
+                      className="text-[18px] mt-[1px]"
+                    />
+                    Feedback
                   </button>
                 </li>
                 <li>
@@ -418,6 +434,7 @@ const Mentor = () => {
         {navLink === "dashboard" && <MentorDashboard />}
         {navLink === "calendar" && <ManageCalendar />}
         {navLink === "appointments" && <ManageAppointments />}
+        {navLink === "feedback" && <MentorFeedback />}
         {navLink === "transaction-history" && <MentorTransactionHistory />}
         {navLink === "edit-profile" && <EditProfile />}
       </div>
