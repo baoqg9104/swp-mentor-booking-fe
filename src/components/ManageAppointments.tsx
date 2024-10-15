@@ -48,9 +48,9 @@ const ManageAppointments = () => {
 
   return (
     <>
-      <div className="flex">
-        <div className="w-[55%]">
-          <div className="-m-1.5 overflow-x-hidden">
+      <div className="flex flex-col py-10 px-16">
+        <div className="bg-white rounded-lg shadow-md">
+          <div className="-m-1.5 overflow-x-auto">
             <div className="p-1.5 min-w-full inline-block align-middle">
               <div className="overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-200">
@@ -90,6 +90,12 @@ const ManageAppointments = () => {
                         scope="col"
                         className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
                       >
+                        Group
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
+                      >
                         Action
                       </th>
                     </tr>
@@ -106,18 +112,24 @@ const ManageAppointments = () => {
                         601
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
-                        1 
+                        1
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
-                        <span className="text-[#209526] font-medium">
-                          Approved
-                        </span>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
+                        <div className="flex items-center">
+                          <span className="inline-flex items-center justify-center p-[0.25rem] bg-[#CFF1E6] rounded-full">
+                            <span className="size-[0.375rem] bg-[#10B981] inline-block rounded-full"></span>
+                          </span>
+                          <span className="ml-[6px]">Approved</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
+                        1 - SE1856
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
                         <button
                           disabled
                           type="button"
-                          className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent focus:outline-none disabled:opacity-50 disabled:pointer-events-none text-gray-500 hover:text-gray-700"
+                          className="inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent focus:outline-none disabled:opacity-50 disabled:pointer-events-none text-gray-500 hover:text-gray-700"
                           aria-haspopup="dialog"
                           aria-expanded="false"
                           aria-controls="hs-scale-animation-modal"
@@ -141,10 +153,19 @@ const ManageAppointments = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
                         0
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-green-500 text-center">
-                        <span className="text-[#7c7c7c] font-medium">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
+                        {/* <span className="text-[#7c7c7c] font-medium">
                           Completed
-                        </span>
+                        </span> */}
+                        <div className="flex items-center">
+                          <span className="inline-flex items-center justify-center p-[0.25rem] bg-gray-200 rounded-full">
+                            <span className="size-[0.375rem] bg-[#adadad] inline-block rounded-full"></span>
+                          </span>
+                          <span className="ml-[6px]">Completed</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
+                        1 - SE1856
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
                         <button
@@ -174,15 +195,24 @@ const ManageAppointments = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
                         3
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
-                        <span className="text-[#b7ba27] font-medium">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
+                        {/* <span className="text-[#b7ba27] font-medium">
                           Pending
-                        </span>
+                        </span> */}
+                        <div className="flex items-center">
+                          <span className="inline-flex items-center justify-center p-[0.25rem] bg-yellow-100 rounded-full">
+                            <span className="size-[0.375rem] bg-[#e9e931] inline-block rounded-full"></span>
+                          </span>
+                          <span className="ml-[6px]">Pending</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
+                        {/* 1 - SE1856 */}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
                         <button
                           type="button"
-                          className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent focus:outline-none disabled:opacity-50 disabled:pointer-events-none text-gray-500 hover:text-gray-700"
+                          className="inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent focus:outline-none disabled:opacity-50 disabled:pointer-events-none text-gray-500 hover:text-gray-700"
                           aria-haspopup="dialog"
                           aria-expanded="false"
                           aria-controls="hs-scale-animation-modal"
@@ -200,13 +230,14 @@ const ManageAppointments = () => {
         </div>
         <ScheduleComponent
           readonly
-          width="50%"
+          width="100%"
           height={635}
           startHour="07:00"
           selectedDate={new Date(2024, 8, 27)}
           eventSettings={{
             dataSource: data,
           }}
+          className="mt-10"
         >
           <Inject services={[Day, Week, WorkWeek, Month, Agenda]} />
         </ScheduleComponent>
@@ -376,7 +407,7 @@ const ManageAppointments = () => {
                 type="button"
                 className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
               >
-                Save changes
+                Approve
               </button>
             </div>
           </div>
