@@ -602,6 +602,7 @@ const BookingMentor = () => {
                     if (skill !== "") {
                       setOpen(false);
                       setOpenSuccess(true);
+                      setSkill("");
                       //call api -> success or fail
                     } else {
                       toast.error("Please choose skill");
