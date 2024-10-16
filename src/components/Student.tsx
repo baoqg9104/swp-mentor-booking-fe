@@ -11,18 +11,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import EditProfileStudent from "./EditProfileStudent";
-import StudentDashboard from "./StudentDashboard";
-import StudentGroup from "./StudentGroup";
 
 import "preline/preline";
 import { IStaticMethods } from "preline/preline";
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import BookingMentor from "./BookingMentor";
-import MyAppointments from "./MyAppointments";
-import StudentTransactionHistory from "./StudentTransactionHistory";
-import StudentFeedback from "./StudentFeedback";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 
 declare global {
   interface Window {
@@ -197,107 +190,128 @@ const Student = () => {
             >
               <ul className="flex flex-col text-[15px]">
                 <li>
-                  <button
+                  <NavLink
+                    to="/student/dashboard"
                     onClick={() => setNavLink("dashboard")}
-                    className={`${
-                      navLink === "dashboard" && "bg-gray-100"
-                    } w-full  flex gap-x-2.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                    className={({ isActive }) =>
+                      `${
+                        isActive ? "bg-gray-100" : ""
+                      } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`
+                    }
                   >
                     <FontAwesomeIcon
                       icon={faHouse}
                       className="text-[16px] mt-[3px]"
                     />
                     Dashboard
-                  </button>
+                  </NavLink>
                 </li>
                 <li>
-                  <button
+                  <NavLink
+                    to="/student/group"
                     onClick={() => setNavLink("group")}
-                    className={`${
-                      navLink === "group" && "bg-gray-100"
-                    } w-full  flex gap-x-2.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                    className={({ isActive }) =>
+                      `${
+                        isActive ? "bg-gray-100" : ""
+                      } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`
+                    }
                   >
                     <FontAwesomeIcon
                       icon={faUserGroup}
                       className="text-[16px] mt-[3px]"
                     />
                     Group
-                  </button>
+                  </NavLink>
                 </li>
 
                 <li>
-                  <button
+                  <NavLink
+                    to="/student/booking-mentor"
                     onClick={() => setNavLink("booking-mentor")}
-                    className={`${
-                      navLink === "booking-mentor" && "bg-gray-100"
-                    } w-full  flex gap-x-2.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                    className={({ isActive }) =>
+                      `${
+                        isActive ? "bg-gray-100" : ""
+                      } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`
+                    }
                   >
                     <FontAwesomeIcon
                       icon={faCalendarPlus}
                       className="text-[16px] mt-[3px]"
                     />
                     Booking Mentor
-                  </button>
+                  </NavLink>
                 </li>
 
                 <li>
-                  <button
+                  <NavLink
+                    to="/student/my-appointments"
                     onClick={() => setNavLink("my-appoinments")}
-                    className={`${
-                      navLink === "my-appoinments" && "bg-gray-100"
-                    } w-full  flex gap-x-2.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                    className={({ isActive }) =>
+                      `${
+                        isActive ? "bg-gray-100" : ""
+                      } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`
+                    }
                   >
                     <FontAwesomeIcon
                       icon={faCalendarCheck}
                       className="text-[16px] mt-[3px]"
                     />
                     My Appointments
-                  </button>
+                  </NavLink>
                 </li>
 
                 <li>
-                  <button
+                  <NavLink
+                    to="/student/feedback"
                     onClick={() => setNavLink("feedback")}
-                    className={`${
-                      navLink === "feedback" && "bg-gray-100"
-                    } w-full  flex gap-x-2.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                    className={({ isActive }) =>
+                      `${
+                        isActive ? "bg-gray-100" : ""
+                      } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`
+                    }
                   >
                     <FontAwesomeIcon
                       icon={faCommentDots}
                       className="text-[16px] mt-[3px]"
                     />
                     Feedback
-                  </button>
+                  </NavLink>
                 </li>
 
                 <li>
-                  <button
+                  <NavLink
+                    to="/student/transaction-history"
                     onClick={() => setNavLink("transaction-history")}
-                    className={`${
-                      navLink === "transaction-history" && "bg-gray-100"
-                    } w-full  flex gap-x-2.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                    className={({ isActive }) =>
+                      `${
+                        isActive ? "bg-gray-100" : ""
+                      } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`
+                    }
                   >
                     <FontAwesomeIcon
                       icon={faHistory}
                       className="text-[16px] mt-[3px]"
                     />
                     Transaction History
-                  </button>
+                  </NavLink>
                 </li>
 
                 <li>
-                  <button
+                  <NavLink
+                    to="/student/edit-profile"
                     onClick={() => setNavLink("edit-profile")}
-                    className={`${
-                      navLink === "edit-profile" && "bg-gray-100"
-                    } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                    className={({ isActive }) =>
+                      `${
+                        isActive ? "bg-gray-100" : ""
+                      } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`
+                    }
                   >
                     <FontAwesomeIcon
                       icon={faPenToSquare}
                       className="text-[18px] mt-[1px]"
                     />
                     Edit Profile
-                  </button>
+                  </NavLink>
                 </li>
               </ul>
             </nav>
@@ -305,15 +319,8 @@ const Student = () => {
         </div>
       </div>
 
-      {/* Body */}
       <div className="w-full lg:ps-64 bg-[#F9FAFB]">
-        {navLink === "dashboard" && <StudentDashboard />}
-        {navLink === "group" && <StudentGroup />}
-        {navLink === "booking-mentor" && <BookingMentor />}
-        {navLink === "my-appoinments" && <MyAppointments />}
-        {navLink === "feedback" && <StudentFeedback />}
-        {navLink === "transaction-history" && <StudentTransactionHistory />}
-        {navLink === "edit-profile" && <EditProfileStudent />}
+        <Outlet />
       </div>
     </>
   );

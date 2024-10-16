@@ -11,8 +11,6 @@ import {
 import { registerLicense } from "@syncfusion/ej2-base";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faCircleCheck,
-  faCircleXmark,
   faSort,
 } from "@fortawesome/free-solid-svg-icons";
 registerLicense(
@@ -23,6 +21,7 @@ import "preline/preline";
 import { IStaticMethods } from "preline/preline";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { colors } from "@mui/material";
 
 declare global {
   interface Window {
@@ -40,7 +39,7 @@ const ManageAppointments = () => {
   const data = [
     {
       Id: 1,
-      Subject: "3 Booked",
+      Subject: "3 Bookings",
       StartTime: new Date(2024, 8, 26, 7, 0),
       EndTime: new Date(2024, 8, 26, 8, 0),
     },
@@ -233,7 +232,6 @@ const ManageAppointments = () => {
           width="100%"
           height={635}
           startHour="07:00"
-          selectedDate={new Date(2024, 8, 27)}
           eventSettings={{
             dataSource: data,
           }}

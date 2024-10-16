@@ -341,7 +341,6 @@ const ManageCalendar = () => {
             width="60%"
             startHour="07:00"
             height={635}
-            selectedDate={new Date(2024, 8, 27)}
             eventSettings={{
               dataSource: data,
             }}

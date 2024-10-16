@@ -10,17 +10,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import MentorDashboard from "./MentorDashboard";
-import ManageCalendar from "./ManageCalendar";
-import ManageAppointments from "./ManageAppointments";
-import EditProfile from "./EditProfile";
-import MentorTransactionHistory from "./MentorTransactionHistory";
 
 import "preline/preline";
 import { IStaticMethods } from "preline/preline";
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import MentorFeedback from "./MentorFeedback";
+import { useLocation, NavLink, Outlet } from "react-router-dom";
 
 declare global {
   interface Window {
@@ -194,249 +188,118 @@ const Mentor = () => {
             >
               <ul className="flex flex-col text-[15px]">
                 <li>
-                  <button
+                  <NavLink
+                    to="/mentor/dashboard"
                     onClick={() => setNavLink("dashboard")}
-                    className={`${
-                      navLink === "dashboard" && "bg-gray-100"
-                    } w-full  flex gap-x-2.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                    className={({ isActive }) =>
+                      `${
+                        isActive ? "bg-gray-100" : ""
+                      } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`
+                    }
                   >
                     <FontAwesomeIcon
                       icon={faHouse}
                       className="text-[16px] mt-[3px]"
                     />
                     Dashboard
-                  </button>
+                  </NavLink>
                 </li>
 
                 <li>
-                  <button
+                  <NavLink
+                    to="/mentor/calendar"
                     onClick={() => setNavLink("calendar")}
-                    className={`${
-                      navLink === "calendar" && "bg-gray-100"
-                    } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                    className={({ isActive }) =>
+                      `${
+                        isActive ? "bg-gray-100" : ""
+                      } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`
+                    }
                   >
                     <FontAwesomeIcon
                       icon={faCalendarDays}
                       className="text-[18px] mt-[1px]"
                     />
                     Manage Calendar
-                  </button>
+                  </NavLink>
                 </li>
 
                 <li>
-                  <button
+                  <NavLink
+                    to="/mentor/appointments"
                     onClick={() => setNavLink("appointments")}
-                    className={`${
-                      navLink === "appointments" && "bg-gray-100"
-                    } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                    className={({ isActive }) =>
+                      `${
+                        isActive ? "bg-gray-100" : ""
+                      } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`
+                    }
                   >
                     <FontAwesomeIcon
                       icon={faCalendarCheck}
                       className="text-[18px] mt-[1px]"
                     />
                     Manage Appointments
-                  </button>
+                  </NavLink>
                 </li>
                 <li>
-                  <button
+                  <NavLink
+                    to="/mentor/feedback"
                     onClick={() => setNavLink("feedback")}
-                    className={`${
-                      navLink === "feedback" && "bg-gray-100"
-                    } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                    className={({ isActive }) =>
+                      `${
+                        isActive ? "bg-gray-100" : ""
+                      } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`
+                    }
                   >
                     <FontAwesomeIcon
                       icon={faCommentDots}
                       className="text-[18px] mt-[1px]"
                     />
                     Feedback
-                  </button>
+                  </NavLink>
                 </li>
                 <li>
-                  <button
+                  <NavLink
+                    to="/mentor/transaction-history"
                     onClick={() => setNavLink("transaction-history")}
-                    className={`${
-                      navLink === "transaction-history" && "bg-gray-100"
-                    } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                    className={({ isActive }) =>
+                      `${
+                        isActive ? "bg-gray-100" : ""
+                      } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`
+                    }
                   >
                     <FontAwesomeIcon
                       icon={faHistory}
                       className="text-[18px] mt-[1px]"
                     />
                     Transaction History
-                  </button>
+                  </NavLink>
                 </li>
 
                 <li>
-                  <button
+                  <NavLink
+                    to="/mentor/edit-profile"
                     onClick={() => setNavLink("edit-profile")}
-                    className={`${
-                      navLink === "edit-profile" && "bg-gray-100"
-                    } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                    className={({ isActive }) =>
+                      `${
+                        isActive ? "bg-gray-100" : ""
+                      } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`
+                    }
                   >
                     <FontAwesomeIcon
                       icon={faPenToSquare}
                       className="text-[18px] mt-[1px]"
                     />
                     Edit Profile
-                  </button>
+                  </NavLink>
                 </li>
-
-                {/* <li className="hs-accordion" id="projects-accordion">
-                  <button
-                    type="button"
-                    className="hs-accordion-toggle w-full text-start flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
-                    aria-expanded="true"
-                    aria-controls="projects-accordion-child"
-                  >
-                    <svg
-                      className="shrink-0 size-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <rect width="20" height="14" x="2" y="7" rx="2" ry="2" />
-                      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
-                    </svg>
-                    Projects
-                    <svg
-                      className="hs-accordion-active:block ms-auto hidden size-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="m18 15-6-6-6 6" />
-                    </svg>
-                    <svg
-                      className="hs-accordion-active:hidden ms-auto block size-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="m6 9 6 6 6-6" />
-                    </svg>
-                  </button>
-
-                  <div
-                    id="projects-accordion-child"
-                    className="hs-accordion-content w-full overflow-hidden transition-[height] duration-300 hidden"
-                    role="region"
-                    aria-labelledby="projects-accordion"
-                  >
-                    <ul className="ps-8 pt-1 space-y-1">
-                      <li>
-                        <a
-                          className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
-                          href="#"
-                        >
-                          Link 1
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
-                          href="#"
-                        >
-                          Link 2
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          className="flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
-                          href="#"
-                        >
-                          Link 3
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                </li>
-
-                <li>
-                  <a
-                    className="w-full flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-100"
-                    href="#"
-                  >
-                    <svg
-                      className="shrink-0 size-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
-                      <line x1="16" x2="16" y1="2" y2="6" />
-                      <line x1="8" x2="8" y1="2" y2="6" />
-                      <line x1="3" x2="21" y1="10" y2="10" />
-                      <path d="M8 14h.01" />
-                      <path d="M12 14h.01" />
-                      <path d="M16 14h.01" />
-                      <path d="M8 18h.01" />
-                      <path d="M12 18h.01" />
-                      <path d="M16 18h.01" />
-                    </svg>
-                    Calendar
-                  </a>
-                </li>
-                <li>
-                  <a
-                    className="w-full flex items-center gap-x-3.5 py-2 px-2.5 text-sm text-gray-800 rounded-lg hover:bg-gray-100"
-                    href="#"
-                  >
-                    <svg
-                      className="shrink-0 size-4"
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                    </svg>
-                    Documentation
-                  </a>
-                </li> */}
               </ul>
             </nav>
           </div>
         </div>
       </div>
 
-      {/* Body */}
       <div className="w-full lg:ps-64 bg-[#F9FAFB]">
-        {navLink === "dashboard" && <MentorDashboard />}
-        {navLink === "calendar" && <ManageCalendar />}
-        {navLink === "appointments" && <ManageAppointments />}
-        {navLink === "feedback" && <MentorFeedback />}
-        {navLink === "transaction-history" && <MentorTransactionHistory />}
-        {navLink === "edit-profile" && <EditProfile />}
+        <Outlet />
       </div>
     </>
   );
