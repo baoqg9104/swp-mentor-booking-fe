@@ -1,10 +1,10 @@
-<<<<<<< HEAD
+
 import {TestStudents} from './shared/listOfOrchids.tsx' ;
 const tStyleHeader = 'px-6 py-3 text-start font-medium text-gray-500 uppercase';
 const tStyleBody = 'px-6 py-3 text-start whitespace-nowrap font-medium text-gray-800';
 const buttonStyle ='bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded';
 
-const ManageStudents = () => {
+export default function ManageStudents(){
   return (
       <>
         <div className="mb-3 md:w-96 mx-auto">
@@ -89,17 +89,4 @@ const ManageStudents = () => {
         </div>
     </div>
     </>
-    
-=======
-
-const ManageStudents = () => {
-  return (
-    <>
-      <h1>Manage Student</h1>
-    </>
-
->>>>>>> b128955845bfaf973baf6357080c9f8fc2d6a192
-  )
-}
-
-export default ManageStudents
+    )}
