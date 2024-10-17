@@ -1,0 +1,50 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@import "../node_modules/@syncfusion/ej2-base/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-buttons/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-calendars/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-dropdowns/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-inputs/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-navigations/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-popups/styles/material.css";
+@import "../node_modules/@syncfusion/ej2-react-schedule/styles/material.css";
+
+body {
+  font-family: "Poppins", sans-serif;
+}
+
+.e-today {
+  display: none !important;
+}
+
+.e-toolbar-item.e-schedule-seperator.e-separator {
+  display: none !important;
+}
+
+.e-toolbar-item.e-views.e-work-week {
+  display: none !important;
+}
+
+.css-1u9des2-indicatorSeparator {
+  display: none !important;
+}
+
+.css-tj5bde-Svg {
+  fill: #7f8286 !important;
+  width: 18px !important;
+}
+
+.css-13cymwt-control {
+  padding: 5px;
+  
+}
+
+.css-t3ipsp-control {
+  padding: 5px;
+}
+
+/* .css-1dimb5e-singleValue {
+  color: #7A7A7A !important;
+} */
