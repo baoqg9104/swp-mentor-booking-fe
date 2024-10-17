@@ -1,4 +1,5 @@
 
+<<<<<<< HEAD
 import {TestMentors} from './shared/listOfOrchids' ;
 const tStyleHeader = 'px-6 py-3 text-start font-medium text-gray-500 uppercase';
 const tStyleBody = 'px-6 py-3 text-start whitespace-nowrap font-medium text-gray-800';
@@ -124,3 +125,12 @@ export default function ManageMentors(){
     </>
     );
 }
+=======
+const ManageMentors = () => {
+  return (
+    <div>abc</div>
+  )
+}
+
+export default ManageMentors
+>>>>>>> b128955845bfaf973baf6357080c9f8fc2d6a192
