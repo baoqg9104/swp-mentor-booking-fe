@@ -8,20 +8,15 @@ import {
   Inject,
 } from "@syncfusion/ej2-react-schedule";
 
-import { registerLicense } from "@syncfusion/ej2-base";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSort,
 } from "@fortawesome/free-solid-svg-icons";
-registerLicense(
-  "Ngo9BigBOggjHTQxAR8/V1NDaF5cWGNCf1NpR2ZGfV5ycEVHYVZTQHxcS00DNHVRdkdnWXZcdnRVRGBdV010V0M="
-);
 
 import "preline/preline";
 import { IStaticMethods } from "preline/preline";
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { colors } from "@mui/material";
 
 declare global {
   interface Window {

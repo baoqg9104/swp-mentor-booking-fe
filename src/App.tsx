@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import Login from "./components/Login";
 import Navbar from "./components/Navbar";
 import Signup from "./components/Signup";
@@ -9,7 +9,7 @@ import Student from "./components/Student";
 import _404Page from "./components/_404Page";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { AuthProvider } from "./components/AuthContext";
+import { AuthContext, AuthProvider } from "./components/AuthContext";
 import MentorDashboard from "./components/MentorDashboard";
 import ManageCalendar from "./components/ManageCalendar";
 import ManageAppointments from "./components/ManageAppointments";
@@ -23,50 +23,180 @@ import MyAppointments from "./components/MyAppointments";
 import StudentFeedback from "./components/StudentFeedback";
 import StudentTransactionHistory from "./components/StudentTransactionHistory";
 import EditProfileStudent from "./components/EditProfileStudent";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { useContext } from "react";
+
+import PuffLoader from "react-spinners/PuffLoader";
+
+import { registerLicense } from "@syncfusion/ej2-base";
+registerLicense(
+  "Ngo9BigBOggjHTQxAR8/V1NDaF5cWGNCf1NpR2ZGfV5ycEVHYVZTQHxcS00DNHVRdkdnWXZcdnRVRGBdV010V0M="
+);
 
 const App = () => {
   return (
+    <AuthProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </AuthProvider>
+  );
+};
+
+const AppContent = () => {
+  const authContext = useContext(AuthContext);
+
+  if (!authContext) {
+    throw new Error("AuthContext is undefined");
+  }
+
+  const { isLoading } = authContext;
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-[90vh] flex items-center justify-center">
+        <PuffLoader color="#ff9000" size={100} />
+      </div>
+    );
+  }
+
+  return (
     <>
-      <AuthProvider>
-        <BrowserRouter>
-          <Navbar />
-          <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/admin" element={<Admin />} />
+      <Navbar />
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
-            <Route path="/mentor" element={<Mentor />}>
-              <Route path="dashboard" element={<MentorDashboard />} />
-              <Route path="calendar" element={<ManageCalendar />} />
-              <Route path="appointments" element={<ManageAppointments />} />
-              <Route path="feedback" element={<MentorFeedback />} />
-              <Route
-                path="transaction-history"
-                element={<MentorTransactionHistory />}
-              />
-              <Route path="edit-profile" element={<EditProfile />} />
-            </Route>
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <Admin />
+            </ProtectedRoute>
+          }
+        />
 
-            <Route path="/student" element={<Student />}>
-              <Route path="dashboard" element={<StudentDashboard />} />
-              <Route path="group" element={<StudentGroup />} />
-              <Route path="booking-mentor" element={<BookingMentor />} />
-              <Route path="my-appointments" element={<MyAppointments />} />
-              <Route path="feedback" element={<StudentFeedback />} />
-              <Route
-                path="transaction-history"
-                element={<StudentTransactionHistory />}
-              />
-              <Route path="edit-profile" element={<EditProfileStudent />} />
-            </Route>
+        <Route
+          path="/mentor"
+          element={
+            <ProtectedRoute allowedRoles={["Mentor"]}>
+              <Mentor />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            path="dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["Mentor"]}>
+                <MentorDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="calendar"
+            element={
+              <ProtectedRoute allowedRoles={["Mentor"]}>
+                <ManageCalendar />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="appointments"
+            element={
+              <ProtectedRoute allowedRoles={["Mentor"]}>
+                <ManageAppointments />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="feedback" element={<MentorFeedback />} />
+          <Route
+            path="transaction-history"
+            element={
+              <ProtectedRoute allowedRoles={["Mentor"]}>
+                <MentorTransactionHistory />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="edit-profile"
+            element={
+              <ProtectedRoute allowedRoles={["Mentor"]}>
+                <EditProfile />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
 
-            <Route path="*" element={<_404Page />} />
-          </Routes>
-          <ToastContainer />
-        </BrowserRouter>
-      </AuthProvider>
+        <Route
+          path="/student"
+          element={
+            <ProtectedRoute allowedRoles={["Student"]}>
+              <Student />
+            </ProtectedRoute>
+          }
+        >
+          <Route
+            path="dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["Student"]}>
+                <StudentDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="group"
+            element={
+              <ProtectedRoute allowedRoles={["Student"]}>
+                <StudentGroup />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="booking-mentor"
+            element={
+              <ProtectedRoute allowedRoles={["Student"]}>
+                <BookingMentor />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="my-appointments"
+            element={
+              <ProtectedRoute allowedRoles={["Student"]}>
+                <MyAppointments />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="feedback"
+            element={
+              <ProtectedRoute allowedRoles={["Student"]}>
+                <StudentFeedback />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="transaction-history"
+            element={
+              <ProtectedRoute allowedRoles={["Student"]}>
+                <StudentTransactionHistory />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="edit-profile"
+            element={
+              <ProtectedRoute allowedRoles={["Student"]}>
+                <EditProfileStudent />
+              </ProtectedRoute>
+            }
+          />
+        </Route>
+
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+      <ToastContainer />
     </>
   );
 };

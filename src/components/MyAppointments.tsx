@@ -29,6 +29,8 @@ import {
   WorkWeek,
 } from "@syncfusion/ej2-react-schedule";
 
+
+
 const MyAppointments = () => {
   const location = useLocation();
 

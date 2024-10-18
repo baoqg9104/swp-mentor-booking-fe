@@ -26,8 +26,6 @@ const Login = () => {
 
   const navigate = useNavigate();
 
-  const authContext = useContext(AuthContext);
-
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -38,20 +36,27 @@ const Login = () => {
         role,
       };
 
+      const authContext = useContext(AuthContext);
+
       if (authContext) {
         const { login } = authContext;
-        const roleId = await login(data);
+        const role = await login(data); 
 
-        if (roleId === "1") {
-          navigate("/student");
-        } else if (roleId === "2") {
-          navigate("/mentor");
-        } else if (roleId === "3") {
-          navigate("/admin");
+        if (role === "Đợi admin approved.") {
+          toast.error("Wait for admin approved.");
+        } else if (role === "Student") {
+          toast.success("Login successful!");
+          navigate("/student/dashboard");
+        } else if (role === "Mentor") {
+          toast.success("Login successful!");
+          navigate("/mentor/dashboard");
+        } else if (role === "Admin") {
+          toast.success("Login successful!");
+          navigate("/admin/dashboard");
+        } else {
+          toast.error("Invalid email or password!");
         }
       }
-
-      toast.success("Login successful!");
     } catch (error) {
       toast.error("Invalid email or password!");
     }
@@ -86,6 +91,7 @@ const Login = () => {
                   onChange={(e) => setPassword(e.target.value)}
                 />
                 <button
+                  tabIndex={-1}
                   type="button"
                   data-hs-toggle-password='{
         "target": "#hs-toggle-password"
@@ -142,7 +148,9 @@ const Login = () => {
                 className="mt-4 w-full h-[55px] bg-[#f7f7f7] pl-5 rounded-[10px] text-[18px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
                 onChange={(e) => setRole(e.target.value)}
               >
-                <option value="" disabled>Login as</option>
+                <option value="" disabled>
+                  Login as
+                </option>
                 <option value="student">Student</option>
                 <option value="mentor">Mentor</option>
                 <option value="admin">Admin</option>
