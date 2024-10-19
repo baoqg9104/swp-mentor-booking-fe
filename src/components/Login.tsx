@@ -25,6 +25,7 @@ const Login = () => {
   const [role, setRole] = useState<string>("");
 
   const navigate = useNavigate();
+  const authContext = useContext(AuthContext);
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -35,8 +36,7 @@ const Login = () => {
         password,
         role,
       };
-
-      const authContext = useContext(AuthContext);
+      
 
       if (authContext) {
         const { login } = authContext;
@@ -58,6 +58,7 @@ const Login = () => {
         }
       }
     } catch (error) {
+      console.log(error);
       toast.error("Invalid email or password!");
     }
   };
@@ -151,9 +152,9 @@ const Login = () => {
                 <option value="" disabled>
                   Login as
                 </option>
-                <option value="student">Student</option>
-                <option value="mentor">Mentor</option>
-                <option value="admin">Admin</option>
+                <option value="Student">Student</option>
+                <option value="Mentor">Mentor</option>
+                <option value="Admin">Admin</option>
               </select>
 
               <Link
