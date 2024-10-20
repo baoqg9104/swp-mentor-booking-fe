@@ -7,13 +7,15 @@ import {
   faLink,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
 
 import "preline/preline";
 import { IStaticMethods } from "preline/preline";
-import { useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import Select from "react-select";
+import { AuthContext } from "./AuthContext";
 
 const skills = [
   // Frontend Development
@@ -150,12 +152,78 @@ declare global {
   }
 }
 
+interface MentorInformation {
+  fullName: string;
+  gender: string;
+  email: string;
+  dateOfBirth: string;
+  phone: string;
+  meetUrl: string;
+}
+
 const EditProfile = () => {
   const location = useLocation();
 
   useEffect(() => {
     window.HSStaticMethods.autoInit();
   }, [location.pathname]);
+
+  const authContext = useContext(AuthContext);
+  if (!authContext) {
+    throw new Error("AuthContext is undefined");
+  }
+
+  const { authData } = authContext;
+
+  const [mentorInformation, setMentorInformation] =
+    useState<MentorInformation>();
+
+  useEffect(() => {
+    const getMentorById = async () => {
+      try {
+        // Make the GET request
+        const response = await axios.get(
+          `https://localhost:7007/api/Mentor/${authData?.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`, // Replace YOUR_TOKEN_HERE with your actual token
+            },
+          }
+        );
+
+        const data: MentorInformation = {
+          fullName: response.data.mentorName,
+          gender: response.data.gender,
+          email: response.data.email,
+          dateOfBirth: response.data.dateOfBirth,
+          phone: response.data.phone,
+          meetUrl: response.data.meetUrl,
+        };
+
+        setMentorInformation(data);
+        setFullName(data.fullName!);
+        setGender(data.gender ? data.gender : "");
+        setEmail(data.email ? data.email : "");
+        setPhone(data.phone ? data.phone : "");
+        setDateOfBirth(data.dateOfBirth ? data.dateOfBirth : "");
+        setMeetUrl(data.meetUrl ? data.meetUrl : "");
+
+        // Set the response data
+      } catch (error) {}
+    };
+
+    getMentorById();
+  }, []);
+
+  const [fullName, setFullName] = useState<string>("");
+  const [gender, setGender] = useState<string>("Male");
+  const [email, setEmail] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [dateOfBirth, setDateOfBirth] = useState<string>("");
+  const [meetUrl, setMeetUrl] = useState<string>("");
+
+
+
 
   return (
     <>
@@ -170,44 +238,90 @@ const EditProfile = () => {
                   </div>
                   <div className="w-[75%]">
                     <div className="text-[25px] font-medium mt-2 mb-3">
-                      Full name
+                      {mentorInformation?.fullName}
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="flex items-center">
                         <FontAwesomeIcon
                           icon={faUser}
-                          className="size-4 mr-2"
+                          className={`size-4 mr-2 ${
+                            mentorInformation?.gender ? "" : "text-gray-500"
+                          }`}
                         />
-                        Male
+                        <span
+                          className={`${
+                            mentorInformation?.dateOfBirth
+                              ? ""
+                              : "text-gray-500"
+                          }`}
+                        >
+                          Gender
+                        </span>
                       </div>
 
                       <div className="flex items-center">
                         <FontAwesomeIcon
                           icon={faGift}
-                          className="size-4 mr-2 text-gray-500"
+                          className={`size-4 mr-2 ${
+                            mentorInformation?.dateOfBirth
+                              ? ""
+                              : "text-gray-500"
+                          }`}
                         />
-                        <span className="text-gray-500">Date of birth</span>
+                        <span
+                          className={`${
+                            mentorInformation?.dateOfBirth
+                              ? ""
+                              : "text-gray-500"
+                          }`}
+                        >
+                          Date of birth
+                        </span>
                       </div>
                       <div className="flex items-center">
                         <FontAwesomeIcon
                           icon={faEnvelope}
-                          className="size-4 mr-2 text-gray-500"
+                          className={`size-4 mr-2 ${
+                            mentorInformation?.email ? "" : "text-gray-500"
+                          }`}
                         />
-                        <span className="text-gray-500">Email</span>
+                        <span
+                          className={`${
+                            mentorInformation?.email ? "" : "text-gray-500"
+                          }`}
+                        >
+                          {mentorInformation?.email}
+                        </span>
                       </div>
                       <div className="flex items-center">
                         <FontAwesomeIcon
                           icon={faPhone}
-                          className="size-4 mr-2 text-gray-500"
+                          className={`size-4 mr-2 ${
+                            mentorInformation?.phone ? "" : "text-gray-500"
+                          }`}
                         />
-                        <span className="text-gray-500">Phone</span>
+                        <span
+                          className={`${
+                            mentorInformation?.phone ? "" : "text-gray-500"
+                          }`}
+                        >
+                          Phone
+                        </span>
                       </div>
                       <div className="flex items-center">
                         <FontAwesomeIcon
                           icon={faLink}
-                          className="size-[18px] mr-2 text-gray-500"
+                          className={`size-[18px] mr-2 ${
+                            mentorInformation?.meetUrl ? "" : "text-gray-500"
+                          }`}
                         />
-                        <span className="text-gray-500">Meet URL</span>
+                        <span
+                          className={`${
+                            mentorInformation?.meetUrl ? "" : "text-gray-500"
+                          }`}
+                        >
+                          Meet URL
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -423,6 +537,8 @@ const EditProfile = () => {
                 <form className="flex flex-col gap-3">
                   <div className="relative">
                     <input
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
                       type="text"
                       className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
     focus:pt-6
@@ -451,6 +567,8 @@ const EditProfile = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="relative">
                       <select
+                        value={gender}
+                        onChange={(e) => setGender(e.target.value)}
                         className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
     focus:pt-6
     focus:pb-2
@@ -459,9 +577,9 @@ const EditProfile = () => {
     autofill:pt-6
     autofill:pb-2"
                       >
+                        <option value="" disabled></option>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
-                        <option value="others">Others</option>
                       </select>
 
                       <label
@@ -481,6 +599,8 @@ const EditProfile = () => {
 
                     <div className="relative">
                       <input
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         type="email"
                         className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
     focus:pt-6
@@ -508,6 +628,8 @@ const EditProfile = () => {
 
                     <div className="relative">
                       <input
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
                         type="text"
                         className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
     focus:pt-6
@@ -535,6 +657,8 @@ const EditProfile = () => {
 
                     <div className="relative">
                       <input
+                        value={dateOfBirth}
+                        onChange={(e) => setDateOfBirth(e.target.value)}
                         type="date"
                         className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
     focus:pt-6
@@ -563,6 +687,8 @@ const EditProfile = () => {
 
                   <div className="relative">
                     <input
+                      value={meetUrl}
+                      onChange={(e) => setMeetUrl(e.target.value)}
                       type="text"
                       className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
     focus:pt-6
@@ -601,6 +727,7 @@ const EditProfile = () => {
               <button
                 type="button"
                 className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                
               >
                 Save changes
               </button>

@@ -64,9 +64,12 @@ const AppContent = () => {
     <>
       <Navbar />
       <Routes>
+        <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/404" element={<_404Page />} />
+
 
         <Route
           path="/admin"
@@ -194,7 +197,7 @@ const AppContent = () => {
           />
         </Route>
 
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="/*" element={<Navigate to="/404" replace />} />
       </Routes>
       <ToastContainer />
     </>
