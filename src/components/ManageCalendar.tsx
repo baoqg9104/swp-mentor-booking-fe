@@ -17,7 +17,7 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faChevronDown,
@@ -25,29 +25,115 @@ import {
   faPenToSquare,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
+import { Dayjs } from "dayjs";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { AuthContext } from "./AuthContext";
+
+interface MentorSlot {
+  mentorSlotId: string;
+  mentorId: string;
+  startTime: string;
+  endTime: string;
+  bookingPoint: number;
+  isOnline: boolean;
+  room: string;
+}
 
 const ManageCalendar = () => {
-  const data = [
-    {
-      Id: 1,
-      Subject: "Meeting",
-      StartTime: new Date(2024, 8, 26, 7, 0),
-      EndTime: new Date(2024, 8, 26, 9, 30),
-    },
-    {
-      Id: 2,
-      Subject: "Meeting",
-      StartTime: new Date(2024, 8, 26, 10, 0),
-      EndTime: new Date(2024, 8, 26, 12, 30),
-    },
-  ];
+  const [mentorSlots, setMentorSlots] = useState<MentorSlot[]>([]);
 
+  useEffect(() => {
+    const getMentorSlots = async () => {
+      try {
+        // setLoading(true);
+
+        // Make the GET request
+        const response = await axios.get(
+          `https://localhost:7007/api/MentorSlot/get-by-mentor-id/${authData?.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`, // Replace YOUR_TOKEN_HERE with your actual token
+            },
+          }
+        );
+
+        // Set the response data
+        setMentorSlots(response.data);
+      } catch (error) {
+        console.log("Can not get mentor slots", error);
+        toast.error("Can not get mentor slots");
+      }
+    };
+
+    getMentorSlots();
+  }, [mentorSlots]);
+
+  const data = mentorSlots.map((slot) => ({
+    Id: slot.mentorSlotId, // Hoặc chuyển đổi sang số nếu cần
+    Subject: slot.room !== "" ? slot.room : "Online", // Bạn có thể thay đổi tiêu đề nếu cần
+    StartTime: new Date(slot.startTime), // Chuyển đổi chuỗi startTime thành đối tượng Date
+    EndTime: new Date(slot.endTime), // Chuyển đổi chuỗi endTime thành đối tượng Date
+  }));
+
+  const [startTime, setStartTime] = useState<Dayjs | null>(null);
+  const [endTime, setEndTime] = useState<Dayjs | null>(null);
+  const [date, setDate] = useState<Dayjs | null>(null);
   const [format, setFormat] = useState<string>("offline");
+  const [room, setRoom] = useState<string>("");
+
   const [isShowForm, setIsShowForm] = useState<boolean>(true);
 
-  const handleAddSlot = (e: React.FormEvent<HTMLFormElement>) => {
+  const authContext = useContext(AuthContext);
+  if (!authContext) {
+    throw new Error("AuthContext is undefined");
+  }
+
+  const { authData } = authContext;
+
+  const handleAddSlot = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Slot added");
+
+    if (
+      !startTime ||
+      !endTime ||
+      !date ||
+      !format ||
+      (format === "offline" && !room)
+    ) {
+      return;
+    }
+
+    if (startTime.isAfter(endTime) || startTime.isSame(endTime)) {
+      toast.error("End time must be after start time");
+      return;
+    }
+
+    // console.log(startTime, endTime, date, format, room);
+
+    const mentorSlot = {
+      mentorId: authData?.id,
+      startTime: `${date.format("YYYY-MM-DD")}T${startTime.format(
+        "HH:mm:ss.SSS"
+      )}Z`,
+      endTime: `${date.format("YYYY-MM-DD")}T${endTime.format(
+        "HH:mm:ss.SSS"
+      )}Z`,
+      bookingPoint: 1,
+      isOnline: format === "online",
+      room,
+    };
+
+    try {
+      const response = await axios.post(
+        "https://localhost:7007/api/MentorSlot/create",
+        mentorSlot
+      );
+
+      toast.success("Slot added successfully");
+    } catch (error) {
+      toast.error("Failed to add slot");
+    }
   };
 
   return (
@@ -83,7 +169,10 @@ const ManageCalendar = () => {
                     </label>
                   </div>
                   <div className="md:w-2/3">
-                    <TimePicker />
+                    <TimePicker
+                      value={startTime}
+                      onChange={(e) => setStartTime(e)}
+                    />
                   </div>
                 </div>
                 <div className="md:flex md:items-center mb-2">
@@ -96,7 +185,10 @@ const ManageCalendar = () => {
                     </label>
                   </div>
                   <div className="md:w-2/3">
-                    <TimePicker />
+                    <TimePicker
+                      value={endTime}
+                      onChange={(e) => setEndTime(e)}
+                    />
                   </div>
                 </div>
 
@@ -110,7 +202,7 @@ const ManageCalendar = () => {
                     </label>
                   </div>
                   <div className="md:w-2/3">
-                    <DatePicker />
+                    <DatePicker value={date} onChange={(e) => setDate(e)} />
                   </div>
                 </div>
 
@@ -127,8 +219,10 @@ const ManageCalendar = () => {
                     <select
                       name=""
                       id=""
+                      value={format}
                       onChange={(e) => setFormat(e.target.value)}
                       className="border-gray-400"
+                      required
                     >
                       <option value="offline">Offline</option>
                       <option value="online">Online</option>
@@ -152,8 +246,11 @@ const ManageCalendar = () => {
                         name=""
                         id=""
                         className="font-semibold text-gray-600"
+                        value={room}
+                        onChange={(e) => setRoom(e.target.value)}
+                        {...(format === "offline" && { required: true })}
                       >
-                        <option value=""></option>
+                        <option value="" disabled></option>
                         <option value="601">601</option>
                         <option value="602">602</option>
                         <option value="603">603</option>
@@ -198,43 +295,46 @@ const ManageCalendar = () => {
               </form>
             )}
 
-            <div className="pl-5 pt-5 font-semibold text-[#6e6e6e]">Number of slots remaining: 7 </div>
+            <div className="pl-10 pt-5 font-medium text-[#6e6e6e]">
+              Number of slots remaining: {10 - mentorSlots.length}{" "}
+            </div>
 
             <div className="flex flex-col mt-7">
-              <div className="-m-1.5 overflow-x-auto bg-white shadow">
-                <div className="p-1.5 min-w-full inline-block align-middle">
-                  <div className="overflow-hidden">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead>
-                        <tr>
-                          <th
-                            scope="col"
-                            className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase"
-                          >
-                            Date
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase"
-                          >
-                            Time
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase"
-                          >
-                            Room
-                          </th>
-                          <th
-                            scope="col"
-                            className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
-                          >
-                            Action
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        <tr>
+              {mentorSlots.length > 0 && (
+                <div className="-m-1.5 overflow-x-auto bg-white shadow">
+                  <div className="p-1.5 min-w-full inline-block align-middle">
+                    <div className="overflow-hidden">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead>
+                          <tr>
+                            <th
+                              scope="col"
+                              className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase"
+                            >
+                              Date
+                            </th>
+                            <th
+                              scope="col"
+                              className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase"
+                            >
+                              Time
+                            </th>
+                            <th
+                              scope="col"
+                              className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase"
+                            >
+                              Room
+                            </th>
+                            <th
+                              scope="col"
+                              className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
+                            >
+                              Action
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {/* <tr>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                             20-09-2024
                           </td>
@@ -328,19 +428,71 @@ const ManageCalendar = () => {
                               />
                             </button>
                           </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                        </tr> */}
+
+                          {mentorSlots.map((slot) => {
+                            return (
+                              <tr key={slot.mentorSlotId}>
+                                {/* Format date as dd-mm-yyyy */}
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                  {new Date(slot.startTime)
+                                    .toLocaleDateString("en-GB")
+                                    .replace(/\//g, "-")}
+                                </td>
+                                {/* Format time to exclude seconds */}
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                  {`${new Date(
+                                    slot.startTime
+                                  ).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })} - ${new Date(
+                                    slot.endTime
+                                  ).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}`}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                  {slot.isOnline ? "Online" : slot.room}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
+                                  <button
+                                    type="button"
+                                    className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={faPenToSquare}
+                                      className="size-4"
+                                    />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
+                                  >
+                                    <FontAwesomeIcon
+                                      icon={faTrashCan}
+                                      className="size-4"
+                                    />
+                                  </button>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
+              ;
             </div>
           </div>
           <ScheduleComponent
             readonly
             width="60%"
             startHour="07:00"
-            height={635}
+            height="100vh"
             eventSettings={{
               dataSource: data,
             }}

@@ -10,6 +10,7 @@ interface LoginDto {
 }
 
 interface AuthData {
+  id: string;
   email: string;
   fullName: string;
   role: string;
@@ -17,6 +18,7 @@ interface AuthData {
 }
 
 interface CustomJwtPayload extends JwtPayload {
+  id: string;
   email: string;
   fullName: string;
   role: string;
@@ -47,6 +49,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           
           if (decodedToken.exp && decodedToken.exp > currentTime) {
             setAuthData({
+              id: decodedToken.id,
               email: decodedToken.email,
               fullName: decodedToken.fullName,
               role: decodedToken.role,
@@ -79,6 +82,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const decodedToken = jwtDecode<CustomJwtPayload>(token);
 
       const userData: AuthData = {
+        id: decodedToken.id,
         email: decodedToken.email,
         fullName: decodedToken.fullName,
         role: decodedToken.role,
