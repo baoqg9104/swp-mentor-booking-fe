@@ -16,20 +16,9 @@ import { useLocation } from "react-router-dom";
 
 import Select from "react-select";
 import { AuthContext } from "./AuthContext";
+import { toast } from "react-toastify";
 
 const skills = [
-  // Frontend Development
-  { value: "html", label: "HTML" },
-  { value: "css", label: "CSS" },
-  { value: "javascript", label: "JavaScript" },
-  { value: "responsive_design", label: "Responsive Design" },
-  { value: "sass_scss", label: "SASS/SCSS" },
-  { value: "bootstrap", label: "Bootstrap" },
-  { value: "tailwind_css", label: "Tailwind CSS" },
-  { value: "material_ui", label: "Material-UI" },
-  { value: "jquery", label: "jQuery" },
-  { value: "web_accessibility", label: "Web Accessibility (WCAG)" },
-
   // Frontend Frameworks & Libraries
   { value: "react_js", label: "React.js" },
   { value: "angular_js", label: "Angular.js" },
@@ -126,12 +115,6 @@ const skills = [
   { value: "ghost", label: "Ghost" },
   { value: "contentful", label: "Contentful" },
 
-  // Web Animation
-  { value: "css_animations", label: "CSS Animations" },
-  { value: "greensock_gsap", label: "GreenSock (GSAP)" },
-  { value: "framer_motion", label: "Framer Motion" },
-  { value: "three_js", label: "Three.js (WebGL)" },
-
   // PWA (Progressive Web Apps)
   { value: "service_workers", label: "Service Workers" },
   { value: "web_app_manifest", label: "Web App Manifest" },
@@ -178,6 +161,8 @@ const EditProfile = () => {
   const [mentorInformation, setMentorInformation] =
     useState<MentorInformation>();
 
+  const [refresh, setRefresh] = useState(false);
+
   useEffect(() => {
     const getMentorById = async () => {
       try {
@@ -213,17 +198,47 @@ const EditProfile = () => {
     };
 
     getMentorById();
-  }, []);
+  }, [refresh]);
 
   const [fullName, setFullName] = useState<string>("");
-  const [gender, setGender] = useState<string>("Male");
+  const [gender, setGender] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
   const [dateOfBirth, setDateOfBirth] = useState<string>("");
   const [meetUrl, setMeetUrl] = useState<string>("");
 
+  const handleSave = async () => {
+    try {
+      const data = {
+        role: authData?.role,
+        id: authData?.id,
+        name: fullName,
+        email: email,
+        phone: phone,
+        gender: gender,
+        dateOfBirth: dateOfBirth,
+        meetUrl: meetUrl,
+      };
 
+      console.log(dateOfBirth);
 
+      const response = await axios.put(
+        "https://localhost:7007/api/User/update-user",
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
+
+      toast.success("Update successful!");
+      setRefresh(!refresh);
+    } catch (error) {
+      console.log(error);
+      toast.error("Update failed!");
+    }
+  };
 
   return (
     <>
@@ -250,12 +265,10 @@ const EditProfile = () => {
                         />
                         <span
                           className={`${
-                            mentorInformation?.dateOfBirth
-                              ? ""
-                              : "text-gray-500"
+                            mentorInformation?.gender ? "" : "text-gray-500"
                           }`}
                         >
-                          Gender
+                          {mentorInformation?.gender}
                         </span>
                       </div>
 
@@ -275,7 +288,9 @@ const EditProfile = () => {
                               : "text-gray-500"
                           }`}
                         >
-                          Date of birth
+                          {mentorInformation?.dateOfBirth === ""
+                            ? "Date of birth"
+                            : new Date(mentorInformation?.dateOfBirth!).toLocaleDateString("en-GB")}
                         </span>
                       </div>
                       <div className="flex items-center">
@@ -290,7 +305,9 @@ const EditProfile = () => {
                             mentorInformation?.email ? "" : "text-gray-500"
                           }`}
                         >
-                          {mentorInformation?.email}
+                          {mentorInformation?.email === ""
+                            ? "Email"
+                            : mentorInformation?.email}
                         </span>
                       </div>
                       <div className="flex items-center">
@@ -305,7 +322,9 @@ const EditProfile = () => {
                             mentorInformation?.phone ? "" : "text-gray-500"
                           }`}
                         >
-                          Phone
+                          {mentorInformation?.phone === ""
+                            ? "Phone"
+                            : mentorInformation?.phone}
                         </span>
                       </div>
                       <div className="flex items-center">
@@ -320,7 +339,9 @@ const EditProfile = () => {
                             mentorInformation?.meetUrl ? "" : "text-gray-500"
                           }`}
                         >
-                          Meet URL
+                          {mentorInformation?.meetUrl === ""
+                            ? "Meet URL"
+                            : mentorInformation?.meetUrl}
                         </span>
                       </div>
                     </div>
@@ -578,8 +599,8 @@ const EditProfile = () => {
     autofill:pb-2"
                       >
                         <option value="" disabled></option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
                       </select>
 
                       <label
@@ -725,9 +746,11 @@ const EditProfile = () => {
                 Close
               </button>
               <button
+                onClick={() => {
+                  handleSave();
+                }}
                 type="button"
                 className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
-                
               >
                 Save changes
               </button>

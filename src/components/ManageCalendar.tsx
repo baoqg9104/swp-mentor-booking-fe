@@ -42,6 +42,7 @@ interface MentorSlot {
 
 const ManageCalendar = () => {
   const [mentorSlots, setMentorSlots] = useState<MentorSlot[]>([]);
+  const [refresh, setRefresh] = useState<boolean>(false);
 
   useEffect(() => {
     const getMentorSlots = async () => {
@@ -53,7 +54,7 @@ const ManageCalendar = () => {
           `https://localhost:7007/api/MentorSlot/get-by-mentor-id/${authData?.id}`,
           {
             headers: {
-              Authorization: `Bearer ${authData?.token}`, // Replace YOUR_TOKEN_HERE with your actual token
+              Authorization: `Bearer ${authData?.token}`,
             },
           }
         );
@@ -67,7 +68,7 @@ const ManageCalendar = () => {
     };
 
     getMentorSlots();
-  }, [mentorSlots]);
+  }, [refresh]);
 
   const data = mentorSlots.map((slot) => ({
     Id: slot.mentorSlotId, // Hoặc chuyển đổi sang số nếu cần
@@ -131,6 +132,7 @@ const ManageCalendar = () => {
       );
 
       toast.success("Slot added successfully");
+      setRefresh(!refresh);
     } catch (error) {
       toast.error("Failed to add slot");
     }

@@ -1,8 +1,6 @@
 import Rating from "@mui/material/Rating";
 import Stack from "@mui/material/Stack";
 
-
-
 const MentorDashboard = () => {
   return (
     <>
@@ -38,7 +36,7 @@ const MentorDashboard = () => {
             </div>
           </div>
 
-          <div className="flex flex-col gap-y-3 lg:gap-y-5 p-4 md:p-5 bg-white border shadow-sm rounded-xl">
+          {/* <div className="flex flex-col gap-y-3 lg:gap-y-5 p-4 md:p-5 bg-white border shadow-sm rounded-xl">
             <div className="inline-flex justify-center items-center">
               <span className="size-2 inline-block bg-red-500 rounded-full me-2"></span>
               <span className="text-xs font-semibold uppercase text-gray-600">
@@ -50,6 +48,26 @@ const MentorDashboard = () => {
               <h3 className="text-3xl sm:text-4xl lg:text-[40px] font-semibold text-gray-800">
                 0
               </h3>
+            </div>
+          </div> */}
+
+          <div className="flex border shadow-sm rounded-xl bg-white p-6 pl-8 pr-8 justify-between">
+            <div>
+              <p className="uppercase font-semibold text-gray-600 text-[15px]">
+                Total hours
+              </p>
+              <p className="text-[40px] font-semibold text-gray-800">100,25</p>
+            </div>
+
+            <div className="bg-[#F5365D] rounded-full size-[70px] flex items-center justify-center">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 512 512"
+                fill="#FEFEFE"
+                className="size-[38px]"
+              >
+                <path d="M464 256A208 208 0 1 1 48 256a208 208 0 1 1 416 0zM0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256zM232 120l0 136c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2 280 120c0-13.3-10.7-24-24-24s-24 10.7-24 24z" />
+              </svg>
             </div>
           </div>
         </div>
@@ -175,7 +193,7 @@ const MentorDashboard = () => {
             </div>
           </div>
           <div className="lg:col-start-3">
-            <div className="flex border shadow-sm rounded-xl bg-white p-6 pl-8 pr-8 justify-between mt-[-10px]">
+            {/* <div className="flex border shadow-sm rounded-xl bg-white p-6 pl-8 pr-8 justify-between mt-[-10px]">
               <div>
                 <p className="uppercase font-semibold text-gray-600 text-[15px]">
                   Total hours
@@ -195,9 +213,9 @@ const MentorDashboard = () => {
                   <path d="M464 256A208 208 0 1 1 48 256a208 208 0 1 1 416 0zM0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256zM232 120l0 136c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2 280 120c0-13.3-10.7-24-24-24s-24 10.7-24 24z" />
                 </svg>
               </div>
-            </div>
+            </div> */}
 
-            <div className="flex border shadow-sm rounded-xl bg-white p-6 pl-8 pr-8 justify-between mt-3">
+            <div className="flex border shadow-sm rounded-xl bg-white p-6 pl-8 pr-8 justify-between">
               <div>
                 <p className="uppercase font-semibold text-gray-600 text-[15px]">
                   Total points
@@ -217,7 +235,7 @@ const MentorDashboard = () => {
               </div>
             </div>
 
-            <div className="flex flex-col gap-y-3 lg:gap-y-5 p-4 md:p-5 bg-white shadow-sm rounded-xl border mt-3">
+            <div className="flex flex-col gap-y-3 lg:gap-y-5 p-4 md:p-5 bg-white shadow-sm rounded-xl border mt-5">
               <div className="inline-flex justify-center items-center">
                 <p className="text-xl font-semibold text-gray-700">
                   Overall Score
