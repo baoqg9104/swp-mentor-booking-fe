@@ -13,20 +13,36 @@ import { faSort, faUsersRectangle } from "@fortawesome/free-solid-svg-icons";
 
 import "preline/preline";
 import { IStaticMethods } from "preline/preline";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import {
   Dialog,
   DialogBackdrop,
   DialogPanel,
-  DialogTitle,
 } from "@headlessui/react";
+import axios from "axios";
+import { AuthContext } from "./AuthContext";
+import { toast } from "react-toastify";
 
 declare global {
   interface Window {
     HSStaticMethods: IStaticMethods;
   }
+}
+
+interface MentorAppointment {
+  mentorSlotId: string;
+  mentorId: string;
+  startTime: string;
+  endTime: string;
+  bookingPoint: number;
+  isOnline: boolean;
+  room: string;
+  bookings: string;
+  status: string;
+  group: string;
+  class: string;
 }
 
 const ManageAppointments = () => {
@@ -37,6 +53,46 @@ const ManageAppointments = () => {
   useEffect(() => {
     window.HSStaticMethods.autoInit();
   }, [location.pathname]);
+
+  //----------------------------------------------
+
+  const authContext = useContext(AuthContext);
+  if (!authContext) {
+    throw new Error("AuthContext is undefined");
+  }
+
+  const { authData } = authContext;
+
+  const [mentorAppointments, setMentorAppointments] = useState<
+    MentorAppointment[]
+  >([]);
+  const [refresh, setRefresh] = useState<boolean>(false);
+
+  useEffect(() => {
+    const getMentorAppointments = async () => {
+      try {
+        // setLoading(true);
+
+        // Make the GET request
+        const response = await axios.get(
+          `https://localhost:7007/api/MentorSlot/get-mentor-appointments-by-mentor-id/${authData?.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+
+        // Set the response data
+        setMentorAppointments(response.data);
+      } catch (error) {
+        console.log("Can not get mentor appointments", error);
+        toast.error("Can not get mentor appointments");
+      }
+    };
+
+    getMentorAppointments();
+  }, [refresh]);
 
   const data = [
     {
@@ -75,12 +131,12 @@ const ManageAppointments = () => {
                       >
                         Room
                       </th>
-                      <th
+                      {/* <th
                         scope="col"
                         className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
                       >
                         Bookings
-                      </th>
+                      </th> */}
                       <th
                         scope="col"
                         className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
@@ -102,7 +158,94 @@ const ManageAppointments = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    <tr>
+                    {mentorAppointments.map((appointment) => {
+                      return (
+                        <tr key={appointment.mentorSlotId}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                            {new Date(appointment.startTime)
+                              .toLocaleDateString("en-GB")
+                              .replace(/\//g, "-")}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                            {`${new Date(
+                              appointment.startTime
+                            ).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })} - ${new Date(
+                              appointment.endTime
+                            ).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}`}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                            {appointment.room ? appointment.room : "Online"}
+                          </td>
+                          <td className="pl-16 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
+                            {appointment.status === "Approved" && (
+                              <div className="flex items-center">
+                                <span className="inline-flex items-center justify-center p-[0.25rem] bg-[#CFF1E6] rounded-full">
+                                  <span className="size-[0.375rem] bg-[#10B981] inline-block rounded-full"></span>
+                                </span>
+                                <span className="ml-[6px]">Approved</span>
+                              </div>
+                            )}
+
+                            {appointment.status === "Completed" && (
+                              <div className="flex items-center">
+                                <span className="inline-flex items-center justify-center p-[0.25rem] bg-gray-200 rounded-full">
+                                  <span className="size-[0.375rem] bg-[#adadad] inline-block rounded-full"></span>
+                                </span>
+                                <span className="ml-[6px]">Completed</span>
+                              </div>
+                            )}
+                            {(appointment.status === "Pending" ||
+                              appointment.status === null) && (
+                              <div className="flex items-center">
+                                <span className="inline-flex items-center justify-center p-[0.25rem] bg-yellow-100 rounded-full">
+                                  <span className="size-[0.375rem] bg-[#e9e931] inline-block rounded-full"></span>
+                                </span>
+                                <span className="ml-[6px]">Pending</span>{" "}
+                                <span className="ml-1 mt-[1px] font-medium">
+                                  {`(${appointment.bookings})`}
+                                </span>
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
+                            {appointment.group} - {appointment.class}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
+                            {appointment.status === "Approved" && (
+                              <button
+                                type="button"
+                                className="inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent focus:outline-none disabled:opacity-50 disabled:pointer-events-none text-gray-500 hover:text-gray-700"
+                                onClick={() => setOpen(true)}
+                              >
+                                Complete
+                              </button>
+                            )}
+
+                            {appointment.status === "Completed" && <div></div>}
+
+                            {appointment.status === "Pending" && (
+                              <button
+                                type="button"
+                                className="inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent focus:outline-none disabled:opacity-50 disabled:pointer-events-none text-gray-500 hover:text-gray-700"
+                                aria-haspopup="dialog"
+                                aria-expanded="false"
+                                aria-controls="hs-scale-animation-modal"
+                                data-hs-overlay="#hs-scale-animation-modal"
+                              >
+                                View
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                    {/* <tr>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                         20-09-2024
                       </td>
@@ -112,10 +255,7 @@ const ManageAppointments = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                         601
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
-                        1
-                      </td>
-                      <td className="pl-12 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
+                      <td className="pl-16 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
                         <div className="flex items-center">
                           <span className="inline-flex items-center justify-center p-[0.25rem] bg-[#CFF1E6] rounded-full">
                             <span className="size-[0.375rem] bg-[#10B981] inline-block rounded-full"></span>
@@ -147,13 +287,7 @@ const ManageAppointments = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                         Online
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
-                        0
-                      </td>
-                      <td className="pl-12 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
-                        {/* <span className="text-[#7c7c7c] font-medium">
-                          Completed
-                        </span> */}
+                      <td className="pl-16 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
                         <div className="flex items-center">
                           <span className="inline-flex items-center justify-center p-[0.25rem] bg-gray-200 rounded-full">
                             <span className="size-[0.375rem] bg-[#adadad] inline-block rounded-full"></span>
@@ -189,23 +323,17 @@ const ManageAppointments = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                         611
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
-                        3
-                      </td>
-                      <td className="pl-12 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
-                        {/* <span className="text-[#b7ba27] font-medium">
-                          Pending
-                        </span> */}
+
+                      <td className="pl-16 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
                         <div className="flex items-center">
                           <span className="inline-flex items-center justify-center p-[0.25rem] bg-yellow-100 rounded-full">
                             <span className="size-[0.375rem] bg-[#e9e931] inline-block rounded-full"></span>
                           </span>
-                          <span className="ml-[6px]">Pending</span>
+                          <span className="ml-[6px]">Pending</span>{" "}
+                          <span className="ml-1 mt-[1px] font-medium">(3)</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
-                        {/* 1 - SE1856 */}
-                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 text-center"></td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
                         <button
                           type="button"
@@ -218,7 +346,7 @@ const ManageAppointments = () => {
                           View
                         </button>
                       </td>
-                    </tr>
+                    </tr> */}
                   </tbody>
                 </table>
               </div>
@@ -410,7 +538,6 @@ const ManageAppointments = () => {
         </div>
       </div>
 
-
       <Dialog open={open} onClose={setOpen} className="relative z-[100]">
         <DialogBackdrop
           transition
@@ -485,7 +612,6 @@ const ManageAppointments = () => {
                           601
                         </div>
                       </div>
-
                     </div>
                   </div>
                 </div>
@@ -494,8 +620,6 @@ const ManageAppointments = () => {
                 <button
                   type="button"
                   onClick={() => {
-
-
                     //call api -> success or fail
                   }}
                   className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-700 sm:ml-3 sm:w-auto"
