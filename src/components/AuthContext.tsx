@@ -14,6 +14,7 @@ interface AuthData {
   email: string;
   fullName: string;
   role: string;
+  groupId: string;
   token: string;
 }
 
@@ -22,6 +23,7 @@ interface CustomJwtPayload extends JwtPayload {
   email: string;
   fullName: string;
   role: string;
+  groupId: string;
 }
 
 interface AuthContextProps {
@@ -53,6 +55,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               email: decodedToken.email,
               fullName: decodedToken.fullName,
               role: decodedToken.role,
+              groupId: decodedToken.groupId,
               token: token,
             });
           } else {
@@ -86,6 +89,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email: decodedToken.email,
         fullName: decodedToken.fullName,
         role: decodedToken.role,
+        groupId: decodedToken.groupId,
         token: token,
       };
 

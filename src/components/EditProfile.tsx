@@ -171,7 +171,7 @@ const EditProfile = () => {
           `https://localhost:7007/api/Mentor/${authData?.id}`,
           {
             headers: {
-              Authorization: `Bearer ${authData?.token}`, // Replace YOUR_TOKEN_HERE with your actual token
+              Authorization: `Bearer ${authData?.token}`,
             },
           }
         );
@@ -220,7 +220,6 @@ const EditProfile = () => {
         meetUrl: meetUrl,
       };
 
-      console.log(dateOfBirth);
 
       const response = await axios.put(
         "https://localhost:7007/api/User/update-user",
@@ -238,6 +237,14 @@ const EditProfile = () => {
       console.log(error);
       toast.error("Update failed!");
     }
+  };
+
+  const formatDate = (isoDate: string): string => {
+    const date = new Date(isoDate);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0 nên cần cộng thêm 1
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
   };
 
   return (
@@ -276,20 +283,20 @@ const EditProfile = () => {
                         <FontAwesomeIcon
                           icon={faGift}
                           className={`size-4 mr-2 ${
-                            mentorInformation?.dateOfBirth
+                            mentorInformation?.dateOfBirth != ""
                               ? ""
                               : "text-gray-500"
                           }`}
                         />
                         <span
                           className={`${
-                            mentorInformation?.dateOfBirth
+                            mentorInformation?.dateOfBirth != ""
                               ? ""
                               : "text-gray-500"
                           }`}
                         >
                           {mentorInformation?.dateOfBirth === ""
-                            ? "Date of birth"
+                            ? ""
                             : new Date(mentorInformation?.dateOfBirth!).toLocaleDateString("en-GB")}
                         </span>
                       </div>
@@ -678,7 +685,7 @@ const EditProfile = () => {
 
                     <div className="relative">
                       <input
-                        value={dateOfBirth}
+                        value={formatDate(dateOfBirth)}
                         onChange={(e) => setDateOfBirth(e.target.value)}
                         type="date"
                         className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
