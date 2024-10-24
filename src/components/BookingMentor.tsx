@@ -72,27 +72,16 @@ interface MentorAvailability {
   room: string;
 }
 
+interface Booking {
+  mentorSlotId: number;
+}
+
 const BookingMentor = () => {
   const location = useLocation();
 
   useEffect(() => {
     window.HSStaticMethods.autoInit();
   }, [location.pathname]);
-
-  const data = [
-    {
-      Id: 1,
-      Subject: "Meeting",
-      StartTime: new Date(2024, 8, 26, 7, 0),
-      EndTime: new Date(2024, 8, 26, 9, 30),
-    },
-    {
-      Id: 2,
-      Subject: "Meeting",
-      StartTime: new Date(2024, 8, 26, 10, 0),
-      EndTime: new Date(2024, 8, 26, 12, 30),
-    },
-  ];
 
   const [open, setOpen] = useState<boolean>(false);
   const [openProfile, setOpenProfile] = useState<boolean>(false);
@@ -106,11 +95,18 @@ const BookingMentor = () => {
   const [selectedMentor, setSelectedMentor] = useState<MentorProfile | null>(
     null
   );
+  const [selectedMentorName, setSelectedMentorName] = useState<string>("");
   const [mentorSkills, setMentorSkills] = useState<MentorSkill[]>([]);
 
   const [mentorAvailability, setMentorAvailability] = useState<
     MentorAvailability[]
   >([]);
+
+  const [bookings, setBookings] = useState<Booking[]>([]);
+
+  const [selectedSlot, setSelectedSlot] = useState<MentorAvailability | null>(
+    null
+  );
 
   const authContext = useContext(AuthContext);
   if (!authContext) {
@@ -185,6 +181,54 @@ const BookingMentor = () => {
       setMentorAvailability(response.data);
     } catch (error) {}
   };
+
+  const bookMentor = async (mentorSlotId: number) => {
+    const groupId = localStorage.getItem("groupId");
+
+    const data = {
+      groupId: groupId,
+      mentorSlotId: mentorSlotId,
+      //  skillId:
+    };
+
+    try {
+      const response = await axios.post(
+        "https://localhost:7007/api/Booking/create",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getBookings = async (groupId: string | null) => {
+    try {
+      const response = await axios.get(
+        `https://localhost:7007/api/Booking/get-bookings-by-groupId/${groupId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
+
+      setBookings(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const data = mentorAvailability.map((slot) => ({
+    Id: slot.mentorSlotId,
+    Subject: slot.room !== "" ? `Room: ${slot.room}` : "Online",
+    StartTime: new Date(slot.startTime),
+    EndTime: new Date(slot.endTime),
+  }));
 
   return (
     <>
@@ -336,6 +380,8 @@ const BookingMentor = () => {
                           onClick={() => {
                             setOpenAvailability(true);
                             getMentorAvailability(mentor.mentorId);
+                            getBookings(localStorage.getItem("groupId"));
+                            setSelectedMentorName(mentor.mentorName);
                           }}
                         >
                           Availability
@@ -967,7 +1013,8 @@ const BookingMentor = () => {
               <div className="p-4 px-10 overflow-y-auto flex justify-center">
                 <div className="w-[40%]">
                   <div className="mb-5 text-[20px] font-medium">
-                    Mentor: TamPM
+                    Mentor:
+                    {" " + selectedMentorName}
                   </div>
                   <div className="-m-1.5 overflow-x-auto">
                     <div className="p-1.5 min-w-full inline-block align-middle">
@@ -1067,7 +1114,7 @@ const BookingMentor = () => {
                             </tr> */}
 
                             {mentorAvailability.map((availability) => (
-                              <tr>
+                              <tr key={availability.mentorSlotId}>
                                 <td className="text-start px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                                   {new Date(availability.startTime)
                                     .toLocaleDateString("en-GB")
@@ -1093,10 +1140,20 @@ const BookingMentor = () => {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
                                   <button
+                                    disabled={bookings.some(
+                                      (booking) =>
+                                        booking.mentorSlotId ===
+                                        availability.mentorSlotId
+                                    )}
                                     type="button"
-                                    disabled
+                                    // disabled
                                     className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
-                                    onClick={() => setOpen(true)}
+                                    onClick={() => {
+                                      setOpen(true);
+                                      setSkill("");
+                                      setSelectedSlot(availability);
+                                      getMentorSkills(availability.mentorId);
+                                    }}
                                   >
                                     Book
                                   </button>
@@ -1115,7 +1172,6 @@ const BookingMentor = () => {
                     readonly
                     startHour="07:00"
                     height={635}
-                    selectedDate={new Date(2024, 8, 27)}
                     eventSettings={{
                       dataSource: data,
                     }}
@@ -1139,13 +1195,15 @@ const BookingMentor = () => {
           <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <DialogPanel
               transition
-              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 lg:w-[550px] data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95 h-[230px]"
+              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 lg:w-[600px] data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95 h-[230px]"
             >
               <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                 <div className="p-0">
                   <div className="text-center sm:ml-2 sm:mt-0 sm:text-left">
                     <div className="mt-2">
-                      <h1 className="mb-3 font-medium">Mentor: TamPM</h1>
+                      <h1 className="mb-3 font-medium">
+                        Mentor: {" " + selectedMentorName}
+                      </h1>
                       <div className="flex">
                         <div className="w-1/3 flex items-center gap-1">
                           <svg
@@ -1155,7 +1213,9 @@ const BookingMentor = () => {
                           >
                             <path d="M152 24c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40L64 64C28.7 64 0 92.7 0 128l0 16 0 48L0 448c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-256 0-48 0-16c0-35.3-28.7-64-64-64l-40 0 0-40c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40L152 64l0-40zM48 192l352 0 0 256c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16l0-256z" />
                           </svg>
-                          15-10-2024
+                          {new Date(selectedSlot?.startTime!)
+                            .toLocaleDateString("en-GB")
+                            .replace(/\//g, "-")}
                         </div>
                         <div className="w-1/3 flex items-center gap-1 ml-8">
                           <svg
@@ -1165,33 +1225,51 @@ const BookingMentor = () => {
                           >
                             <path d="M464 256A208 208 0 1 1 48 256a208 208 0 1 1 416 0zM0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256zM232 120l0 136c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2 280 120c0-13.3-10.7-24-24-24s-24 10.7-24 24z" />
                           </svg>
-                          7:00 - 9:30
+                          {`${new Date(
+                            selectedSlot?.startTime!
+                          ).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })} - ${new Date(
+                            selectedSlot?.endTime!
+                          ).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}`}
                         </div>
                         <div className="w-1/3 flex items-center gap-1 ml-8">
                           <FontAwesomeIcon
                             icon={faUsersRectangle}
                             className="size-[18px]"
                           />
-                          601
+                          {selectedSlot?.room! ? selectedSlot?.room! : "Online"}
                         </div>
                         <div className="w-1/3 flex items-center gap-1">
                           {/* <FontAwesomeIcon
                             icon={faWallet}
                             className="size-[18px]"
                           /> */}
-                          Point: 1
+                          Point:
+                          {" " + selectedSlot?.bookingPoint}
                         </div>
                       </div>
                       <select
+                        value={skill}
                         defaultValue=""
                         className="w-[250px] mt-4"
                         onChange={(e) => setSkill(e.target.value)}
                       >
-                        <option value="" disabled>
-                          Choose skill
-                        </option>
-                        <option value="Git">Git</option>
-                        <option value="React">React</option>
+                        <option value="">Choose skill</option>
+                        {/* <option value="Git">Git</option>
+                        <option value="React">React</option> */}
+                        {mentorSkills.map((skill) => (
+                          <option
+                            key={skill.mentorSkillId}
+                            value={skill.mentorSkillId}
+                          >
+                            {skill.skillName}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
