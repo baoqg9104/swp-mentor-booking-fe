@@ -18,7 +18,7 @@ import {
 } from "@syncfusion/ej2-react-schedule";
 import "preline/preline";
 import { IStaticMethods } from "preline/preline";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 declare global {
@@ -32,6 +32,26 @@ declare global {
 import { useState } from "react";
 import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 import { toast } from "react-toastify";
+import axios from "axios";
+import { AuthContext } from "./AuthContext";
+
+interface Mentor {
+  mentorId: string;
+  mentorName: string;
+  email: string;
+  phone: string;
+  applyStatus: boolean;
+}
+
+interface MentorProfile {
+  mentorId: string;
+  mentorName: string;
+  email: string;
+  phone: string;
+  gender: string;
+  dateOfBirth: string;
+  meetUrl: string;
+}
 
 const BookingMentor = () => {
   const location = useLocation();
@@ -56,9 +76,58 @@ const BookingMentor = () => {
   ];
 
   const [open, setOpen] = useState<boolean>(false);
+  const [openProfile, setOpenProfile] = useState<boolean>(false);
   const [openSuccess, setOpenSuccess] = useState<boolean>(false);
 
   const [skill, setSkill] = useState<string>("");
+
+  const [refresh, setRefresh] = useState<boolean>(false);
+  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [selectedMentor, setSelectedMentor] = useState<MentorProfile | null>(
+    null
+  );
+
+  const authContext = useContext(AuthContext);
+  if (!authContext) {
+    throw new Error("AuthContext is undefined");
+  }
+  const { authData } = authContext;
+
+  useEffect(() => {
+    const getMentors = async () => {
+      try {
+        const response = await axios.get(
+          `https://localhost:7007/api/Mentor/all`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+        setMentors(response.data);
+      } catch (error) {
+        // console.log("Can not get group", error);
+        // toast.error("Can not get group");
+      }
+    };
+
+    getMentors();
+  }, [refresh]);
+
+  const getMentorProfile = async (mentorId: string) => {
+    try {
+      const response = await axios.get(
+        `https://localhost:7007/api/Mentor/${mentorId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
+
+      setSelectedMentor(response.data);
+    } catch (error) {}
+  };
 
   return (
     <>
@@ -85,7 +154,7 @@ const BookingMentor = () => {
               </tr>
             </thead>
             <tbody>
-              <tr className="bg-white border-b  hover:bg-gray-50 ">
+              {/* <tr className="bg-white border-b  hover:bg-gray-50 ">
                 <th
                   scope="row"
                   className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
@@ -177,13 +246,52 @@ const BookingMentor = () => {
                     Availability
                   </span>
                 </td>
-              </tr>
+              </tr> */}
+              {mentors.map(
+                (mentor) =>
+                  mentor.applyStatus && (
+                    <tr
+                      key={mentor.mentorId}
+                      className="bg-white border-b  hover:bg-gray-50 "
+                    >
+                      <th
+                        scope="row"
+                        className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap "
+                      >
+                        {mentor.mentorName}
+                      </th>
+                      <td className="px-6 py-4">{mentor.email}</td>
+                      <td className="px-6 py-4">{mentor.phone}</td>
+                      <td className="px-6 py-4 text-center"></td>
+                      <td className="px-6 py-4 text-right">
+                        <span
+                          className="cursor-pointer font-medium text-blue-600 hover:underline"
+                          onClick={() => {
+                            setOpenProfile(true);
+                            getMentorProfile(mentor.mentorId);
+                          }}
+                        >
+                          Profile
+                        </span>
+                        <span
+                          className="cursor-pointer font-medium text-yellow-700 hover:underline ml-3"
+                          aria-haspopup="dialog"
+                          aria-expanded="false"
+                          aria-controls="hs-scale-animation-modal-avaibility"
+                          data-hs-overlay="#hs-scale-animation-modal-avaibility"
+                        >
+                          Availability
+                        </span>
+                      </td>
+                    </tr>
+                  )
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      <div
+      {/* <div
         id="hs-scale-animation-modal"
         className="hs-overlay hidden size-full fixed top-0 start-0 z-[80] overflow-x-hidden overflow-y-auto pointer-events-none"
         role="dialog"
@@ -336,16 +444,216 @@ const BookingMentor = () => {
               >
                 Close
               </button>
-              {/* <button
-                type="button"
-                className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
-              >
-                Save changes
-              </button> */}
+        
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
+
+      <Dialog
+        open={openProfile}
+        onClose={setOpenProfile}
+        className="relative z-[100]"
+      >
+        <DialogBackdrop
+          transition
+          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+        />
+
+        <div className="fixed inset-0 z-[100] w-screen overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div className="w-[60%] h-[90vh] flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto">
+              <div className="flex justify-between items-center py-3 px-4 border-b">
+                <h2 className="font-bold text-gray-800 text-[18px]">
+                  Mentor Profile
+                </h2>
+                <button
+                  type="button"
+                  className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none"
+                  onClick={() => setOpenProfile(false)}
+                >
+                  <span className="sr-only">Close</span>
+                  <svg
+                    className="shrink-0 size-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 6 6 18"></path>
+                    <path d="m6 6 12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <div className="p-4 px-10 pl-16 overflow-y-auto flex justify-center items-center">
+                <div className="w-[50%]">
+                  <div className="size-[120px] bg-gray-200 rounded-full border-[3px] border-white shadow-lg"></div>
+                  <div className="text-[25px] font-medium mt-4 mb-3 text-start">
+                    {selectedMentor?.mentorName}
+                  </div>
+                  <div className="grid grid-cols-1 gap-2">
+                    <div className="flex items-center">
+                      <FontAwesomeIcon
+                        icon={faUser}
+                        className={`size-4 mr-2 ${
+                          selectedMentor?.gender ? "" : "text-gray-500"
+                        }`}
+                      />
+                      <span
+                        className={`${
+                          selectedMentor?.gender ? "" : "text-gray-500"
+                        }`}
+                      >
+                        {selectedMentor?.gender}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center">
+                      <FontAwesomeIcon
+                        icon={faGift}
+                        className={`size-4 mr-2 ${
+                          selectedMentor?.dateOfBirth != ""
+                            ? ""
+                            : "text-gray-500"
+                        }`}
+                      />
+                      <span
+                        className={`${
+                          selectedMentor?.dateOfBirth != ""
+                            ? ""
+                            : "text-gray-500"
+                        }`}
+                      >
+                        {selectedMentor?.dateOfBirth === ""
+                          ? ""
+                          : new Date(
+                              selectedMentor?.dateOfBirth!
+                            ).toLocaleDateString("en-GB")}
+                      </span>
+                    </div>
+                    <div className="flex items-center">
+                      <FontAwesomeIcon
+                        icon={faEnvelope}
+                        className={`size-4 mr-2 ${
+                          selectedMentor?.email ? "" : "text-gray-500"
+                        }`}
+                      />
+                      <span
+                        className={`${
+                          selectedMentor?.email ? "" : "text-gray-500"
+                        }`}
+                      >
+                        {selectedMentor?.email === ""
+                          ? "Email"
+                          : selectedMentor?.email}
+                      </span>
+                    </div>
+                    <div className="flex items-center">
+                      <FontAwesomeIcon
+                        icon={faPhone}
+                        className={`size-4 mr-2 ${
+                          selectedMentor?.phone ? "" : "text-gray-500"
+                        }`}
+                      />
+                      <span
+                        className={`${
+                          selectedMentor?.phone ? "" : "text-gray-500"
+                        }`}
+                      >
+                        {selectedMentor?.phone === null
+                          ? ""
+                          : selectedMentor?.phone}
+                      </span>
+                    </div>
+                    <div className="flex items-center">
+                      <FontAwesomeIcon
+                        icon={faLink}
+                        className={`size-[18px] mr-2 ${
+                          selectedMentor?.meetUrl ? "" : "text-gray-500"
+                        }`}
+                      />
+                      <span
+                        className={`${
+                          selectedMentor?.meetUrl ? "" : "text-gray-500"
+                        }`}
+                      >
+                        {selectedMentor?.meetUrl === null
+                          ? ""
+                          : selectedMentor?.meetUrl}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="w-[50%]">
+                  <div className="mt-6">
+                    <h3 className="font-semibold">Expert</h3>
+                    <div className="mt-3 ml-1 flex gap-x-4 justify-center">
+                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
+                        React
+                      </span>
+                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
+                        ASP.NET
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-6">
+                    <h3 className="font-semibold">Advanced</h3>
+                    <div className="mt-3 ml-1 flex gap-x-4 justify-center">
+                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
+                        React
+                      </span>
+                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
+                        ASP.NET
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-6">
+                    <h3 className="font-semibold">Proficient</h3>
+                    <div className="mt-3 ml-1 flex gap-x-4 justify-center">
+                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
+                        React
+                      </span>
+                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
+                        ASP.NET
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <h3 className="font-semibold">Intermediate</h3>
+                    <div className="mt-3 ml-1 flex gap-x-4 justify-center">
+                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
+                        React
+                      </span>
+                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
+                        ASP.NET
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <h3 className="font-semibold">Beginner</h3>
+                    <div className="mt-3 ml-1 flex gap-x-4 justify-center">
+                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
+                        React
+                      </span>
+                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
+                        ASP.NET
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Dialog>
 
       <div
         id="hs-scale-animation-modal-avaibility"

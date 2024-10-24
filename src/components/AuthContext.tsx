@@ -31,6 +31,7 @@ interface AuthContextProps {
   login: (data: LoginDto) => Promise<string>;
   logout: () => void;
   isLoading: boolean;
+  setAuthData: React.Dispatch<React.SetStateAction<AuthData | null>>;
 }
 
 export const AuthContext = createContext<AuthContextProps | undefined>(
@@ -94,6 +95,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       };
 
       setAuthData(userData);
+      
+      localStorage.setItem('groupId', userData.groupId);
+
       return userData.role;
     } catch (error: any) {
       return error.response.data;
@@ -106,7 +110,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ authData, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ authData, login, logout, isLoading, setAuthData }}>
       {children}
     </AuthContext.Provider>
   );

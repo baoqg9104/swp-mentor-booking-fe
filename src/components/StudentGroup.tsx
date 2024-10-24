@@ -33,6 +33,7 @@ interface Group {
   swpClassId: number;
   swpClassName: string;
   walletPoint: number;
+  progress: number;
   createdDate: string;
 }
 
@@ -48,6 +49,16 @@ interface Topic {
   status: boolean;
 }
 
+interface GroupTopic {
+  topicId: number;
+  name: string;
+  description: string;
+  semesterId: string;
+  semesterName: string;
+  actors: string;
+  status: boolean;
+}
+
 const StudentGroup = () => {
   const location = useLocation();
 
@@ -56,13 +67,14 @@ const StudentGroup = () => {
   }, [location.pathname]);
 
   const [open, setOpen] = useState(false);
+  const [openSetting, setOpenSetting] = useState<boolean>(false);
   const [refresh, setRefresh] = useState<boolean>(false);
 
   const authContext = useContext(AuthContext);
   if (!authContext) {
     throw new Error("AuthContext is undefined");
   }
-  const { authData } = authContext;
+  const { authData, setAuthData } = authContext;
 
   const [group, setGroup] = useState<Group | null>(null);
   const [classes, setClasses] = useState<Class[]>([]);
@@ -71,8 +83,15 @@ const StudentGroup = () => {
   useEffect(() => {
     const getGroup = async () => {
       try {
+        const groupId = localStorage.getItem("groupId");
+        const data = groupId;
+        console.log(data);
+        if (data === "") {
+          return;
+        }
+
         const response = await axios.get(
-          `https://localhost:7007/api/Group/get/${authData?.groupId}`,
+          `https://localhost:7007/api/Group/get/${data}`,
           {
             headers: {
               Authorization: `Bearer ${authData?.token}`,
@@ -80,16 +99,40 @@ const StudentGroup = () => {
           }
         );
         setGroup(response.data);
+
+        localStorage.setItem("group", JSON.stringify(response.data));
+        getGroupTopic();
       } catch (error) {
-        console.log("Can not get group", error);
-        toast.error("Can not get group");
+        // console.log("Can not get group", error);
+        // toast.error("Can not get group");
       }
     };
 
-    if (authData?.groupId != "") {
-      getGroup();
+    getGroup();
+  }, [refresh]);
+
+  const getGroupTopic = async () => {
+    try {
+      const groupDataString = localStorage.getItem("group"); // Lấy dữ liệu nhóm từ localStorage
+
+      // Chuyển đổi chuỗi JSON thành đối tượng
+      const groupData = groupDataString ? JSON.parse(groupDataString) : null;
+      const response = await axios.get(
+        `https://localhost:7007/api/Topic/get/${groupData.topicId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
+
+      setGroupTopic(response.data);
+    } catch (error) {
+      console.error(error);
     }
-  }, [refresh, authData]);
+  };
+
+  const [groupTopic, setGroupTopic] = useState<GroupTopic | null>(null);
 
   const getClasses = async () => {
     try {
@@ -124,6 +167,44 @@ const StudentGroup = () => {
     }
   };
 
+  const [name, setName] = useState<string>("");
+  const [classId, setClassId] = useState<number>(0);
+  const [topicId, setTopicId] = useState<number>(0);
+
+  const handleCreateGroup = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      const data = {
+        leaderId: authData?.id,
+        name,
+        topicId,
+        swpClassId: classId,
+      };
+
+      const response = await axios.post(
+        `https://localhost:7007/api/Group/create`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
+
+      localStorage.setItem("groupId", response.data);
+
+      window.location.reload();
+
+      toast.success("Create group successful!");
+
+      setRefresh(!refresh);
+    } catch (error) {
+      console.log(error);
+      toast.error("Dupplicate topic in the same class!");
+    }
+  };
+
   return (
     <>
       <div className="py-10 px-12 h-[90vh]">
@@ -142,6 +223,9 @@ const StudentGroup = () => {
               onClick={() => {
                 getClasses();
                 getTopics();
+                setName("");
+                setClassId(0);
+                setTopicId(0);
               }}
             >
               <FontAwesomeIcon icon={faPlus} className="size-4 mr-1" />
@@ -157,42 +241,48 @@ const StudentGroup = () => {
             >
               <div className="hs-overlay-animation-target hs-overlay-open:scale-100 hs-overlay-open:opacity-100 scale-95 opacity-0 ease-in-out transition-all duration-200 sm:max-w-lg sm:w-full m-3 sm:mx-auto min-h-[calc(100%-3.5rem)] flex items-center">
                 <div className="w-full flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto">
-                  <div className="flex justify-between items-center py-3 px-4 border-b">
-                    <h2
-                      id="hs-scale-animation-modal-label"
-                      className="font-bold text-gray-800 text-[18px]"
-                    >
-                      Create new group
-                    </h2>
-                    <button
-                      type="button"
-                      className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none"
-                      aria-label="Close"
-                      data-hs-overlay="#hs-scale-animation-modal"
-                    >
-                      <span className="sr-only">Close</span>
-                      <svg
-                        className="shrink-0 size-4"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                  <form
+                    className="flex flex-col gap-3"
+                    onSubmit={handleCreateGroup}
+                  >
+                    <div className="flex justify-between items-center py-3 px-4 border-b">
+                      <h2
+                        id="hs-scale-animation-modal-label"
+                        className="font-bold text-gray-800 text-[18px]"
                       >
-                        <path d="M18 6 6 18"></path>
-                        <path d="m6 6 12 12"></path>
-                      </svg>
-                    </button>
-                  </div>
-                  <div className="p-4 overflow-y-auto flex flex-col justify-center items-center">
-                    <div className="w-full px-10">
-                      <form className="flex flex-col gap-3">
+                        Create new group
+                      </h2>
+                      <button
+                        type="button"
+                        className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none"
+                        aria-label="Close"
+                        data-hs-overlay="#hs-scale-animation-modal"
+                      >
+                        <span className="sr-only">Close</span>
+                        <svg
+                          className="shrink-0 size-4"
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <path d="M18 6 6 18"></path>
+                          <path d="m6 6 12 12"></path>
+                        </svg>
+                      </button>
+                    </div>
+                    <div className="p-4 overflow-y-auto flex flex-col justify-center items-center">
+                      <div className="w-full px-10 flex flex-col gap-3">
                         <div className="relative">
                           <input
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
                             type="text"
                             className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
     focus:pt-6
@@ -220,6 +310,11 @@ const StudentGroup = () => {
 
                         <div className="relative">
                           <select
+                            value={classId}
+                            onChange={(e) =>
+                              setClassId(parseInt(e.target.value))
+                            }
+                            required
                             className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
     focus:pt-6
     focus:pb-2
@@ -228,9 +323,7 @@ const StudentGroup = () => {
     autofill:pt-6
     autofill:pb-2"
                           >
-                            <option value="" disabled>
-                              Choose class
-                            </option>
+                            <option value="">Choose class</option>
                             {/* <option value="SE1849">SE1849</option>
                             <option value="SE1850">SE1850</option>
                             <option value="SE1851">SE1851</option>
@@ -286,7 +379,11 @@ const StudentGroup = () => {
 
                         <div className="relative">
                           <select
-                            onChange={(e) => console.log(e.target.value)}
+                            value={topicId}
+                            onChange={(e) =>
+                              setTopicId(parseInt(e.target.value))
+                            }
+                            required
                             className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
     focus:pt-6
     focus:pb-2
@@ -295,9 +392,7 @@ const StudentGroup = () => {
     autofill:pt-6
     autofill:pb-2"
                           >
-                            <option value="" disabled>
-                              Choose topic
-                            </option>
+                            <option value="">Choose topic</option>
                             {/* <option value="Koi Farm Shop">Koi Farm Shop</option>
                             <option value="Koi Ordering System in Japan">
                               Koi Ordering System in Japan
@@ -357,11 +452,14 @@ const StudentGroup = () => {
                             <option value="STEM KIT Sales System">
                               STEM KIT Sales System
                             </option> */}
-                            {topics.map((t) => (
-                              <option key={t.topicId} value={t.topicId}>
-                                {t.name}
-                              </option>
-                            ))}
+                            {topics.map(
+                              (t) =>
+                                t.status == true && (
+                                  <option key={t.topicId} value={t.topicId}>
+                                    {t.name}
+                                  </option>
+                                )
+                            )}
                           </select>
 
                           <label
@@ -380,24 +478,24 @@ const StudentGroup = () => {
                         </div>
 
                         <div className="relative"></div>
-                      </form>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t">
-                    <button
-                      type="button"
-                      className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
-                      data-hs-overlay="#hs-scale-animation-modal"
-                    >
-                      Close
-                    </button>
-                    <button
-                      type="button"
-                      className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
-                    >
-                      Create group
-                    </button>
-                  </div>
+                    <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t">
+                      <button
+                        type="button"
+                        className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                        data-hs-overlay="#hs-scale-animation-modal"
+                      >
+                        Close
+                      </button>
+                      <button
+                        type="submit"
+                        className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                      >
+                        Create group
+                      </button>
+                    </div>
+                  </form>
                 </div>
               </div>
             </div>
@@ -411,7 +509,7 @@ const StudentGroup = () => {
                 <div className="flex w-[280px]">
                   <div className="w-[90%]">
                     <h1 className="text-[21px] font-medium mb-3">
-                      Group 1 - SE1867
+                      {group.name} - {group.swpClassName}
                     </h1>
                     <div className="flex -space-x-1 overflow-hidden">
                       <img
@@ -439,10 +537,7 @@ const StudentGroup = () => {
                   <div>
                     <div
                       className="cursor-pointer flex justify-center items-center size-9 rounded-full bg-[#ffffff] hover:bg-[#e2e2e2] shadow"
-                      aria-haspopup="dialog"
-                      aria-expanded="false"
-                      aria-controls="hs-scale-animation-modal"
-                      data-hs-overlay="#hs-scale-animation-modal"
+                      onClick={() => setOpenSetting(true)}
                     >
                       <FontAwesomeIcon icon={faGear} className="size-4" />
                     </div>
@@ -451,7 +546,8 @@ const StudentGroup = () => {
 
                 <div className="mt-7">
                   <h1 className="text-[15px] font-semibold text-[#3c3c3c]">
-                    Remaining points: <span className="text-[#0c9eff]">10</span>
+                    Remaining points:{" "}
+                    <span className="text-[#0c9eff]">{group.walletPoint}</span>
                   </h1>
                 </div>
 
@@ -462,11 +558,11 @@ const StudentGroup = () => {
                   <div className="pt-4 mt-3 bg-white shadow-md rounded-lg inline-block">
                     <div className="border-l-[4px] border-[#FFD0B5] pl-5 ml-3 mb-4 pr-8">
                       <p className="text-[14px] font-medium text-[#4a4a4a] bg-[#F0F4F8] px-[10px] inline-block rounded-md py-[2px]">
-                        Fall 24
+                        {groupTopic?.semesterName}
                       </p>
                       <p className="font-semibold mt-3 ml-1">SWP391</p>
                       <p className="mt-2 text-[#4a4a4a] text-[15px] ml-1">
-                        Koi Auction System for Breeder
+                        {groupTopic?.name}
                       </p>
                     </div>
                     <div className="border-t-2 py-[6px] flex justify-end px-4">
@@ -606,18 +702,19 @@ const StudentGroup = () => {
                 transition
                 className="pointer-events-auto relative w-screen max-w-md transform transition duration-500 ease-in-out data-[closed]:translate-x-full sm:duration-700"
               >
-                <div className="flex h-full flex-col overflow-y-scroll bg-white py-6 shadow-xl">
-                  <div className="px-4 sm:px-6">
+                <div className="flex h-full flex-col overflow-y-scroll bg-white py-6 pt-0 shadow-xl">
+                  {/* <div className="px-4 sm:px-6">
                     <DialogTitle className="text-base font-semibold leading-6 text-gray-900">
                       Panel title
                     </DialogTitle>
-                  </div>
+                  </div> */}
                   <div className="relative mt-6 flex-1 px-4 sm:px-6 py-3">
                     <p className="font-medium text-[18px] mb-3">
-                      Koi Auction System for Breeder
+                      {groupTopic?.name}
                     </p>
-                    <span className="text-[15px] mr-2">Actors: </span>
-                    <div className="mt-2 flex gap-2">
+                    <p className="mr-2 text-[#a17a3a] font-medium">Actors: </p>
+                    <span className="text-[15px]">{groupTopic?.actors}</span>
+                    {/* <div className="mt-2 flex gap-2">
                       <span className="bg-[#C6F7E9] rounded-[20px] py-[2px] px-[10px] text-[14px] font-medium text-[#46ad90]">
                         Guest
                       </span>
@@ -630,26 +727,12 @@ const StudentGroup = () => {
                       <span className="bg-[#ccf1d0] rounded-[20px] py-[2px] px-[10px] text-[14px] font-medium text-[#82b588]">
                         Staff
                       </span>
-                    </div>
+                    </div> */}
                     <div className="mt-4">
-                      <p>Description: </p>
-                      {` 
-Koi auction software for Koi farms of auction companies 
-- Home page introduces the auction company, fish farms, policies and regulations, sharing blog, ...
-- Buyers can search for information about Koi fish to bid.
-- Manage the Koi auction request process of the farm owner.
-<< The farm owner sends an auction request --> The company directly checks the Koi (if necessary) --> The two parties finalize the starting price and auction method --> The company puts the fish into the auction >>
-- Manage the auction according to 04 methods:
-Method 1 - Sell fish at a fixed price: In this form, the price of Koi fish is specifically determined at 1 level. If 1 person wants to buy, the price is still fixed, however, if 2 people want to buy 1 fish, when the closing time ends, the system will randomly draw lots to determine the buyer of the fish.
-Method 2 - Bid once: When each Koi fish is put up for auction, the buyer will determine the price to pay for the Koi fish (this price is completely confidential). At the end of the auction, whoever bids the highest will buy the Koi fish.
-Method 3 - Bid up: 1 buyer can bid multiple times, whoever bids the highest will be the winner. The buyer's bid information is made public.
-Method 4 - Bid down: the auction winner is the first person to accept the starting price or the reduced price (the system will periodically reduce the price if no one bids). The buyer's bid information is made public.
-- Manage the Koi fish auction process of the buyer.
-<< Buyer registers to participate in the auction --> Buyer makes an auction --> System notifies buyer of winning or losing auction results at the end of the session --> Auction winner makes payment --> Farm owner transports fish to company --> Company transports fish to auction winner --> Company transfers money to farm owner >>
-- Function allows buyer to conduct manual auction or automatic auction (activation price, maximum price, increment amount)
-- Declare transaction fees that buyer/seller must pay to the company.
-- Statistics dashboard.
-Reference link: https://auctionkoi.com/`}
+                      <p className="text-[#39ae6c] font-medium">
+                        Description:{" "}
+                      </p>
+                      <p className="text-[15px]">{groupTopic?.description}</p>
                     </div>
                   </div>
                 </div>
@@ -659,66 +742,69 @@ Reference link: https://auctionkoi.com/`}
         </div>
       </Dialog>
 
-      <div
-        id="hs-scale-animation-modal"
-        className="hs-overlay hidden size-full fixed top-0 start-0 z-[80] overflow-x-hidden overflow-y-auto pointer-events-none"
-        role="dialog"
-        tabIndex={-1}
-        aria-labelledby="hs-scale-animation-modal-label"
+      <Dialog
+        open={openSetting}
+        onClose={setOpenSetting}
+        className="relative z-[100]"
       >
-        <div className="hs-overlay-animation-target hs-overlay-open:scale-100 hs-overlay-open:opacity-100 scale-95 opacity-0 ease-in-out transition-all duration-200 sm:max-w-lg sm:w-full m-3 sm:mx-auto min-h-[calc(100%-3.5rem)] flex items-center">
-          <div className="w-full flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto">
-            <div className="flex justify-between items-center py-3 px-4 border-b">
-              <h2
-                id="hs-scale-animation-modal-label"
-                className="font-bold text-gray-800 text-[18px]"
-              >
-                Setting Group
-              </h2>
-              <button
-                type="button"
-                className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none"
-                aria-label="Close"
-                data-hs-overlay="#hs-scale-animation-modal"
-              >
-                <span className="sr-only">Close</span>
-                <svg
-                  className="shrink-0 size-4"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+        <DialogBackdrop
+          transition
+          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+        />
+
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div className="w-[500px] flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto">
+              <div className="flex justify-between items-center py-3 px-4 border-b">
+                <h2
+                  id="hs-scale-animation-modal-label-setting"
+                  className="font-bold text-gray-800 text-[18px]"
                 >
-                  <path d="M18 6 6 18"></path>
-                  <path d="m6 6 12 12"></path>
-                </svg>
-              </button>
-            </div>
-            <div className="p-4 overflow-y-auto flex flex-col justify-center items-center">
-              <h1 className="mb-2 font-medium text-[#474747]">
-                - Add member -
-              </h1>
-              <form className="w-full mb-5">
-                <div className="flex gap-3">
-                  <div className="relative w-[80%]">
-                    <input
-                      type="email"
-                      className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+                  Setting Group
+                </h2>
+                <button
+                  type="button"
+                  className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none"
+                  onClick={() => setOpenSetting(false)}
+                >
+                  <span className="sr-only">Close</span>
+                  <svg
+                    className="shrink-0 size-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 6 6 18"></path>
+                    <path d="m6 6 12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <div className="p-4 overflow-y-auto flex flex-col justify-center items-center">
+                <h1 className="mb-2 font-medium text-[#474747]">
+                  - Add member -
+                </h1>
+                <form className="w-full mb-5">
+                  <div className="flex gap-3">
+                    <div className="relative w-[80%]">
+                      <input
+                        type="email"
+                        className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
     focus:pt-6
     focus:pb-2
     [&:not(:placeholder-shown)]:pt-6
     [&:not(:placeholder-shown)]:pb-2
     autofill:pt-6
     autofill:pb-2"
-                      placeholder="Email"
-                    />
-                    <label
-                      className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
+                        placeholder="Email"
+                      />
+                      <label
+                        className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
       peer-focus:scale-90
       peer-focus:translate-x-0.5
       peer-focus:-translate-y-1.5
@@ -727,40 +813,34 @@ Reference link: https://auctionkoi.com/`}
       peer-[:not(:placeholder-shown)]:translate-x-0.5
       peer-[:not(:placeholder-shown)]:-translate-y-1.5
       peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
-                    >
-                      Email
-                    </label>
-                  </div>
+                      >
+                        Email
+                      </label>
+                    </div>
 
-                  <div
-                    className="flex items-center justify-center cursor-pointer border border-[blue] py-3 rounded-md w-[20%] text-blue-500 font-semibold hover:bg-blue-50"
-                    onClick={() => {
-                      console.log("OK");
-                    }}
-                  >
-                    Add
+                    <div
+                      className="flex items-center justify-center cursor-pointer border border-[blue] py-3 rounded-md w-[20%] text-blue-500 font-semibold hover:bg-blue-50"
+                      onClick={() => {
+                      }}
+                    >
+                      Add
+                    </div>
                   </div>
-                </div>
-              </form>
-            </div>
-            <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t">
-              <button
-                type="button"
-                className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
-                data-hs-overlay="#hs-scale-animation-modal"
-              >
-                Close
-              </button>
-              {/* <button
-                type="button"
-                className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
-              >
-                Save changes
-              </button> */}
+                </form>
+              </div>
+              <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t">
+                <button
+                  type="button"
+                  className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                  onClick={() => setOpenSetting(false)}
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </Dialog>
     </>
   );
 };

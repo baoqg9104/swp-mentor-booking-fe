@@ -185,6 +185,8 @@ const EditProfile = () => {
           meetUrl: response.data.meetUrl,
         };
 
+        // console.log(data.dateOfBirth ? data.dateOfBirth : "2024-1-1");
+
         setMentorInformation(data);
         setFullName(data.fullName!);
         setGender(data.gender ? data.gender : "");
@@ -283,7 +285,7 @@ const EditProfile = () => {
                         <FontAwesomeIcon
                           icon={faGift}
                           className={`size-4 mr-2 ${
-                            mentorInformation?.dateOfBirth != ""
+                            mentorInformation?.dateOfBirth != null
                               ? ""
                               : "text-gray-500"
                           }`}
@@ -295,9 +297,10 @@ const EditProfile = () => {
                               : "text-gray-500"
                           }`}
                         >
-                          {mentorInformation?.dateOfBirth === ""
+                          {mentorInformation?.dateOfBirth === null
                             ? ""
-                            : new Date(mentorInformation?.dateOfBirth!).toLocaleDateString("en-GB")}
+                            : new Date(mentorInformation?.dateOfBirth!).toLocaleDateString("en-GB")
+                            }
                         </span>
                       </div>
                       <div className="flex items-center">
