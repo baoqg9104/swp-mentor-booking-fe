@@ -211,7 +211,7 @@ const EditProfile = () => {
     undefined
   );
 
-  const handleAddSkill = async (e : any) => {
+  const handleAddSkill = async (e: any) => {
     try {
       e.preventDefault();
       const response = await axios.post(
@@ -228,11 +228,35 @@ const EditProfile = () => {
         }
       );
 
-      toast.success("Skill added successfully!");
+      toast.success("Skill added successfully!", {
+        autoClose: 1000,
+        pauseOnHover: false,
+      });
       setRefresh(!refresh);
     } catch (error) {
       console.log(error);
       toast.error("Skill already exists!");
+    }
+  };
+
+  const handleDeleteSkill = async (mentorSkillId: number) => {
+    try {
+      const response = await axios.delete(
+        `https://localhost:7007/api/Skills/mentorskill/delete/${mentorSkillId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
+
+      toast.success("Skill deleted successfully!", {
+        autoClose: 1000,
+        pauseOnHover: false,
+      });
+      setRefresh(!refresh);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -901,12 +925,18 @@ const EditProfile = () => {
                       {mentorSkills
                         .filter((skill) => skill.level === 5)
                         .map((skill) => (
-                          <span className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
+                          <span
+                            key={skill.mentorSkillId}
+                            className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer"
+                          >
                             {skill.skillName}
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               viewBox="0 0 384 512"
                               className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
+                              onClick={() =>
+                                handleDeleteSkill(skill.mentorSkillId)
+                              }
                             >
                               <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
                             </svg>
@@ -923,12 +953,18 @@ const EditProfile = () => {
                       {mentorSkills
                         .filter((skill) => skill.level === 4)
                         .map((skill) => (
-                          <span key={skill.mentorSkillId} className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
+                          <span
+                            key={skill.mentorSkillId}
+                            className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer"
+                          >
                             {skill.skillName}
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               viewBox="0 0 384 512"
                               className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
+                              onClick={() =>
+                                handleDeleteSkill(skill.mentorSkillId)
+                              }
                             >
                               <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
                             </svg>
@@ -945,12 +981,18 @@ const EditProfile = () => {
                       {mentorSkills
                         .filter((skill) => skill.level === 3)
                         .map((skill) => (
-                          <span key={skill.mentorSkillId} className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
+                          <span
+                            key={skill.mentorSkillId}
+                            className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer"
+                          >
                             {skill.skillName}
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               viewBox="0 0 384 512"
                               className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
+                              onClick={() =>
+                                handleDeleteSkill(skill.mentorSkillId)
+                              }
                             >
                               <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
                             </svg>
@@ -968,12 +1010,18 @@ const EditProfile = () => {
                       {mentorSkills
                         .filter((skill) => skill.level === 2)
                         .map((skill) => (
-                          <span key={skill.mentorSkillId} className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
+                          <span
+                            key={skill.mentorSkillId}
+                            className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer"
+                          >
                             {skill.skillName}
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               viewBox="0 0 384 512"
                               className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
+                              onClick={() =>
+                                handleDeleteSkill(skill.mentorSkillId)
+                              }
                             >
                               <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
                             </svg>
@@ -991,12 +1039,18 @@ const EditProfile = () => {
                       {mentorSkills
                         .filter((skill) => skill.level === 1)
                         .map((skill) => (
-                          <span key={skill.mentorSkillId} className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
+                          <span
+                            key={skill.mentorSkillId}
+                            className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer"
+                          >
                             {skill.skillName}
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               viewBox="0 0 384 512"
                               className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
+                              onClick={() =>
+                                handleDeleteSkill(skill.mentorSkillId)
+                              }
                             >
                               <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
                             </svg>
@@ -1015,12 +1069,12 @@ const EditProfile = () => {
               >
                 Close
               </button>
-              <button
+              {/* <button
                 type="button"
                 className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
               >
                 Save changes
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

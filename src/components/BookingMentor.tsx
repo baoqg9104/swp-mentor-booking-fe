@@ -5,6 +5,7 @@ import {
   faPhone,
   faUser,
   faUsersRectangle,
+  faWallet,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -53,6 +54,24 @@ interface MentorProfile {
   meetUrl: string;
 }
 
+interface MentorSkill {
+  mentorSkillId: number;
+  mentorId: string;
+  skillId: number;
+  skillName: string;
+  level: number;
+}
+
+interface MentorAvailability {
+  mentorSlotId: number;
+  mentorId: string;
+  startTime: string;
+  endTime: string;
+  bookingPoint: number;
+  isOnline: boolean;
+  room: string;
+}
+
 const BookingMentor = () => {
   const location = useLocation();
 
@@ -87,8 +106,11 @@ const BookingMentor = () => {
   const [selectedMentor, setSelectedMentor] = useState<MentorProfile | null>(
     null
   );
+  const [mentorSkills, setMentorSkills] = useState<MentorSkill[]>([]);
 
-  const [mentorAvailability, setMentorAvailability] = useState<MentorProfile[]>([]);
+  const [mentorAvailability, setMentorAvailability] = useState<
+    MentorAvailability[]
+  >([]);
 
   const authContext = useContext(AuthContext);
   if (!authContext) {
@@ -132,10 +154,10 @@ const BookingMentor = () => {
     } catch (error) {}
   };
 
-  const getMentorAvailability = async (mentorId: string) => {
+  const getMentorSkills = async (mentorId: string) => {
     try {
       const response = await axios.get(
-        `https://localhost:7007/api/MentorSlot/get-by-mentor-id/${authData?.id}`,
+        `https://localhost:7007/api/Skills/mentorskill/${mentorId}`,
         {
           headers: {
             Authorization: `Bearer ${authData?.token}`,
@@ -143,7 +165,24 @@ const BookingMentor = () => {
         }
       );
 
-      set
+      setMentorSkills(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getMentorAvailability = async (mentorId: string) => {
+    try {
+      const response = await axios.get(
+        `https://localhost:7007/api/MentorSlot/get-by-mentor-id/${mentorId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
+
+      setMentorAvailability(response.data);
     } catch (error) {}
   };
 
@@ -287,6 +326,7 @@ const BookingMentor = () => {
                           onClick={() => {
                             setOpenProfile(true);
                             getMentorProfile(mentor.mentorId);
+                            getMentorSkills(mentor.mentorId);
                           }}
                         >
                           Profile
@@ -480,7 +520,7 @@ const BookingMentor = () => {
 
         <div className="fixed inset-0 z-[100] w-screen overflow-y-auto">
           <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div className="w-[60%] h-[90vh] flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto">
+            <div className="lg:w-[60%] sm:w-[85%] h-[90vh] flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto">
               <div className="flex justify-between items-center py-3 px-4 border-b">
                 <h2 className="font-bold text-gray-800 text-[18px]">
                   Mentor Profile
@@ -509,7 +549,7 @@ const BookingMentor = () => {
                 </button>
               </div>
               <div className="p-4 px-10 pl-16 overflow-y-auto flex justify-center items-center">
-                <div className="w-[50%]">
+                <div className="w-[50%] flex flex-col justify-center mt-10">
                   <div className="size-[120px] bg-gray-200 rounded-full border-[3px] border-white shadow-lg"></div>
                   <div className="text-[25px] font-medium mt-4 mb-3 text-start">
                     {selectedMentor?.mentorName}
@@ -608,64 +648,99 @@ const BookingMentor = () => {
                   </div>
                 </div>
 
-                <div className="w-[50%]">
-                  <div className="mt-6">
-                    <h3 className="font-semibold">Expert</h3>
-                    <div className="mt-3 ml-1 flex gap-x-4 justify-center">
-                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                        React
-                      </span>
-                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                        ASP.NET
-                      </span>
+                <div className="w-[50%] flex flex-col gap-y-2">
+                  {mentorSkills.filter((skill) => skill.level === 5).length >
+                    0 && (
+                    <div className="mt-6">
+                      <h3 className="font-semibold">Expert</h3>
+                      <div className="mt-3 ml-1 flex gap-x-4 justify-center">
+                        {mentorSkills
+                          .filter((skill) => skill.level === 5)
+                          .map((skill) => (
+                            <span
+                              key={skill.mentorSkillId}
+                              className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow"
+                            >
+                              {skill.skillName}
+                            </span>
+                          ))}
+                      </div>
                     </div>
-                  </div>
-                  <div className="mt-6">
-                    <h3 className="font-semibold">Advanced</h3>
-                    <div className="mt-3 ml-1 flex gap-x-4 justify-center">
-                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                        React
-                      </span>
-                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                        ASP.NET
-                      </span>
+                  )}
+                  {mentorSkills.filter((skill) => skill.level === 4).length >
+                    0 && (
+                    <div className="mt-6">
+                      <h3 className="font-semibold">Advanced</h3>
+                      <div className="mt-3 ml-1 flex gap-x-4 justify-center">
+                        {mentorSkills
+                          .filter((skill) => skill.level === 4)
+                          .map((skill) => (
+                            <span
+                              key={skill.mentorSkillId}
+                              className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow"
+                            >
+                              {skill.skillName}
+                            </span>
+                          ))}
+                      </div>
                     </div>
-                  </div>
-                  <div className="mt-6">
-                    <h3 className="font-semibold">Proficient</h3>
-                    <div className="mt-3 ml-1 flex gap-x-4 justify-center">
-                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                        React
-                      </span>
-                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                        ASP.NET
-                      </span>
+                  )}
+                  {mentorSkills.filter((skill) => skill.level === 3).length >
+                    0 && (
+                    <div className="mt-6">
+                      <h3 className="font-semibold">Proficient</h3>
+                      <div className="mt-3 ml-1 flex gap-x-4 justify-center">
+                        {mentorSkills
+                          .filter((skill) => skill.level === 3)
+                          .map((skill) => (
+                            <span
+                              key={skill.mentorSkillId}
+                              className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow"
+                            >
+                              {skill.skillName}
+                            </span>
+                          ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  <div className="mt-6">
-                    <h3 className="font-semibold">Intermediate</h3>
-                    <div className="mt-3 ml-1 flex gap-x-4 justify-center">
-                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                        React
-                      </span>
-                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                        ASP.NET
-                      </span>
+                  {mentorSkills.filter((skill) => skill.level === 2).length >
+                    0 && (
+                    <div className="mt-6">
+                      <h3 className="font-semibold">Intermediate</h3>
+                      <div className="mt-3 ml-1 flex gap-x-4 justify-center">
+                        {mentorSkills
+                          .filter((skill) => skill.level === 2)
+                          .map((skill) => (
+                            <span
+                              key={skill.mentorSkillId}
+                              className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow"
+                            >
+                              {skill.skillName}
+                            </span>
+                          ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
-                  <div className="mt-6">
-                    <h3 className="font-semibold">Beginner</h3>
-                    <div className="mt-3 ml-1 flex gap-x-4 justify-center">
-                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                        React
-                      </span>
-                      <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                        ASP.NET
-                      </span>
+                  {mentorSkills.filter((skill) => skill.level === 1).length >
+                    0 && (
+                    <div className="mt-6">
+                      <h3 className="font-semibold">Beginner</h3>
+                      <div className="mt-3 ml-1 flex gap-x-4 justify-center">
+                        {mentorSkills
+                          .filter((skill) => skill.level === 1)
+                          .map((skill) => (
+                            <span
+                              key={skill.mentorSkillId}
+                              className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow"
+                            >
+                              {skill.skillName}
+                            </span>
+                          ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -927,7 +1002,7 @@ const BookingMentor = () => {
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-200">
-                            <tr>
+                            {/* <tr>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                                 20-09-2024
                               </td>
@@ -989,7 +1064,45 @@ const BookingMentor = () => {
                                   Book
                                 </button>
                               </td>
-                            </tr>
+                            </tr> */}
+
+                            {mentorAvailability.map((availability) => (
+                              <tr>
+                                <td className="text-start px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                  {new Date(availability.startTime)
+                                    .toLocaleDateString("en-GB")
+                                    .replace(/\//g, "-")}
+                                </td>
+                                <td className="text-start px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                  {`${new Date(
+                                    availability.startTime
+                                  ).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })} - ${new Date(
+                                    availability.endTime
+                                  ).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}`}
+                                </td>
+                                <td className="text-start px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                  {availability.room
+                                    ? availability.room
+                                    : "Online"}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
+                                  <button
+                                    type="button"
+                                    disabled
+                                    className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
+                                    onClick={() => setOpen(true)}
+                                  >
+                                    Book
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
                           </tbody>
                         </table>
                       </div>
@@ -1026,17 +1139,11 @@ const BookingMentor = () => {
           <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <DialogPanel
               transition
-              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-lg lg:w-[420px] data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
+              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 lg:w-[550px] data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95 h-[230px]"
             >
               <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                 <div className="p-0">
                   <div className="text-center sm:ml-2 sm:mt-0 sm:text-left">
-                    {/* <DialogTitle
-                      as="h3"
-                      className="text-base font-semibold leading-6 text-gray-900"
-                    >
-                      Booking
-                    </DialogTitle> */}
                     <div className="mt-2">
                       <h1 className="mb-3 font-medium">Mentor: TamPM</h1>
                       <div className="flex">
@@ -1050,7 +1157,7 @@ const BookingMentor = () => {
                           </svg>
                           15-10-2024
                         </div>
-                        <div className="w-1/3 flex items-center gap-1">
+                        <div className="w-1/3 flex items-center gap-1 ml-8">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 512 512"
@@ -1060,17 +1167,24 @@ const BookingMentor = () => {
                           </svg>
                           7:00 - 9:30
                         </div>
-                        <div className="w-1/3 flex items-center gap-1">
+                        <div className="w-1/3 flex items-center gap-1 ml-8">
                           <FontAwesomeIcon
                             icon={faUsersRectangle}
                             className="size-[18px]"
                           />
                           601
                         </div>
+                        <div className="w-1/3 flex items-center gap-1">
+                          {/* <FontAwesomeIcon
+                            icon={faWallet}
+                            className="size-[18px]"
+                          /> */}
+                          Point: 1
+                        </div>
                       </div>
                       <select
                         defaultValue=""
-                        className="w-[200px] mt-4"
+                        className="w-[250px] mt-4"
                         onChange={(e) => setSkill(e.target.value)}
                       >
                         <option value="" disabled>
