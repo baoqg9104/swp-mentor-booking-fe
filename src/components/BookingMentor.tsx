@@ -262,7 +262,7 @@ const BookingMentor = () => {
                       </th>
                       <td className="px-6 py-4">{mentor.email}</td>
                       <td className="px-6 py-4">{mentor.phone}</td>
-                      <td className="px-6 py-4 text-center">5 / 5</td>
+                      <td className="px-6 py-4 text-center"></td>
                       <td className="px-6 py-4 text-right">
                         <span
                           className="cursor-pointer font-medium text-blue-600 hover:underline"
@@ -565,8 +565,8 @@ const BookingMentor = () => {
                           selectedMentor?.phone ? "" : "text-gray-500"
                         }`}
                       >
-                        {selectedMentor?.phone === ""
-                          ? "Phone"
+                        {selectedMentor?.phone === null
+                          ? ""
                           : selectedMentor?.phone}
                       </span>
                     </div>
@@ -582,8 +582,8 @@ const BookingMentor = () => {
                           selectedMentor?.meetUrl ? "" : "text-gray-500"
                         }`}
                       >
-                        {selectedMentor?.meetUrl === ""
-                          ? "Meet URL"
+                        {selectedMentor?.meetUrl === null
+                          ? ""
                           : selectedMentor?.meetUrl}
                       </span>
                     </div>
