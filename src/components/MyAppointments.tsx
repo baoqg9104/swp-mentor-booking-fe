@@ -52,6 +52,7 @@ const MyAppointments = () => {
   return (
     <>
       <div className="h-[90vh] py-10 px-20">
+      Search bar
         <div className="-m-1.5 overflow-x-auto bg-white rounded-lg shadow">
           <div className="p-1.5 min-w-full inline-block align-middle">
             <div className="overflow-hidden">

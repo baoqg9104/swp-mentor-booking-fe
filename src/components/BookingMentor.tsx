@@ -77,6 +77,7 @@ const BookingMentor = () => {
 
   const [open, setOpen] = useState<boolean>(false);
   const [openProfile, setOpenProfile] = useState<boolean>(false);
+  const [openAvailability, setOpenAvailability] = useState<boolean>(false);
   const [openSuccess, setOpenSuccess] = useState<boolean>(false);
 
   const [skill, setSkill] = useState<string>("");
@@ -86,6 +87,8 @@ const BookingMentor = () => {
   const [selectedMentor, setSelectedMentor] = useState<MentorProfile | null>(
     null
   );
+
+  const [mentorAvailability, setMentorAvailability] = useState<MentorProfile[]>([]);
 
   const authContext = useContext(AuthContext);
   if (!authContext) {
@@ -126,6 +129,21 @@ const BookingMentor = () => {
       );
 
       setSelectedMentor(response.data);
+    } catch (error) {}
+  };
+
+  const getMentorAvailability = async (mentorId: string) => {
+    try {
+      const response = await axios.get(
+        `https://localhost:7007/api/MentorSlot/get-by-mentor-id/${authData?.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
+
+      set
     } catch (error) {}
   };
 
@@ -275,10 +293,10 @@ const BookingMentor = () => {
                         </span>
                         <span
                           className="cursor-pointer font-medium text-yellow-700 hover:underline ml-3"
-                          aria-haspopup="dialog"
-                          aria-expanded="false"
-                          aria-controls="hs-scale-animation-modal-avaibility"
-                          data-hs-overlay="#hs-scale-animation-modal-avaibility"
+                          onClick={() => {
+                            setOpenAvailability(true);
+                            getMentorAvailability(mentor.mentorId);
+                          }}
                         >
                           Availability
                         </span>
@@ -655,7 +673,7 @@ const BookingMentor = () => {
         </div>
       </Dialog>
 
-      <div
+      {/* <div
         id="hs-scale-animation-modal-avaibility"
         className="hs-overlay hidden size-full fixed top-0 start-0 z-[80] overflow-x-hidden overflow-y-auto pointer-events-none"
         role="dialog"
@@ -825,16 +843,178 @@ const BookingMentor = () => {
               >
                 Close
               </button>
-              {/* <button
-                type="button"
-                className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
-              >
-                Save changes
-              </button> */}
+             
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
+
+      <Dialog
+        open={openAvailability}
+        onClose={setOpenAvailability}
+        className="relative z-[100]"
+      >
+        <DialogBackdrop
+          transition
+          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+        />
+
+        <div className="fixed inset-0 z-[100] w-screen overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div className="w-[90%] h-[95vh] flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto">
+              <div className="flex justify-between items-center py-3 px-4 border-b">
+                <h2 className="font-bold text-gray-800 text-[18px]">
+                  Mentor Availability
+                </h2>
+                <button
+                  type="button"
+                  className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none"
+                  onClick={() => setOpenAvailability(false)}
+                >
+                  <span className="sr-only">Close</span>
+                  <svg
+                    className="shrink-0 size-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 6 6 18"></path>
+                    <path d="m6 6 12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <div className="p-4 px-10 overflow-y-auto flex justify-center">
+                <div className="w-[40%]">
+                  <div className="mb-5 text-[20px] font-medium">
+                    Mentor: TamPM
+                  </div>
+                  <div className="-m-1.5 overflow-x-auto">
+                    <div className="p-1.5 min-w-full inline-block align-middle">
+                      <div className="overflow-hidden">
+                        <table className="min-w-full divide-y divide-gray-200">
+                          <thead>
+                            <tr>
+                              <th
+                                scope="col"
+                                className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase"
+                              >
+                                Date
+                              </th>
+                              <th
+                                scope="col"
+                                className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase"
+                              >
+                                Time
+                              </th>
+                              <th
+                                scope="col"
+                                className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase"
+                              >
+                                Room
+                              </th>
+                              <th
+                                scope="col"
+                                className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
+                              >
+                                Action
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-200">
+                            <tr>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                20-09-2024
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                07:00 - 09:30
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                601
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
+                                <button
+                                  type="button"
+                                  className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
+                                  onClick={() => setOpen(true)}
+                                >
+                                  Book
+                                </button>
+                              </td>
+                            </tr>
+
+                            <tr>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                20-09-2024
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                08:00 - 10:30
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                Online
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
+                                <button
+                                  type="button"
+                                  className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
+                                  onClick={() => setOpen(true)}
+                                >
+                                  Book
+                                </button>
+                              </td>
+                            </tr>
+
+                            <tr>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                20-09-2024
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                14:00 - 16:30
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                611
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
+                                <button
+                                  type="button"
+                                  disabled
+                                  className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
+                                  onClick={() => setOpen(true)}
+                                >
+                                  Book
+                                </button>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="w-[60%]">
+                  <ScheduleComponent
+                    readonly
+                    startHour="07:00"
+                    height={635}
+                    selectedDate={new Date(2024, 8, 27)}
+                    eventSettings={{
+                      dataSource: data,
+                    }}
+                  >
+                    <Inject services={[Day, Week, WorkWeek, Month, Agenda]} />
+                  </ScheduleComponent>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Dialog>
 
       <Dialog open={open} onClose={setOpen} className="relative z-[100]">
         <DialogBackdrop

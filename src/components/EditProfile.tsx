@@ -18,115 +18,12 @@ import Select from "react-select";
 import { AuthContext } from "./AuthContext";
 import { toast } from "react-toastify";
 
-const skills = [
-  // Frontend Frameworks & Libraries
-  { value: "react_js", label: "React.js" },
-  { value: "angular_js", label: "Angular.js" },
-  { value: "vue_js", label: "Vue.js" },
-  { value: "svelte", label: "Svelte" },
-  { value: "next_js", label: "Next.js" },
-  { value: "nuxt_js", label: "Nuxt.js" },
-
-  // Backend Development
-  { value: "node_js", label: "Node.js" },
-  { value: "express_js", label: "Express.js" },
-  { value: "asp_net_core", label: "ASP.NET Core" },
-  { value: "django", label: "Django" },
-  { value: "flask", label: "Flask" },
-  { value: "ruby_on_rails", label: "Ruby on Rails" },
-  { value: "php", label: "PHP" },
-  { value: "laravel", label: "Laravel" },
-  { value: "spring_boot", label: "Spring Boot (Java)" },
-  { value: "graphql", label: "GraphQL" },
-
-  // Version Control
-  { value: "git", label: "Git" },
-  { value: "github", label: "GitHub" },
-  { value: "gitlab", label: "GitLab" },
-  { value: "bitbucket", label: "Bitbucket" },
-
-  // Database & Data Handling
-  { value: "sql", label: "SQL" },
-  { value: "mysql", label: "MySQL" },
-  { value: "postgresql", label: "PostgreSQL" },
-  { value: "mongodb", label: "MongoDB" },
-  { value: "firebase", label: "Firebase Realtime Database" },
-  { value: "sqlite", label: "SQLite" },
-  { value: "redis", label: "Redis" },
-
-  // API Integration
-  { value: "rest_api", label: "RESTful APIs" },
-  { value: "graphql_api", label: "GraphQL APIs" },
-  { value: "json_xml", label: "JSON & XML" },
-  { value: "websockets", label: "WebSockets" },
-  { value: "axios", label: "Axios / Fetch" },
-
-  // Build Tools & Package Managers
-  { value: "webpack", label: "Webpack" },
-  { value: "babel", label: "Babel" },
-  { value: "npm", label: "NPM (Node Package Manager)" },
-  { value: "yarn", label: "Yarn" },
-  { value: "gulp", label: "Gulp" },
-  { value: "parcel", label: "Parcel" },
-
-  // Testing
-  { value: "jest", label: "Jest" },
-  { value: "mocha", label: "Mocha" },
-  { value: "chai", label: "Chai" },
-  { value: "cypress", label: "Cypress" },
-  { value: "jasmine", label: "Jasmine" },
-  { value: "react_testing_library", label: "React Testing Library" },
-  { value: "selenium", label: "Selenium" },
-
-  // Web Performance Optimization
-  { value: "lazy_loading", label: "Lazy Loading" },
-  { value: "code_splitting", label: "Code Splitting" },
-  { value: "caching", label: "Caching (Service Workers)" },
-  { value: "minification", label: "Minification (CSS/JS)" },
-  { value: "image_compression", label: "Image Compression" },
-
-  // Security
-  { value: "https_ssl", label: "HTTPS/SSL" },
-  { value: "xss_prevention", label: "Cross-Site Scripting (XSS) Prevention" },
-  { value: "sql_injection_prevention", label: "SQL Injection Prevention" },
-  {
-    value: "csrf_prevention",
-    label: "Cross-Site Request Forgery (CSRF) Prevention",
-  },
-  { value: "content_security_policy", label: "Content Security Policy (CSP)" },
-
-  // DevOps & Deployment
-  {
-    value: "ci_cd",
-    label: "CI/CD (Continuous Integration/Continuous Deployment)",
-  },
-  { value: "docker", label: "Docker" },
-  { value: "nginx", label: "Nginx" },
-  { value: "apache", label: "Apache" },
-  { value: "aws", label: "AWS (Amazon Web Services)" },
-  { value: "heroku", label: "Heroku" },
-  { value: "netlify", label: "Netlify" },
-  { value: "vercel", label: "Vercel" },
-
-  // CMS (Content Management Systems)
-  { value: "wordpress", label: "WordPress" },
-  { value: "joomla", label: "Joomla" },
-  { value: "drupal", label: "Drupal" },
-  { value: "ghost", label: "Ghost" },
-  { value: "contentful", label: "Contentful" },
-
-  // PWA (Progressive Web Apps)
-  { value: "service_workers", label: "Service Workers" },
-  { value: "web_app_manifest", label: "Web App Manifest" },
-  { value: "push_notifications", label: "Push Notifications" },
-];
-
 const levels = [
-  { value: "beginner", label: "Beginner" },
-  { value: "intermediate", label: "Intermediate" },
-  { value: "proficient", label: "Proficient" },
-  { value: "advanced", label: "Advanced" },
-  { value: "expert", label: "Expert" },
+  { value: "1", label: "Beginner" },
+  { value: "2", label: "Intermediate" },
+  { value: "3", label: "Proficient" },
+  { value: "4", label: "Advanced" },
+  { value: "5", label: "Expert" },
 ];
 
 declare global {
@@ -142,6 +39,19 @@ interface MentorInformation {
   dateOfBirth: string;
   phone: string;
   meetUrl: string;
+}
+
+interface MentorSkill {
+  mentorSkillId: number;
+  mentorId: string;
+  skillId: number;
+  skillName: string;
+  level: number;
+}
+
+interface Skill {
+  skillId: number;
+  name: string;
 }
 
 const EditProfile = () => {
@@ -160,6 +70,9 @@ const EditProfile = () => {
 
   const [mentorInformation, setMentorInformation] =
     useState<MentorInformation>();
+
+  const [mentorSkills, setMentorSkills] = useState<MentorSkill[]>([]);
+  const [skills, setSkills] = useState<Skill[]>([]);
 
   const [refresh, setRefresh] = useState(false);
 
@@ -199,7 +112,25 @@ const EditProfile = () => {
       } catch (error) {}
     };
 
+    const getMentorSkills = async () => {
+      try {
+        const response = await axios.get(
+          `https://localhost:7007/api/Skills/mentorskill/${authData?.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+
+        setMentorSkills(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     getMentorById();
+    getMentorSkills();
   }, [refresh]);
 
   const [fullName, setFullName] = useState<string>("");
@@ -222,7 +153,6 @@ const EditProfile = () => {
         meetUrl: meetUrl,
       };
 
-
       const response = await axios.put(
         "https://localhost:7007/api/User/update-user",
         data,
@@ -243,15 +173,72 @@ const EditProfile = () => {
 
   const formatDate = (isoDate: string): string => {
     const date = new Date(isoDate);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0 nên cần cộng thêm 1
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Tháng bắt đầu từ 0 nên cần cộng thêm 1
     const year = date.getFullYear();
     return `${year}-${month}-${day}`;
   };
 
+  const formatSkill = (skills: Skill[]): { value: string; label: string }[] => {
+    return skills.map((skill) => ({
+      value: skill.skillId.toString(),
+      label: skill.name,
+    }));
+  };
+
+  const getSkills = async () => {
+    try {
+      const response = await axios.get(
+        "https://localhost:7007/api/Skills/all",
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
+
+      setSkills(response.data);
+      // console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const [selectedSkill, setSelectedSkill] = useState<string | undefined>(
+    undefined
+  );
+  const [selectedLevel, setSelectedLevel] = useState<string | undefined>(
+    undefined
+  );
+
+  const handleAddSkill = async (e : any) => {
+    try {
+      e.preventDefault();
+      const response = await axios.post(
+        "https://localhost:7007/api/Skills/addskill",
+        {
+          mentorId: authData?.id,
+          skillId: parseInt(selectedSkill!),
+          level: parseInt(selectedLevel!),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
+
+      toast.success("Skill added successfully!");
+      setRefresh(!refresh);
+    } catch (error) {
+      console.log(error);
+      toast.error("Skill already exists!");
+    }
+  };
+
   return (
     <>
-      <div className="p-14 pt-7">
+      <div className="p-14 pt-7 h-[100vh]">
         <div className="space-y-8">
           <div>
             <div className="mt-10">
@@ -269,15 +256,21 @@ const EditProfile = () => {
                         <FontAwesomeIcon
                           icon={faUser}
                           className={`size-4 mr-2 ${
-                            mentorInformation?.gender ? "" : "text-gray-500"
+                            mentorInformation?.gender !== ""
+                              ? ""
+                              : "text-gray-500"
                           }`}
                         />
                         <span
                           className={`${
-                            mentorInformation?.gender ? "" : "text-gray-500"
+                            mentorInformation?.gender !== ""
+                              ? ""
+                              : "text-gray-500"
                           }`}
                         >
-                          {mentorInformation?.gender}
+                          {mentorInformation?.gender === ""
+                            ? "Gender"
+                            : mentorInformation?.gender}
                         </span>
                       </div>
 
@@ -299,8 +292,9 @@ const EditProfile = () => {
                         >
                           {mentorInformation?.dateOfBirth === null
                             ? ""
-                            : new Date(mentorInformation?.dateOfBirth!).toLocaleDateString("en-GB")
-                            }
+                            : new Date(
+                                mentorInformation?.dateOfBirth!
+                              ).toLocaleDateString("en-GB")}
                         </span>
                       </div>
                       <div className="flex items-center">
@@ -423,66 +417,97 @@ const EditProfile = () => {
         </div>
 
         <div className="w-[80%] mt-7 bg-white shadow-md p-7 pt-5 flex rounded-[10px]">
-          <div className="w-[90%] flex-col">
+          <div className="w-[90%] flex-col min-h-36">
             <h1 className="text-2xl font-semibold">Skills</h1>
             <hr className="mt-5 mb-3" />
-            <div className="mt-6">
-              <h3 className="font-semibold">Expert</h3>
-              <div className="mt-3 ml-1 flex gap-x-4">
-                <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                  React
-                </span>
-                <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                  ASP.NET
-                </span>
+            {mentorSkills.filter((skill) => skill.level === 5).length > 0 && (
+              <div className="mt-6">
+                <h3 className="font-semibold">Expert</h3>
+                <div className="mt-3 ml-1 flex gap-x-4">
+                  {mentorSkills
+                    .filter((skill) => skill.level === 5)
+                    .map((skill) => (
+                      <span
+                        key={skill.mentorSkillId}
+                        className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow"
+                      >
+                        {skill.skillName}
+                      </span>
+                    ))}
+                </div>
               </div>
-            </div>
-            <div className="mt-6">
-              <h3 className="font-semibold">Advanced</h3>
-              <div className="mt-3 ml-1 flex gap-x-4">
-                <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                  React
-                </span>
-                <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                  ASP.NET
-                </span>
+            )}
+            {mentorSkills.filter((skill) => skill.level === 4).length > 0 && (
+              <div className="mt-6">
+                <h3 className="font-semibold">Advanced</h3>
+                <div className="mt-3 ml-1 flex gap-x-4">
+                  {mentorSkills
+                    .filter((skill) => skill.level === 4)
+                    .map((skill) => (
+                      <span
+                        key={skill.mentorSkillId}
+                        className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow"
+                      >
+                        {skill.skillName}
+                      </span>
+                    ))}
+                </div>
               </div>
-            </div>
-            <div className="mt-6">
-              <h3 className="font-semibold">Proficient</h3>
-              <div className="mt-3 ml-1 flex gap-x-4">
-                <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                  React
-                </span>
-                <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                  ASP.NET
-                </span>
-              </div>
-            </div>
+            )}
 
-            <div className="mt-6">
-              <h3 className="font-semibold">Intermediate</h3>
-              <div className="mt-3 ml-1 flex gap-x-4">
-                <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                  React
-                </span>
-                <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                  ASP.NET
-                </span>
+            {mentorSkills.filter((skill) => skill.level === 3).length > 0 && (
+              <div className="mt-6">
+                <h3 className="font-semibold">Proficient</h3>
+                <div className="mt-3 ml-1 flex gap-x-4">
+                  {mentorSkills
+                    .filter((skill) => skill.level === 3)
+                    .map((skill) => (
+                      <span
+                        key={skill.mentorSkillId}
+                        className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow"
+                      >
+                        {skill.skillName}
+                      </span>
+                    ))}
+                </div>
               </div>
-            </div>
+            )}
 
-            <div className="mt-6">
-              <h3 className="font-semibold">Beginner</h3>
-              <div className="mt-3 ml-1 flex gap-x-4">
-                <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                  React
-                </span>
-                <span className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow">
-                  ASP.NET
-                </span>
+            {mentorSkills.filter((skill) => skill.level === 2).length > 0 && (
+              <div className="mt-6">
+                <h3 className="font-semibold">Intermediate</h3>
+                <div className="mt-3 ml-1 flex gap-x-4">
+                  {mentorSkills
+                    .filter((skill) => skill.level === 2)
+                    .map((skill) => (
+                      <span
+                        key={skill.mentorSkillId}
+                        className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow"
+                      >
+                        {skill.skillName}
+                      </span>
+                    ))}
+                </div>
               </div>
-            </div>
+            )}
+
+            {mentorSkills.filter((skill) => skill.level === 1).length > 0 && (
+              <div className="mt-6">
+                <h3 className="font-semibold">Beginner</h3>
+                <div className="mt-3 ml-1 flex gap-x-4">
+                  {mentorSkills
+                    .filter((skill) => skill.level === 1)
+                    .map((skill) => (
+                      <span
+                        key={skill.mentorSkillId}
+                        className="py-[4px] px-[12px] rounded-[20px] bg-[#F7F7F7] shadow"
+                      >
+                        {skill.skillName}
+                      </span>
+                    ))}
+                </div>
+              </div>
+            )}
           </div>
           <div className="w-[10%] flex justify-end">
             <svg
@@ -493,11 +518,15 @@ const EditProfile = () => {
               aria-expanded="false"
               aria-controls="hs-scale-animation-modal-skills"
               data-hs-overlay="#hs-scale-animation-modal-skills"
+              onClick={() => {
+                getSkills();
+              }}
             >
               <path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z" />
             </svg>
           </div>
         </div>
+        <div className="mb-[1000px]"></div>
       </div>
 
       <div
@@ -834,157 +863,148 @@ const EditProfile = () => {
                   </div>
                 </div>
               </div> */}
-              <div className="w-full mt-6">
-                <form className="">
+              <div className="w-full mt-6 min-h-[500px]">
+                <form onSubmit={handleAddSkill}>
                   <div className="flex gap-3">
                     <Select
-                      options={skills}
+                      options={formatSkill(skills)}
                       placeholder="Search skills"
                       className="w-[50%]"
+                      onChange={(e) => {
+                        setSelectedSkill(e?.value);
+                      }}
+                      required
                     />
 
                     <Select
                       options={levels}
                       placeholder="Select level"
                       className="w-[30%]"
-                    />
-                    <div
-                      className="flex items-center justify-center cursor-pointer border border-[red] py-3 rounded-md w-[20%] text-red-500 font-semibold hover:bg-red-50"
-                      onClick={() => {
-                        console.log("OK");
+                      onChange={(e) => {
+                        setSelectedLevel(e?.value);
                       }}
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className="flex items-center justify-center cursor-pointer border border-[red] py-3 rounded-md w-[20%] text-red-500 font-semibold hover:bg-red-50"
                     >
                       Add
-                    </div>
+                    </button>
                   </div>
                 </form>
-                <div className="mt-6">
-                  <h3 className="font-semibold">Expert</h3>
-                  <div className="mt-3 ml-1 flex gap-x-4">
-                    <span className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
-                      React
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 384 512"
-                        className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
-                      >
-                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                      </svg>
-                    </span>
-                    <span className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
-                      ASP.NET
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 384 512"
-                        className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
-                      >
-                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                      </svg>
-                    </span>
+                {mentorSkills.filter((skill) => skill.level === 5).length >
+                  0 && (
+                  <div className="mt-6">
+                    <h3 className="font-semibold">Expert</h3>
+                    <div className="mt-3 ml-1 flex gap-x-4 flex-wrap gap-y-3">
+                      {mentorSkills
+                        .filter((skill) => skill.level === 5)
+                        .map((skill) => (
+                          <span className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
+                            {skill.skillName}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 384 512"
+                              className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
+                            >
+                              <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                            </svg>
+                          </span>
+                        ))}
+                    </div>
                   </div>
-                </div>
-                <div className="mt-6">
-                  <h3 className="font-semibold">Advanced</h3>
-                  <div className="mt-3 ml-1 flex gap-x-4">
-                    <span className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
-                      React
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 384 512"
-                        className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
-                      >
-                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                      </svg>
-                    </span>
-                    <span className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
-                      ASP.NET
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 384 512"
-                        className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
-                      >
-                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                      </svg>
-                    </span>
+                )}
+                {mentorSkills.filter((skill) => skill.level === 4).length >
+                  0 && (
+                  <div className="mt-6">
+                    <h3 className="font-semibold">Advanced</h3>
+                    <div className="mt-3 ml-1 flex gap-x-4 flex-wrap gap-y-3">
+                      {mentorSkills
+                        .filter((skill) => skill.level === 4)
+                        .map((skill) => (
+                          <span key={skill.mentorSkillId} className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
+                            {skill.skillName}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 384 512"
+                              className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
+                            >
+                              <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                            </svg>
+                          </span>
+                        ))}
+                    </div>
                   </div>
-                </div>
-                <div className="mt-6">
-                  <h3 className="font-semibold">Proficient</h3>
-                  <div className="mt-3 ml-1 flex gap-x-4">
-                    <span className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
-                      React
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 384 512"
-                        className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
-                      >
-                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                      </svg>
-                    </span>
-                    <span className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
-                      ASP.NET
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 384 512"
-                        className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
-                      >
-                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                      </svg>
-                    </span>
+                )}
+                {mentorSkills.filter((skill) => skill.level === 3).length >
+                  0 && (
+                  <div className="mt-6">
+                    <h3 className="font-semibold">Proficient</h3>
+                    <div className="mt-3 ml-1 flex gap-x-4 flex-wrap gap-y-3">
+                      {mentorSkills
+                        .filter((skill) => skill.level === 3)
+                        .map((skill) => (
+                          <span key={skill.mentorSkillId} className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
+                            {skill.skillName}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 384 512"
+                              className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
+                            >
+                              <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                            </svg>
+                          </span>
+                        ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div className="mt-6">
-                  <h3 className="font-semibold">Intermediate</h3>
-                  <div className="mt-3 ml-1 flex gap-x-4">
-                    <span className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
-                      React
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 384 512"
-                        className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
-                      >
-                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                      </svg>
-                    </span>
-                    <span className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
-                      ASP.NET
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 384 512"
-                        className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
-                      >
-                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                      </svg>
-                    </span>
+                {mentorSkills.filter((skill) => skill.level === 2).length >
+                  0 && (
+                  <div className="mt-6">
+                    <h3 className="font-semibold">Intermediate</h3>
+                    <div className="mt-3 ml-1 flex gap-x-4 flex-wrap gap-y-3">
+                      {mentorSkills
+                        .filter((skill) => skill.level === 2)
+                        .map((skill) => (
+                          <span key={skill.mentorSkillId} className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
+                            {skill.skillName}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 384 512"
+                              className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
+                            >
+                              <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                            </svg>
+                          </span>
+                        ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div className="mt-6">
-                  <h3 className="font-semibold">Beginner</h3>
-                  <div className="mt-3 ml-1 flex gap-x-4">
-                    <span className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
-                      React
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 384 512"
-                        className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
-                      >
-                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                      </svg>
-                    </span>
-                    <span className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
-                      ASP.NET
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 384 512"
-                        className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
-                      >
-                        <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
-                      </svg>
-                    </span>
+                {mentorSkills.filter((skill) => skill.level === 1).length >
+                  0 && (
+                  <div className="mt-6">
+                    <h3 className="font-semibold">Beginner</h3>
+                    <div className="mt-3 ml-1 flex gap-x-4 flex-wrap gap-y-3">
+                      {mentorSkills
+                        .filter((skill) => skill.level === 1)
+                        .map((skill) => (
+                          <span key={skill.mentorSkillId} className="flex items-center py-[4px] px-[12px] rounded-[20px] border border-[#aeaeae] hover:border-black cursor-pointer">
+                            {skill.skillName}
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 384 512"
+                              className="size-[15px] inline-block ml-1 fill-slate-500 hover:fill-slate-800"
+                            >
+                              <path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z" />
+                            </svg>
+                          </span>
+                        ))}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
             <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t">
