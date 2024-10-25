@@ -1,6 +1,6 @@
 import "preline/preline";
 import { IStaticMethods } from "preline/preline";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 declare global {
@@ -28,8 +28,23 @@ import {
   Week,
   WorkWeek,
 } from "@syncfusion/ej2-react-schedule";
+import { AuthContext } from "./AuthContext";
+import axios from "axios";
 
-
+interface Booking {
+  bookingId: number;
+  groupId: string;
+  groupName: string;
+  mentorSlotId: number;
+  mentorName: string;
+  startTime: string;
+  endTime: string;
+  room: string;
+  isOnline: boolean;
+  skillName: string;
+  bookingTime: string;
+  status: string;
+}
 
 const MyAppointments = () => {
   const location = useLocation();
@@ -40,19 +55,78 @@ const MyAppointments = () => {
 
   const [open, setOpen] = useState<boolean>(false);
 
-  const data = [
-    {
-      Id: 1,
-      Subject: "3 Bookings",
-      StartTime: new Date(2024, 8, 26, 7, 0),
-      EndTime: new Date(2024, 8, 26, 8, 0),
-    },
-  ];
+  const [refresh, setRefresh] = useState<boolean>(false);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+
+  const data = bookings.map((slot) => ({
+    Id: slot.mentorSlotId,
+    Subject: slot.room !== "" ? `Room: ${slot.room}` : "Online",
+    StartTime: new Date(slot.startTime),
+    EndTime: new Date(slot.endTime),
+  }));
+
+  const authContext = useContext(AuthContext);
+  if (!authContext) {
+    throw new Error("AuthContext is undefined");
+  }
+  const { authData } = authContext;
+
+  useEffect(() => {
+    const getBookings = async () => {
+      try {
+        const groupId = localStorage.getItem("groupId");
+        const response = await axios.get(
+          `https://localhost:7007/api/Booking/get-bookings-by-groupId/${groupId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+
+        setBookings(response.data);
+        console.log(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getBookings();
+  }, [refresh]);
 
   return (
     <>
       <div className="h-[90vh] py-10 px-20">
-      Search bar
+        <div className="w-[300px] mb-5">
+          <div className="relative flex items-center bg-white shadow">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="absolute w-5 h-5 top-2.5 left-2.5 text-slate-600"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z"
+                clipRule="evenodd"
+              />
+            </svg>
+
+            <input
+              className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md pl-10 pr-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+              placeholder="Search mentor, date, room..."
+              // value={searchTerm}
+              // onChange={handleSearch}
+            />
+
+            {/* <button
+              className="rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
+              type="button"
+            >
+              Search
+            </button> */}
+          </div>
+        </div>
         <div className="-m-1.5 overflow-x-auto bg-white rounded-lg shadow">
           <div className="p-1.5 min-w-full inline-block align-middle">
             <div className="overflow-hidden">
@@ -89,16 +163,16 @@ const MyAppointments = () => {
                     >
                       Status
                     </th>
-                    <th
+                    {/* <th
                       scope="col"
                       className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase"
                     >
                       Action
-                    </th>
+                    </th> */}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  <tr>
+                  {/* <tr>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                       TamPM
                     </td>
@@ -186,7 +260,55 @@ const MyAppointments = () => {
                         Cancel
                       </button>
                     </td>
-                  </tr>
+                  </tr> */}
+
+                  {bookings
+                  .sort(
+                    (a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
+                  )
+                  .map((booking) => (
+                    <tr key={booking.bookingId}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                        {booking.mentorName}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                        {new Date(booking.startTime)
+                          .toLocaleDateString("en-GB")
+                          .replace(/\//g, "-")}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                        {`${new Date(booking.startTime).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })} - ${new Date(booking.endTime).toLocaleTimeString(
+                          [],
+                          {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )}`}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                        {booking.room ? booking.room : "Online"}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 flex justify-center">
+                        {booking.status === "Pending" && (
+                          <span className="text-[#9d9f34] font-medium w-[100px] h-[35px] flex items-center justify-center bg-[#ffffc3] rounded-[20px] shadow">
+                            Pending
+                          </span>
+                        )}
+                      </td>
+                      {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent focus:outline-none disabled:opacity-50 disabled:pointer-events-none text-gray-500 hover:text-gray-700"
+                          onClick={() => setOpen(true)}
+                        >
+                          Cancel
+                        </button>
+                      </td> */}
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

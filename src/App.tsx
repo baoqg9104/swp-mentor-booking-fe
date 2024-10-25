@@ -30,7 +30,7 @@ import PuffLoader from "react-spinners/PuffLoader";
 
 import { registerLicense } from "@syncfusion/ej2-base";
 registerLicense(
-  "Ngo9BigBOggjHTQxAR8/V1NDaF5cWGNCf1NpR2ZGfV5ycEVHYVZTQHxcS00DNHVRdkdnWXZcdnRVRGBdV010V0M="
+  "Mgo+DSMBMAY9C3t2UlhhQlVMfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTX9TdEBiW3xacHdRQGNY"
 );
 
 const App = () => {

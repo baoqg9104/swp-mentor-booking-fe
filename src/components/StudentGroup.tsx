@@ -555,7 +555,7 @@ const StudentGroup = () => {
                   <h1 className="uppercase text-[13px] font-semibold text-[#4B6883]">
                     Current project
                   </h1>
-                  <div className="pt-4 mt-3 bg-white shadow-md rounded-lg inline-block">
+                  <div className="pt-4 mt-3 bg-white shadow-md rounded-lg inline-block min-w-[300px]">
                     <div className="border-l-[4px] border-[#FFD0B5] pl-5 ml-3 mb-4 pr-8">
                       <p className="text-[14px] font-medium text-[#4a4a4a] bg-[#F0F4F8] px-[10px] inline-block rounded-md py-[2px]">
                         {groupTopic?.semesterName}

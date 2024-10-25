@@ -19,7 +19,7 @@ import {
 } from "@syncfusion/ej2-react-schedule";
 import "preline/preline";
 import { IStaticMethods } from "preline/preline";
-import { useContext, useEffect } from "react";
+import { SetStateAction, useContext, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 
 declare global {
@@ -108,6 +108,8 @@ const BookingMentor = () => {
     null
   );
 
+  const [booked, setBooked] = useState<number[]>([]);
+
   const authContext = useContext(AuthContext);
   if (!authContext) {
     throw new Error("AuthContext is undefined");
@@ -188,21 +190,25 @@ const BookingMentor = () => {
     const data = {
       groupId: groupId,
       mentorSlotId: mentorSlotId,
-      //  skillId:
+      skillId: parseInt(skill),
     };
 
     try {
       const response = await axios.post(
         "https://localhost:7007/api/Booking/create",
-        {},
+        data,
         {
           headers: {
             Authorization: `Bearer ${authData?.token}`,
           },
         }
       );
+
+      // toast.success("Booked successfully");
+      setOpenSuccess(true);
+      setBooked([...booked, mentorSlotId]);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
@@ -230,9 +236,64 @@ const BookingMentor = () => {
     EndTime: new Date(slot.endTime),
   }));
 
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Safe string check helper function
+  const safeString = (value: any) => {
+    return (value || "").toString().toLowerCase();
+  };
+
+  // Filter mentors based on search term
+  const filteredMentors = useMemo(() => {
+    const searchValue = searchTerm.toLowerCase();
+    return mentors.filter((mentor) => {
+      if (!mentor || !mentor.applyStatus) return false;
+
+      return (
+        safeString(mentor.mentorName).includes(searchValue) ||
+        safeString(mentor.email).includes(searchValue)
+      );
+    });
+  }, [mentors, searchTerm]);
+
+  // Handle search input change
+  const handleSearch = (event: any) => {
+    setSearchTerm(event.target.value);
+  };
+
   return (
     <>
-      <div className="p-10 h-[90vh]">
+      <div className="p-10 h-[100%] min-h-[90vh]">
+        <div className="w-[300px] mb-5">
+          <div className="relative flex items-center bg-white shadow">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="absolute w-5 h-5 top-2.5 left-2.5 text-slate-600"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z"
+                clipRule="evenodd"
+              />
+            </svg>
+
+            <input
+              className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md pl-10 pr-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+              placeholder="Search mentor, email..."
+              value={searchTerm}
+              onChange={handleSearch}
+            />
+
+            {/* <button
+              className="rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
+              type="button"
+            >
+              Search
+            </button> */}
+          </div>
+        </div>
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
           <table className="w-full text-sm text-left rtl:text-right text-gray-500">
             <thead className="text-xs text-gray-700 uppercase bg-[#ffffff] border-b">
@@ -348,7 +409,7 @@ const BookingMentor = () => {
                   </span>
                 </td>
               </tr> */}
-              {mentors.map(
+              {filteredMentors.map(
                 (mentor) =>
                   mentor.applyStatus && (
                     <tr
@@ -1113,53 +1174,90 @@ const BookingMentor = () => {
                               </td>
                             </tr> */}
 
-                            {mentorAvailability.map((availability) => (
-                              <tr key={availability.mentorSlotId}>
-                                <td className="text-start px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                                  {new Date(availability.startTime)
-                                    .toLocaleDateString("en-GB")
-                                    .replace(/\//g, "-")}
-                                </td>
-                                <td className="text-start px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                                  {`${new Date(
-                                    availability.startTime
-                                  ).toLocaleTimeString([], {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  })} - ${new Date(
-                                    availability.endTime
-                                  ).toLocaleTimeString([], {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  })}`}
-                                </td>
-                                <td className="text-start px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                                  {availability.room
-                                    ? availability.room
-                                    : "Online"}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
-                                  <button
-                                    disabled={bookings.some(
-                                      (booking) =>
-                                        booking.mentorSlotId ===
-                                        availability.mentorSlotId
-                                    )}
-                                    type="button"
-                                    // disabled
-                                    className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
-                                    onClick={() => {
-                                      setOpen(true);
-                                      setSkill("");
-                                      setSelectedSlot(availability);
-                                      getMentorSkills(availability.mentorId);
-                                    }}
-                                  >
-                                    Book
-                                  </button>
-                                </td>
-                              </tr>
-                            ))}
+                            {mentorAvailability
+                              .sort(
+                                (a, b) =>
+                                  new Date(b.startTime).getTime() -
+                                  new Date(a.startTime).getTime()
+                              )
+                              .map((availability) => (
+                                <tr key={availability.mentorSlotId}>
+                                  <td className="text-start px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                    {new Date(availability.startTime)
+                                      .toLocaleDateString("en-GB")
+                                      .replace(/\//g, "-")}
+                                  </td>
+                                  <td className="text-start px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                    {`${new Date(
+                                      availability.startTime
+                                    ).toLocaleTimeString([], {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })} - ${new Date(
+                                      availability.endTime
+                                    ).toLocaleTimeString([], {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}`}
+                                  </td>
+                                  <td className="text-start px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                    {availability.room
+                                      ? availability.room
+                                      : "Online"}
+                                  </td>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
+                                    <button
+                                      disabled={
+                                        bookings.some(
+                                          (booking) =>
+                                            booking.mentorSlotId ===
+                                            availability.mentorSlotId
+                                        ) ||
+                                        new Date(availability.startTime) <
+                                          new Date() ||
+                                        booked.some(
+                                          (b) => b === availability.mentorSlotId
+                                        )
+                                      }
+                                      type="button"
+                                      // disabled
+                                      className={`inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none ${
+                                        (bookings.some(
+                                          (booking) =>
+                                            booking.mentorSlotId ===
+                                            availability.mentorSlotId
+                                        ) ||
+                                          booked.some(
+                                            (b) =>
+                                              b === availability.mentorSlotId
+                                          )) &&
+                                        "text-gray-500"
+                                      }
+                                      `}
+                                      onClick={() => {
+                                        setOpen(true);
+                                        setSkill("");
+                                        setSelectedSlot(availability);
+                                        getMentorSkills(availability.mentorId);
+                                      }}
+                                    >
+                                      {bookings.some(
+                                        (booking) =>
+                                          booking.mentorSlotId ===
+                                          availability.mentorSlotId
+                                      ) ||
+                                      booked.some(
+                                        (b) => b === availability.mentorSlotId
+                                      )
+                                        ? "Booked"
+                                        : new Date(availability.startTime) <
+                                          new Date()
+                                        ? ""
+                                        : "Book"}
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
                           </tbody>
                         </table>
                       </div>
@@ -1255,7 +1353,6 @@ const BookingMentor = () => {
                       </div>
                       <select
                         value={skill}
-                        defaultValue=""
                         className="w-[250px] mt-4"
                         onChange={(e) => setSkill(e.target.value)}
                       >
@@ -1281,9 +1378,8 @@ const BookingMentor = () => {
                   onClick={() => {
                     if (skill !== "") {
                       setOpen(false);
-                      setOpenSuccess(true);
                       setSkill("");
-                      //call api -> success or fail
+                      bookMentor(selectedSlot?.mentorSlotId!);
                     } else {
                       toast.error("Please choose skill");
                     }
