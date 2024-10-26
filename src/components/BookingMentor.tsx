@@ -88,7 +88,7 @@ const BookingMentor = () => {
   const [openAvailability, setOpenAvailability] = useState<boolean>(false);
   const [openSuccess, setOpenSuccess] = useState<boolean>(false);
 
-  const [skill, setSkill] = useState<string>("");
+  const [mentorSkill, setMentorSkill] = useState<string>("");
 
   const [refresh, setRefresh] = useState<boolean>(false);
   const [mentors, setMentors] = useState<Mentor[]>([]);
@@ -190,8 +190,10 @@ const BookingMentor = () => {
     const data = {
       groupId: groupId,
       mentorSlotId: mentorSlotId,
-      skillId: parseInt(skill),
+      mentorSkillId: parseInt(mentorSkill),
     };
+
+    console.log(data);
 
     try {
       const response = await axios.post(
@@ -1236,7 +1238,7 @@ const BookingMentor = () => {
                                       `}
                                       onClick={() => {
                                         setOpen(true);
-                                        setSkill("");
+                                        setMentorSkill("");
                                         setSelectedSlot(availability);
                                         getMentorSkills(availability.mentorId);
                                       }}
@@ -1293,7 +1295,7 @@ const BookingMentor = () => {
           <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <DialogPanel
               transition
-              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 lg:w-[600px] data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95 h-[230px]"
+              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 lg:w-[600px] data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95 h-[250px]"
             >
               <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                 <div className="p-0">
@@ -1352,9 +1354,9 @@ const BookingMentor = () => {
                         </div>
                       </div>
                       <select
-                        value={skill}
+                        value={mentorSkill}
                         className="w-[250px] mt-4"
-                        onChange={(e) => setSkill(e.target.value)}
+                        onChange={(e) => setMentorSkill(e.target.value)}
                       >
                         <option value="">Choose skill</option>
                         {/* <option value="Git">Git</option>
@@ -1362,7 +1364,7 @@ const BookingMentor = () => {
                         {mentorSkills.map((skill) => (
                           <option
                             key={skill.mentorSkillId}
-                            value={skill.mentorSkillId}
+                            value={skill.mentorSkillId} 
                           >
                             {skill.skillName}
                           </option>
@@ -1376,9 +1378,9 @@ const BookingMentor = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    if (skill !== "") {
+                    if (mentorSkill !== "") {
                       setOpen(false);
-                      setSkill("");
+                      setMentorSkill("");
                       bookMentor(selectedSlot?.mentorSlotId!);
                     } else {
                       toast.error("Please choose skill");
