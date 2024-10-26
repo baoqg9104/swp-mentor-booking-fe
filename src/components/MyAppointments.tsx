@@ -1,6 +1,6 @@
 import "preline/preline";
 import { IStaticMethods } from "preline/preline";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 
 declare global {
@@ -94,6 +94,31 @@ const MyAppointments = () => {
     getBookings();
   }, [refresh]);
 
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Safe string check helper function
+  const safeString = (value: any) => {
+    return (value || "").toString().toLowerCase();
+  };
+
+  // Filter bookings based on search term
+  const filteredBookings = useMemo(() => {
+    const searchValue = searchTerm.toLowerCase();
+    return bookings.filter((booking) => {
+      if (!booking) return false;
+
+      return (
+        safeString(booking.mentorName).includes(searchValue) ||
+        safeString(booking.room).includes(searchValue)
+      );
+    });
+  }, [bookings, searchTerm]);
+
+  // Handle search input change
+  const handleSearch = (event: any) => {
+    setSearchTerm(event.target.value);
+  };
+
   return (
     <>
       <div className="h-[90vh] py-10 px-20">
@@ -115,8 +140,8 @@ const MyAppointments = () => {
             <input
               className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md pl-10 pr-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
               placeholder="Search mentor, date, room..."
-              // value={searchTerm}
-              // onChange={handleSearch}
+              value={searchTerm}
+              onChange={handleSearch}
             />
 
             {/* <button
@@ -262,7 +287,7 @@ const MyAppointments = () => {
                     </td>
                   </tr> */}
 
-                  {bookings
+                  {filteredBookings
                   .sort(
                     (a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
                   )
