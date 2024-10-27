@@ -206,7 +206,7 @@ const ManageAppointments = () => {
     } else if (args.data.Status === "Pending" || args.data.Status === null) {
       args.element.style.backgroundColor = '#FEC200';
     } else if (args.data.Status === "Completed") {
-      args.element.style.backgroundColor = '#E9ECEF';
+      args.element.style.backgroundColor = '#bfbfbf';
     }
   }
 

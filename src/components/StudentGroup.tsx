@@ -1,4 +1,9 @@
-import { faGear, faPaperclip, faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faGear,
+  faPaperclip,
+  faPlus,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import "preline/preline";
@@ -202,6 +207,38 @@ const StudentGroup = () => {
     } catch (error) {
       console.log(error);
       toast.error("Dupplicate topic in the same class!");
+    }
+  };
+
+  const [email, setEmail] = useState<string>("");
+
+  const addMember = async (e: React.FormEvent) => {
+    try {
+      e.preventDefault();
+      const groupId = localStorage.getItem("groupId");
+      const data = {
+        groupId: groupId,
+        email: email,
+      };
+
+      if (email === "") {
+        return;
+      }
+
+      const response = await axios.put(
+        `https://localhost:7007/api/Group/add-member/`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
+
+      toast.success("Add member successful!");
+    } catch (error: any) {
+      // Display response message if available, otherwise show a generic message
+      toast.error(error.response.data!);
     }
   };
 
@@ -511,27 +548,19 @@ const StudentGroup = () => {
                     <h1 className="text-[21px] font-medium mb-3">
                       {group.name} - {group.swpClassName}
                     </h1>
-                    <div className="flex -space-x-1 overflow-hidden">
-                      <img
-                        className="inline-block size-7 rounded-full ring-2 ring-white"
-                        // src="https://images.unsplash.com/photo-1491528323818-fdd1faba62cc?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                        alt=""
-                      />
-                      <img
-                        className="inline-block size-7 rounded-full ring-2 ring-white"
-                        // src="https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                        alt=""
-                      />
-                      <img
-                        className="inline-block size-7 rounded-full ring-2 ring-white"
-                        // src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2.25&w=256&h=256&q=80"
-                        alt=""
-                      />
-                      <img
-                        className="inline-block size-7 rounded-full ring-2 ring-white"
-                        // src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                        alt=""
-                      />
+                    <div className="flex -space-x-1 overflow-hidden p-1">
+                      <div className="size-7 rounded-full ring-2 ring-gray-200 flex items-center justify-center bg-white">
+                        <FontAwesomeIcon icon={faUser} className="text-gray-500 size-4" />
+                      </div>
+                      <div className="size-7 rounded-full ring-2 ring-gray-200 flex items-center justify-center bg-white">
+                        <FontAwesomeIcon icon={faUser} className="text-gray-500 size-4" />
+                      </div>
+                      <div className="size-7 rounded-full ring-2 ring-gray-200 flex items-center justify-center bg-white">
+                        <FontAwesomeIcon icon={faUser} className="text-gray-500 size-4" />
+                      </div>
+                      <div className="size-7 rounded-full ring-2 ring-gray-200 flex items-center justify-center bg-white">
+                        <FontAwesomeIcon icon={faUser} className="text-gray-500 size-4" />
+                      </div>
                     </div>
                   </div>
                   <div>
@@ -789,10 +818,12 @@ const StudentGroup = () => {
                 <h1 className="mb-2 font-medium text-[#474747]">
                   - Add member -
                 </h1>
-                <form className="w-full mb-5">
+                <form className="w-full mb-5" onSubmit={addMember}>
                   <div className="flex gap-3">
                     <div className="relative w-[80%]">
                       <input
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         type="email"
                         className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
     focus:pt-6
@@ -818,13 +849,12 @@ const StudentGroup = () => {
                       </label>
                     </div>
 
-                    <div
+                    <button
+                      type="submit"
                       className="flex items-center justify-center cursor-pointer border border-[blue] py-3 rounded-md w-[20%] text-blue-500 font-semibold hover:bg-blue-50"
-                      onClick={() => {
-                      }}
                     >
                       Add
-                    </div>
+                    </button>
                   </div>
                 </form>
               </div>
