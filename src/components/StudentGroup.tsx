@@ -64,6 +64,13 @@ interface GroupTopic {
   status: boolean;
 }
 
+interface Member {
+  studentId: string;
+  fullName: string;
+  email: string;
+  phone: string;
+}
+
 const StudentGroup = () => {
   const location = useLocation();
 
@@ -113,7 +120,27 @@ const StudentGroup = () => {
       }
     };
 
+    const getMembers = async () => {
+      try {
+        const groupId = localStorage.getItem("groupId");
+        const response = await axios.get(
+          `https://localhost:7007/api/Group/get-members/${groupId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+
+        setMembers(response.data);
+      } catch (error) {
+        console.log("Can not get members", error);
+        // toast.error("Can not get members");
+      }
+    };
+
     getGroup();
+    getMembers();
   }, [refresh]);
 
   const getGroupTopic = async () => {
@@ -241,6 +268,8 @@ const StudentGroup = () => {
       toast.error(error.response.data!);
     }
   };
+
+  const [members, setMembers] = useState<Member[]>([]);
 
   return (
     <>
@@ -549,18 +578,38 @@ const StudentGroup = () => {
                       {group.name} - {group.swpClassName}
                     </h1>
                     <div className="flex -space-x-1 overflow-hidden p-1">
-                      <div className="size-7 rounded-full ring-2 ring-gray-200 flex items-center justify-center bg-white">
-                        <FontAwesomeIcon icon={faUser} className="text-gray-500 size-4" />
+                      {/* <div className="size-7 rounded-full ring-2 ring-gray-200 flex items-center justify-center bg-white">
+                        <FontAwesomeIcon
+                          icon={faUser}
+                          className="text-gray-500 size-4"
+                        />
                       </div>
                       <div className="size-7 rounded-full ring-2 ring-gray-200 flex items-center justify-center bg-white">
-                        <FontAwesomeIcon icon={faUser} className="text-gray-500 size-4" />
+                        <FontAwesomeIcon
+                          icon={faUser}
+                          className="text-gray-500 size-4"
+                        />
                       </div>
                       <div className="size-7 rounded-full ring-2 ring-gray-200 flex items-center justify-center bg-white">
-                        <FontAwesomeIcon icon={faUser} className="text-gray-500 size-4" />
+                        <FontAwesomeIcon
+                          icon={faUser}
+                          className="text-gray-500 size-4"
+                        />
                       </div>
                       <div className="size-7 rounded-full ring-2 ring-gray-200 flex items-center justify-center bg-white">
-                        <FontAwesomeIcon icon={faUser} className="text-gray-500 size-4" />
-                      </div>
+                        <FontAwesomeIcon
+                          icon={faUser}
+                          className="text-gray-500 size-4"
+                        />
+                      </div> */}
+                      {members.map((member) => (
+                        <div className="size-7 rounded-full ring-2 ring-gray-200 flex items-center justify-center bg-white">
+                          <FontAwesomeIcon
+                            icon={faUser}
+                            className="text-gray-500 size-4"
+                          />
+                        </div>
+                      ))}
                     </div>
                   </div>
                   <div>
@@ -638,16 +687,10 @@ const StudentGroup = () => {
                               >
                                 Phone
                               </th>
-                              {/* <th
-                            scope="col"
-                            className="px-6 py-3 text-end text-xs font-medium text-gray-500 uppercase"
-                          >
-                            Action
-                          </th> */}
                             </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-200">
-                            <tr>
+                            {/* <tr>
                               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
                                 Member 1
                               </td>
@@ -657,14 +700,7 @@ const StudentGroup = () => {
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                                 0123456789
                               </td>
-                              {/* <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                            <button
-                              type="button"
-                              className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
-                            >
-                              Delete
-                            </button>
-                          </td> */}
+                              
                             </tr>
 
                             <tr>
@@ -677,14 +713,7 @@ const StudentGroup = () => {
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                                 0123456789
                               </td>
-                              {/* <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                            <button
-                              type="button"
-                              className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
-                            >
-                              Delete
-                            </button>
-                          </td> */}
+
                             </tr>
 
                             <tr>
@@ -697,15 +726,21 @@ const StudentGroup = () => {
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                                 0123456789
                               </td>
-                              {/* <td className="px-6 py-4 whitespace-nowrap text-end text-sm font-medium">
-                            <button
-                              type="button"
-                              className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent text-blue-600 hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none"
-                            >
-                              Delete
-                            </button>
-                          </td> */}
-                            </tr>
+                            
+                            </tr> */}
+                            {members.map((member) => (
+                              <tr>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
+                                  {member.fullName}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                  {member.email}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                  {member.phone}
+                                </td>
+                              </tr>
+                            ))}
                           </tbody>
                         </table>
                       </div>

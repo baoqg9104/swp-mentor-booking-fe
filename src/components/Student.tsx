@@ -42,6 +42,12 @@ const Student = () => {
     }
   };
 
+  if (!authContext) {
+    throw new Error("AuthContext is undefined");
+  }
+
+  const { authData } = authContext;
+
   return (
     <>
       <header className="sticky top-0 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-[48] w-full bg-white border-b text-sm py-2.5 lg:ps-[260px]">
@@ -87,7 +93,7 @@ const Student = () => {
                       <FontAwesomeIcon className="text-[22px]" icon={faUser} />
                     </div>
                     <div className="text-[18px] text-gray-800 font-semibold">
-                      Student
+                      {authData?.fullName}
                     </div>
                   </div>
                   <div className="p-1.5">

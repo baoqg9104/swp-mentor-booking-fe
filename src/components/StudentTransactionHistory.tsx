@@ -1,5 +1,57 @@
+import axios from "axios";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "./AuthContext";
+
+interface Transaction {
+  bookingId: number;
+  point: number;
+  dateTime: string;
+  groupName: string;
+  swpClassName: string;
+  mentorName: string;
+}
 
 const StudentTransactionHistory = () => {
+  const [refresh, setRefresh] = useState<boolean>(false);
+
+  const authContext = useContext(AuthContext);
+  if (!authContext) {
+    throw new Error("AuthContext is undefined");
+  }
+  const { authData, setAuthData } = authContext;
+
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+
+  useEffect(() => {
+    const getTransactionByGroupId = async () => {
+      try {
+        const groupId = localStorage.getItem("groupId");
+
+        const data = groupId;
+
+        if (data === "") {
+          return;
+        }
+
+        const response = await axios.get(
+          `https://localhost:7007/api/Transaction/get-transactions-by-groupId/${data}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+
+        setTransactions(response.data);
+      } catch (error) {
+        // console.log("Can not get group", error);
+        // toast.error("Can not get group");
+      }
+    };
+
+    getTransactionByGroupId();
+  }, [refresh]);
+
   return (
     <>
       <div className="flex flex-col p-10 h-[90svh]">
@@ -8,7 +60,10 @@ const StudentTransactionHistory = () => {
           style={{ boxShadow: "0 0 8px #bbbbbb" }}
         >
           <div className="relative">
-            <div id="date-range-picker" className="flex items-center justify-start mb-2">
+            <div
+              id="date-range-picker"
+              className="flex items-center justify-start mb-2"
+            >
               <div className="relative">
                 <input type="date" placeholder="Select date start" />
               </div>
@@ -82,7 +137,7 @@ const StudentTransactionHistory = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y-2 divide-gray-200 divide-">
-                  <tr className="hover:bg-gray-50">
+                  {/* <tr className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
                       Booking
                     </td>
@@ -126,7 +181,39 @@ const StudentTransactionHistory = () => {
                         Failed
                       </span>
                     </td>
-                  </tr>
+                  </tr> */}
+                  {transactions.map((transaction) => (
+                    <tr className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
+                        Booking
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-red-500 font-semibold">
+                        - {transaction.point}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                        {new Date(transaction.dateTime)
+                          .toLocaleDateString("en-GB")
+                          .replace(/\//g, "-")}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                        {`${new Date(transaction.dateTime).toLocaleTimeString(
+                          [],
+                          {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )}`}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                        {transaction.mentorName}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 flex justify-center">
+                        <span className="text-[#209526]  font-medium w-[80px] h-[35px] flex items-center justify-center bg-[#e7fae3] rounded-[20px]">
+                          Success
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -134,7 +221,7 @@ const StudentTransactionHistory = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default StudentTransactionHistory
+export default StudentTransactionHistory;
