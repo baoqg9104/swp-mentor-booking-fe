@@ -70,6 +70,7 @@ interface MentorAvailability {
   bookingPoint: number;
   isOnline: boolean;
   room: string;
+  status: string;
 }
 
 interface Booking {
@@ -193,7 +194,7 @@ const BookingMentor = () => {
       mentorSkillId: parseInt(mentorSkill),
     };
 
-    console.log(data);
+    // console.log(data);
 
     try {
       const response = await axios.post(
@@ -210,7 +211,7 @@ const BookingMentor = () => {
       setOpenSuccess(true);
       setBooked([...booked, mentorSlotId]);
     } catch (error) {
-      console.error(error);
+      toast.warning("Not enough wallet points");
     }
   };
 
@@ -1219,7 +1220,8 @@ const BookingMentor = () => {
                                           new Date() ||
                                         booked.some(
                                           (b) => b === availability.mentorSlotId
-                                        )
+                                        ) || 
+                                        availability.status === "Approved"
                                       }
                                       type="button"
                                       // disabled

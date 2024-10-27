@@ -33,7 +33,7 @@ declare global {
 }
 
 interface MentorAppointment {
-  mentorSlotId: string;
+  mentorSlotId: number;
   mentorId: string;
   startTime: string;
   endTime: string;
@@ -91,6 +91,9 @@ const ManageAppointments = () => {
     BookingsByMentorSlot[]
   >([]);
 
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<MentorAppointment | null>(null);
+
   useEffect(() => {
     const getMentorAppointments = async () => {
       try {
@@ -117,16 +120,17 @@ const ManageAppointments = () => {
     getMentorAppointments();
   }, [refresh]);
 
-  const data = [
-    {
-      Id: 1,
-      Subject: "3 Bookings",
-      StartTime: new Date(2024, 8, 26, 7, 0),
-      EndTime: new Date(2024, 8, 26, 8, 0),
-    },
-  ];
+  const data = mentorAppointments
+    // .filter((appointment) => appointment.status === "Approved")
+    .map((appointment) => ({
+      Id: appointment.mentorSlotId,
+      Subject: appointment.room !== "" ? `Room: ${appointment.room}` : "Online",
+      StartTime: new Date(appointment.startTime),
+      EndTime: new Date(appointment.endTime),
+      Status: appointment.status,
+    }));
 
-  const getBookingsByMentorSlotId = async (mentorSlotId: string) => {
+  const getBookingsByMentorSlotId = async (mentorSlotId: number) => {
     try {
       const response = await axios.get(
         `https://localhost:7007/api/Booking/get-by-mentorslot/${mentorSlotId}`,
@@ -158,16 +162,19 @@ const ManageAppointments = () => {
     // console.log("Selected booking", bookingId);
   };
 
-  const updateStatus = async (status: string) => {
+  const updateStatus = async (status: string, mentorSlotId: number) => {
     try {
-      if (!selectedBooking) {
+      if (status === "Approved" && !selectedBooking) {
         return;
       }
 
       const data = {
-        bookingId: selectedBooking,
+        bookingId: !selectedBooking ? 0 : selectedBooking,
+        mentorSlotId: mentorSlotId,
         status: status,
       };
+
+      console.log(data);
 
       const response = await axios.put(
         `https://localhost:7007/api/Booking/update-status`,
@@ -178,15 +185,30 @@ const ManageAppointments = () => {
           },
         }
       );
-
+      
       toast.success("Booking status updated successfully");
       setOpenView(false);
       setRefresh(!refresh);
     } catch (error) {
-      console.log("Can not update booking status", error);
-      // toast.error("Can not update booking status");
+      if (status === "Completed") {
+        // message -> thời gian chưa tới
+        toast.error("The appointment is not over!");
+      }
     }
   };
+
+  const onEventRendered = (args: any) => {
+
+    if (args.data.Status === "Approved") {
+      args.element.style.backgroundColor = '#1AAA55';
+    } else if (args.data.Status === "Denied") {
+      args.element.style.backgroundColor = '#ff8773';
+    } else if (args.data.Status === "Pending" || args.data.Status === null) {
+      args.element.style.backgroundColor = '#FEC200';
+    } else if (args.data.Status === "Completed") {
+      args.element.style.backgroundColor = '#E9ECEF';
+    }
+  }
 
   return (
     <>
@@ -306,7 +328,10 @@ const ManageAppointments = () => {
                               <button
                                 type="button"
                                 className="inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent focus:outline-none disabled:opacity-50 disabled:pointer-events-none text-gray-500 hover:text-gray-700"
-                                onClick={() => setOpen(true)}
+                                onClick={() => {
+                                  setOpen(true);
+                                  setSelectedAppointment(appointment);
+                                }}
                               >
                                 Complete
                               </button>
@@ -324,6 +349,7 @@ const ManageAppointments = () => {
                                     appointment.mentorSlotId
                                   );
                                   setSelectedBooking(undefined);
+                                  setSelectedAppointment(appointment);
                                 }}
                               >
                                 View
@@ -449,6 +475,7 @@ const ManageAppointments = () => {
           eventSettings={{
             dataSource: data,
           }}
+          eventRendered={onEventRendered}
           className="mt-10"
         >
           <Inject services={[Day, Week, WorkWeek, Month, Agenda]} />
@@ -636,7 +663,7 @@ const ManageAppointments = () => {
               <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 mb-3">
                 <button
                   type="button"
-                  onClick={() => updateStatus("Approved")}
+                  onClick={() => updateStatus("Approved", selectedAppointment?.mentorSlotId!)}
                   className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
                 >
                   Approve
@@ -699,7 +726,10 @@ const ManageAppointments = () => {
                       Complete
                     </DialogTitle> */}
                     <div className="mt-2">
-                      <h1 className="mb-3 font-medium">Group: 1 - SE1856</h1>
+                      <h1 className="mb-3 font-medium">
+                        {selectedAppointment?.group} -{" "}
+                        {selectedAppointment?.class}
+                      </h1>
                       <div className="flex">
                         <div className="w-1/3 flex items-center gap-1">
                           <svg
@@ -709,7 +739,9 @@ const ManageAppointments = () => {
                           >
                             <path d="M152 24c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40L64 64C28.7 64 0 92.7 0 128l0 16 0 48L0 448c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-256 0-48 0-16c0-35.3-28.7-64-64-64l-40 0 0-40c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 40L152 64l0-40zM48 192l352 0 0 256c0 8.8-7.2 16-16 16L64 464c-8.8 0-16-7.2-16-16l0-256z" />
                           </svg>
-                          20-09-2024
+                          {new Date(selectedAppointment?.startTime!)
+                            .toLocaleDateString("en-GB")
+                            .replace(/\//g, "-")}
                         </div>
                         <div className="w-1/3 flex items-center gap-1">
                           <svg
@@ -719,14 +751,24 @@ const ManageAppointments = () => {
                           >
                             <path d="M464 256A208 208 0 1 1 48 256a208 208 0 1 1 416 0zM0 256a256 256 0 1 0 512 0A256 256 0 1 0 0 256zM232 120l0 136c0 8 4 15.5 10.7 20l96 64c11 7.4 25.9 4.4 33.3-6.7s4.4-25.9-6.7-33.3L280 243.2 280 120c0-13.3-10.7-24-24-24s-24 10.7-24 24z" />
                           </svg>
-                          7:00 - 9:30
+                          {`${new Date(
+                            selectedAppointment?.startTime!
+                          ).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })} - ${new Date(
+                            selectedAppointment?.endTime!
+                          ).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}`}
                         </div>
                         <div className="w-1/3 flex items-center gap-1">
                           <FontAwesomeIcon
                             icon={faUsersRectangle}
                             className="size-[18px]"
                           />
-                          601
+                          {selectedAppointment?.room ? selectedAppointment?.room : "Online"}
                         </div>
                       </div>
                     </div>
@@ -737,7 +779,8 @@ const ManageAppointments = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    //call api -> success or fail
+                    setOpen(false);
+                    updateStatus("Completed", selectedAppointment?.mentorSlotId!);
                   }}
                   className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-700 sm:ml-3 sm:w-auto"
                 >

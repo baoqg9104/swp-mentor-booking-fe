@@ -174,7 +174,7 @@ const StudentFeedback = () => {
                         <Stack spacing={1}>
                           <Rating
                             size="small"
-                            precision={0.5}
+                            precision={1}
                             value={3}
                             readOnly
                           />
@@ -305,7 +305,7 @@ const StudentFeedback = () => {
                         <Stack spacing={1}>
                           <Rating
                             size="large"
-                            precision={0.5}
+                            precision={1}
                             value={rating}
                             onChange={(event, newValue) => {
                               setRating(newValue === null ? 0 : newValue);
@@ -459,7 +459,7 @@ const StudentFeedback = () => {
                         <Stack spacing={1}>
                           <Rating
                             size="medium"
-                            precision={0.5}
+                            precision={1}
                             value={3}
                             readOnly
                           />
@@ -584,7 +584,7 @@ const StudentFeedback = () => {
                         <Stack spacing={1}>
                           <Rating
                             size="medium"
-                            precision={0.5}
+                            precision={1}
                             value={3}
                             readOnly
                           />

@@ -58,11 +58,14 @@ const MyAppointments = () => {
   const [refresh, setRefresh] = useState<boolean>(false);
   const [bookings, setBookings] = useState<Booking[]>([]);
 
-  const data = bookings.map((slot) => ({
-    Id: slot.mentorSlotId,
-    Subject: slot.room !== "" ? `Room: ${slot.room}` : "Online",
-    StartTime: new Date(slot.startTime),
-    EndTime: new Date(slot.endTime),
+  const data = bookings
+  // .filter((booking) => booking.status === "Approved")
+  .map((booking) => ({
+    Id: booking.mentorSlotId,
+    Subject: booking.room !== "" ? `Room: ${booking.room}` : "Online",
+    StartTime: new Date(booking.startTime),
+    EndTime: new Date(booking.endTime),
+    Status: booking.status,
   }));
 
   const authContext = useContext(AuthContext);
@@ -85,7 +88,7 @@ const MyAppointments = () => {
         );
 
         setBookings(response.data);
-        console.log(response.data);
+        // console.log(response.data);
       } catch (error) {
         console.log(error);
       }
@@ -118,6 +121,19 @@ const MyAppointments = () => {
   const handleSearch = (event: any) => {
     setSearchTerm(event.target.value);
   };
+
+  const onEventRendered = (args: any) => {
+
+    if (args.data.Status === "Approved") {
+      args.element.style.backgroundColor = '#1AAA55';
+    } else if (args.data.Status === "Denied") {
+      args.element.style.backgroundColor = '#ff8773';
+    } else if (args.data.Status === "Pending") {
+      args.element.style.backgroundColor = '#FEC200';
+    } else if (args.data.Status === "Completed") {
+      args.element.style.backgroundColor = '#E6E6E6';
+    }
+  }
 
   return (
     <>
@@ -288,42 +304,66 @@ const MyAppointments = () => {
                   </tr> */}
 
                   {filteredBookings
-                  .sort(
-                    (a, b) => new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
-                  )
-                  .map((booking) => (
-                    <tr key={booking.bookingId}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                        {booking.mentorName}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                        {new Date(booking.startTime)
-                          .toLocaleDateString("en-GB")
-                          .replace(/\//g, "-")}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                        {`${new Date(booking.startTime).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })} - ${new Date(booking.endTime).toLocaleTimeString(
-                          [],
-                          {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          }
-                        )}`}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                        {booking.room ? booking.room : "Online"}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 flex justify-center">
-                        {booking.status === "Pending" && (
-                          <span className="text-[#9d9f34] font-medium w-[100px] h-[35px] flex items-center justify-center bg-[#ffffc3] rounded-[20px] shadow">
-                            Pending
-                          </span>
-                        )}
-                      </td>
-                      {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
+                    .sort(
+                      (a, b) =>
+                        new Date(b.startTime).getTime() -
+                        new Date(a.startTime).getTime()
+                    )
+                    .map((booking) => (
+                      <tr key={booking.bookingId}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                          {booking.mentorName}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                          {new Date(booking.startTime)
+                            .toLocaleDateString("en-GB")
+                            .replace(/\//g, "-")}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                          {`${new Date(booking.startTime).toLocaleTimeString(
+                            [],
+                            {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )} - ${new Date(booking.endTime).toLocaleTimeString(
+                            [],
+                            {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )}`}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                          {booking.room ? booking.room : "Online"}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 flex justify-center">
+                          {booking.status === "Pending" && (
+                            <span className="text-[#9d9f34] font-medium w-[100px] h-[35px] flex items-center justify-center bg-[#ffffc3] rounded-[20px] shadow">
+                              Pending
+                            </span>
+                          )}
+
+                          {booking.status === "Approved" && (
+                            <span className="text-[#209526]  font-medium w-[100px] h-[35px] flex items-center justify-center bg-[#e7fae3] rounded-[20px] shadow">
+                              Approved
+                            </span>
+                          )}
+
+                          {booking.status === "Denied" && (
+                            <span className="text-[#d34d41]  font-medium w-[100px] h-[35px] flex items-center justify-center bg-[#ffe1de] rounded-[20px] shadow">
+                              Denied
+                            </span>
+                          )}
+
+                          {booking.status === "Completed" && (
+                            <span className="text-[#636363]  font-medium w-[100px] h-[35px] flex items-center justify-center bg-[#e6e6e6] rounded-[20px] shadow">
+                              Completed
+                            </span>
+                          )}
+                        </td>
+
+                        {/* <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
                         <button
                           type="button"
                           className="inline-flex items-center gap-x-2 text-sm font-semibold rounded-lg border border-transparent focus:outline-none disabled:opacity-50 disabled:pointer-events-none text-gray-500 hover:text-gray-700"
@@ -332,8 +372,8 @@ const MyAppointments = () => {
                           Cancel
                         </button>
                       </td> */}
-                    </tr>
-                  ))}
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
@@ -341,16 +381,17 @@ const MyAppointments = () => {
         </div>
 
         <ScheduleComponent
-          readOnly
+          readonly
           width="100%"
           height={635}
           startHour="07:00"
           eventSettings={{
             dataSource: data,
           }}
+          eventRendered={onEventRendered}
           className="mt-10"
         >
-          <Inject services={[Day, Week, WorkWeek, Month, Agenda]} />
+          <Inject services={[Day, Week, Month, Agenda]} />
         </ScheduleComponent>
       </div>
 
