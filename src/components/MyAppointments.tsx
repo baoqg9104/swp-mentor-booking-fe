@@ -59,14 +59,14 @@ const MyAppointments = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
 
   const data = bookings
-  // .filter((booking) => booking.status === "Approved")
-  .map((booking) => ({
-    Id: booking.mentorSlotId,
-    Subject: booking.room !== "" ? `Room: ${booking.room}` : "Online",
-    StartTime: new Date(booking.startTime),
-    EndTime: new Date(booking.endTime),
-    Status: booking.status,
-  }));
+    // .filter((booking) => booking.status === "Approved")
+    .map((booking) => ({
+      Id: booking.mentorSlotId,
+      Subject: booking.room !== "" ? `Room: ${booking.room}` : "Online",
+      StartTime: new Date(booking.startTime),
+      EndTime: new Date(booking.endTime),
+      Status: booking.status,
+    }));
 
   const authContext = useContext(AuthContext);
   if (!authContext) {
@@ -123,51 +123,88 @@ const MyAppointments = () => {
   };
 
   const onEventRendered = (args: any) => {
-
     if (args.data.Status === "Approved") {
-      args.element.style.backgroundColor = '#1AAA55';
+      args.element.style.backgroundColor = "#1AAA55";
     } else if (args.data.Status === "Denied") {
-      args.element.style.backgroundColor = '#ff8773';
+      args.element.style.backgroundColor = "#ff8773";
     } else if (args.data.Status === "Pending") {
-      args.element.style.backgroundColor = '#FEC200';
+      args.element.style.backgroundColor = "#FEC200";
     } else if (args.data.Status === "Completed") {
-      args.element.style.backgroundColor = '#E6E6E6';
+      args.element.style.backgroundColor = "#bfbfbf";
     }
-  }
+  };
 
   return (
     <>
       <div className="h-[90vh] py-10 px-20">
-        <div className="w-[300px] mb-5">
-          <div className="relative flex items-center bg-white shadow">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="absolute w-5 h-5 top-2.5 left-2.5 text-slate-600"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z"
-                clipRule="evenodd"
+        <div className="flex gap-16">
+          <div className="mb-5">
+            <div className="relative flex items-center bg-white shadow w-[300px]">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="absolute w-5 h-5 top-2.5 left-2.5 text-slate-600"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10.5 3.75a6.75 6.75 0 1 0 0 13.5 6.75 6.75 0 0 0 0-13.5ZM2.25 10.5a8.25 8.25 0 1 1 14.59 5.28l4.69 4.69a.75.75 0 1 1-1.06 1.06l-4.69-4.69A8.25 8.25 0 0 1 2.25 10.5Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+
+              <input
+                className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md pl-10 pr-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
+                placeholder="Search mentor, room..."
+                value={searchTerm}
+                onChange={handleSearch}
               />
-            </svg>
 
-            <input
-              className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md pl-10 pr-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-              placeholder="Search mentor, date, room..."
-              value={searchTerm}
-              onChange={handleSearch}
-            />
-
-            {/* <button
+              {/* <button
               className="rounded-md bg-slate-800 py-2 px-4 border border-transparent text-center text-sm text-white transition-all shadow-md hover:shadow-lg focus:bg-slate-700 focus:shadow-none active:bg-slate-700 hover:bg-slate-700 active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none ml-2"
               type="button"
             >
               Search
             </button> */}
+            </div>
           </div>
+
+          {/* <div className="relative">
+            <div
+              id="date-range-picker"
+              className="flex items-center justify-start mb-2"
+            >
+              <div className="relative">
+                <input type="date" placeholder="Select date start" className="h-[38px] text-gray-500" />
+              </div>
+              <span className="mx-4 text-gray-500">to</span>
+              <div className="relative">
+                <input type="date" placeholder="Select date end" className="h-[38px] text-gray-500"  />
+              </div>
+              <div className="relative ml-5">
+                <button
+                  className="flex items-center rounded bg-[#6AD9C2] py-2 px-2.5 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:shadow focus:shadow-none hover:bg-[#58efd0] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                  type="button"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 16 16"
+                    fill="currentColor"
+                    className="w-4 h-4 mr-1.5"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  Search
+                </button>
+              </div>
+            </div>
+          </div> */}
         </div>
+
         <div className="-m-1.5 overflow-x-auto bg-white rounded-lg shadow">
           <div className="p-1.5 min-w-full inline-block align-middle">
             <div className="overflow-hidden">
