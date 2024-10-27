@@ -1,5 +1,4 @@
 
-import {TestMentors} from '../shared/listOfOrchids' ;
 import {
   faUser
 } from "@fortawesome/free-solid-svg-icons";
@@ -7,7 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 //const tStyleHeader = 'px-6 py-3 text-start font-medium text-gray-500 uppercase';
 //const tStyleBody = 'px-6 py-3 text-start whitespace-nowrap font-medium text-gray-800';
 //const buttonStyle ='bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import "preline/preline";
 import { IStaticMethods } from "preline/preline";
@@ -17,19 +16,44 @@ declare global {
   }
 }
 
+
+
 export default function ManageMentors(){
   const location = useLocation();
 
+  const baseURL=`${"https://671792d4b910c6a6e028f033.mockapi.io/Orchids"}`;
+const [API, setAPI] = useState<any[]>([]);
+
+useEffect(() => {
+  const fetchAPI = async () =>{
+    await fetch(baseURL, {
+      method:"GET",
+      headers: {
+        "Content-type": "application/json",
+      },
+    }).then((Response) => {
+      if(!Response.ok)
+        throw new Error("Network response was not ok");
+      return Response.json();
+      })
+      .then((data) =>setAPI(data))
+      .catch((error)=> console.log(error));
+  };
+  fetchAPI();
+}, [baseURL]);
+
   useEffect(() => {
     window.HSStaticMethods.autoInit();
-  }, [location.pathname]);
+  }, [location.pathname]); 
+
+
   return (
     <>      
             {/*Grid starts*/}
             <div className="px-2 grid grid-cols-1 gap-4 py-2">
 
                     {/* Main Content */}
-                    {TestMentors.map((mentors) => ( 
+                    {API.map((mentors) => ( 
                       
                       <div className="grid grid-cols-5 py-2 border-4 rounded-lg ">
                         <div className="col-span-1 ">
@@ -151,4 +175,5 @@ export default function ManageMentors(){
 //them ten email sdt vao cai preview
 //edit hien thi het, lam modal
 //delete hien thi modal confirm
+//them nut apply status
 
