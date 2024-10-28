@@ -85,7 +85,7 @@ const MentorTransactionHistory = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y-2 divide-gray-200 divide-">
-                    <tr className="hover:bg-gray-50">
+                    {/* <tr className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
                         Receive
                       </td>
@@ -129,7 +129,7 @@ const MentorTransactionHistory = () => {
                           Failed
                         </span>
                       </td>
-                    </tr>
+                    </tr> */}
                   </tbody>
                 </table>
               </div>

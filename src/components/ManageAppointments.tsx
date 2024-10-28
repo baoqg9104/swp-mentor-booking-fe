@@ -57,7 +57,7 @@ interface BookingsByMentorSlot {
   endTime: string;
   room: string;
   isOnline: boolean;
-  skillName: string;
+  skillName: string[];
   bookingTime: string;
   topicName: string;
   status: string;
@@ -635,7 +635,7 @@ const ManageAppointments = () => {
                                       {booking.topicName}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                                      {booking.skillName}
+                                      {booking.skillName.join(", ")}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
                                       <input

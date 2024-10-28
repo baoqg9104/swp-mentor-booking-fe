@@ -89,7 +89,7 @@ const BookingMentor = () => {
   const [openAvailability, setOpenAvailability] = useState<boolean>(false);
   const [openSuccess, setOpenSuccess] = useState<boolean>(false);
 
-  const [mentorSkill, setMentorSkill] = useState<string>("");
+  const [mentorSkill, setMentorSkill] = useState<number[]>([]);
 
   const [refresh, setRefresh] = useState<boolean>(false);
   const [mentors, setMentors] = useState<Mentor[]>([]);
@@ -191,7 +191,7 @@ const BookingMentor = () => {
     const data = {
       groupId: groupId,
       mentorSlotId: mentorSlotId,
-      mentorSkillId: parseInt(mentorSkill),
+      mentorSkillIds: mentorSkill,
     };
 
     // console.log(data);
@@ -262,6 +262,15 @@ const BookingMentor = () => {
   // Handle search input change
   const handleSearch = (event: any) => {
     setSearchTerm(event.target.value);
+  };
+
+  const handleCheckboxChange = (skillId: number) => {
+    setMentorSkill(
+      (prev) =>
+        prev.includes(skillId)
+          ? prev.filter((id) => id !== skillId) // Xóa skillId nếu đã chọn trước đó
+          : [...prev, skillId] // Thêm skillId nếu chưa chọn
+    );
   };
 
   return (
@@ -1220,7 +1229,7 @@ const BookingMentor = () => {
                                           new Date() ||
                                         booked.some(
                                           (b) => b === availability.mentorSlotId
-                                        ) || 
+                                        ) ||
                                         availability.status === "Approved"
                                       }
                                       type="button"
@@ -1240,7 +1249,7 @@ const BookingMentor = () => {
                                       `}
                                       onClick={() => {
                                         setOpen(true);
-                                        setMentorSkill("");
+                                        setMentorSkill([]);
                                         setSelectedSlot(availability);
                                         getMentorSkills(availability.mentorId);
                                       }}
@@ -1297,7 +1306,7 @@ const BookingMentor = () => {
           <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <DialogPanel
               transition
-              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 lg:w-[600px] data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95 h-[250px]"
+              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 lg:w-[600px] data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
             >
               <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                 <div className="p-0">
@@ -1355,14 +1364,12 @@ const BookingMentor = () => {
                           {" " + selectedSlot?.bookingPoint}
                         </div>
                       </div>
-                      <select
+                      {/* <select
                         value={mentorSkill}
                         className="w-[250px] mt-4"
                         onChange={(e) => setMentorSkill(e.target.value)}
                       >
                         <option value="">Choose skill</option>
-                        {/* <option value="Git">Git</option>
-                        <option value="React">React</option> */}
                         {mentorSkills.map((skill) => (
                           <option
                             key={skill.mentorSkillId}
@@ -1371,7 +1378,33 @@ const BookingMentor = () => {
                             {skill.skillName}
                           </option>
                         ))}
-                      </select>
+                      </select> */}
+                      <div className="grid grid-cols-3 gap-4">
+                        {mentorSkills.map((skill) => (
+                          <div
+                            key={skill.mentorSkillId}
+                            className="flex items-center mt-2"
+                          >
+                            <input
+                              type="checkbox"
+                              id={`skill-${skill.mentorSkillId}`}
+                              value={skill.mentorSkillId}
+                              checked={mentorSkill.includes(
+                                skill.mentorSkillId
+                              )}
+                              onChange={() =>
+                                handleCheckboxChange(skill.mentorSkillId)
+                              }
+                            />
+                            <label
+                              htmlFor={`skill-${skill.mentorSkillId}`}
+                              className="ml-2"
+                            >
+                              {skill.skillName}
+                            </label>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1380,9 +1413,9 @@ const BookingMentor = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    if (mentorSkill !== "") {
+                    if (mentorSkill.length > 0) {
                       setOpen(false);
-                      setMentorSkill("");
+                      setMentorSkill([]);
                       bookMentor(selectedSlot?.mentorSlotId!);
                     } else {
                       toast.error("Please choose skill");
