@@ -263,6 +263,7 @@ const StudentGroup = () => {
       );
 
       toast.success("Add member successful!");
+      setRefresh(!refresh);
     } catch (error: any) {
       // Display response message if available, otherwise show a generic message
       toast.error(error.response.data!);

@@ -20,9 +20,9 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthContext } from "./AuthContext";
 
-registerLicense(
-  "Ngo9BigBOggjHTQxAR8/V1NDaF5cWGNCf1NpR2ZGfV5ycEVHYVZTQHxcS00DNHVRdkdnWXZcdnRVRGBdV010V0M="
-);
+// registerLicense(
+//   "Ngo9BigBOggjHTQxAR8/V1NDaF5cWGNCf1NpR2ZGfV5ycEVHYVZTQHxcS00DNHVRdkdnWXZcdnRVRGBdV010V0M="
+// );
 
 interface MentorSlot {
   mentorSlotId: string;
@@ -41,7 +41,7 @@ const ManageCalendar = () => {
   const [endTime, setEndTime] = useState<Dayjs | null>(null);
   const [date, setDate] = useState<Dayjs | null>(null);
   const [format, setFormat] = useState<string>("offline");
-  const [point, setPoint] = useState<number>(1);
+  const [point, setPoint] = useState<number>(1); 
   const [room, setRoom] = useState<string>("");
   const [isShowForm, setIsShowForm] = useState<boolean>(true);
 
