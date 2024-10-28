@@ -1,4 +1,8 @@
 
+
+import axios from 'axios';
+import { toast } from "react-toastify";
+
 import {
   faUser
 } from "@fortawesome/free-solid-svg-icons";
@@ -6,54 +10,92 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 //const tStyleHeader = 'px-6 py-3 text-start font-medium text-gray-500 uppercase';
 //const tStyleBody = 'px-6 py-3 text-start whitespace-nowrap font-medium text-gray-800';
 //const buttonStyle ='bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded';
-import { useState, useEffect } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
 import "preline/preline";
+import { AuthContext } from "./AuthContext";
 import { IStaticMethods } from "preline/preline";
 declare global {
   interface Window {
     HSStaticMethods: IStaticMethods;
   }
 }
-
+interface Mentors {
+  mentorId: string,
+  mentorName: string,
+  password: string,
+  email: string,
+  phone: string,
+  gender: string,
+  dateOfBirth: string,
+  pointsReceived: string,
+  numOfSlot:string,
+  registrationDate: string,
+  meetUrl: string,
+  applyStatus: true,
+  mentorSkills: null,
+  mentorSlots: null
+}
 
 
 export default function ManageMentors(){
+  const authContext = useContext(AuthContext);
+  if (!authContext) {
+    throw new Error("AuthContext is undefined");
+  }
   const location = useLocation();
+  
+  const { authData,setAuthData} = authContext;
 
-  const baseURL=`${"https://671792d4b910c6a6e028f033.mockapi.io/Orchids"}`;
-const [API, setAPI] = useState<any[]>([]);
+  const [specMentor, setSpecMentor]= useState<string>('');
 
-useEffect(() => {
-  const fetchAPI = async () =>{
-    await fetch(baseURL, {
-      method:"GET",
-      headers: {
-        "Content-type": "application/json",
-      },
-    }).then((Response) => {
-      if(!Response.ok)
-        throw new Error("Network response was not ok");
-      return Response.json();
-      })
-      .then((data) =>setAPI(data))
-      .catch((error)=> console.log(error));
-  };
-  fetchAPI();
-}, [baseURL]);
+  const [data, setData] = useState<Mentors[]>([]);
+  
+
+  const getMentors = async () => {
+    try {
+      const response = await axios.get(
+        `https://localhost:7007/api/Mentor/all`,
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
+
+      setData(response.data);
+      console.log(data);
+    } catch (error) {
+      console.log("Can not get classes", error);
+      toast.error("Can not get classes");
+    }
+  }
+
+  /*const deleteMentor = async () => {
+    try {
+      const response = await axios.delete(
+        `https://localhost:7007/api/Mentor/all`,
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
+  }*/
 
   useEffect(() => {
     window.HSStaticMethods.autoInit();
-  }, [location.pathname]); 
-
+    getMentors();
+  }, [location.pathname]);
 
   return (
     <>      
             {/*Grid starts*/}
+            
             <div className="px-2 grid grid-cols-1 gap-4 py-2">
 
                     {/* Main Content */}
-                    {API.map((mentors) => ( 
+                    {data.map((mentor)=> ( 
                       
                       <div className="grid grid-cols-5 py-2 border-4 rounded-lg ">
                         <div className="col-span-1 ">
@@ -62,10 +104,12 @@ useEffect(() => {
                           </div>
                         </div>
                         <div className="col-span-3 border-l px-4">
-                          {mentors.name}{/*add preview email, name and gender to the items preview */}
-                          
+                          {mentor.mentorName}{/*add preview email, name and gender to the items preview */}<br></br>
+                          {mentor.email}<br></br>
+                          {mentor.gender}<br></br>
+                          {mentor.phone}<br></br>
                         </div>
-
+                      
                         {/* Buttons  */}
                         <div className="col-span-1">
                           <div className="flex justify-end items-center gap-x-2 py-3 px-4">
@@ -77,7 +121,7 @@ useEffect(() => {
                             {/* Edit button code */}
 
                             {/*Delete button code */}
-                            <button type="button" className="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none" aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-basic-modal" data-hs-overlay="#hs-basic-modal">
+                            <button type="button" onClick={()=>{setSpecMentor(mentor.mentorId)}} className="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none" aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-basic-modal" data-hs-overlay="#DeleteModal">
                               Delete
                             </button>
                             {/*Delete button code */}
@@ -87,7 +131,7 @@ useEffect(() => {
                         {/*  Buttons End */}
 
                       </div>
-                    ))}                   
+                    ))};                   
                     {/*  Main Content Ends */}
                 </div>
               {/*  Grid Ends */}
@@ -132,14 +176,14 @@ useEffect(() => {
                 {/* Fullscreen Modal for Edit ends */}
 
                 {/*  Basic Modal for Delete starts */}
-                <div id="hs-basic-modal" className="hs-overlay hs-overlay-open:opacity-100 hs-overlay-open:duration-500 hidden size-full fixed top-0 start-0 z-[80] opacity-0 overflow-x-hidden transition-all overflow-y-auto pointer-events-none" role="dialog" tabIndex={-1} aria-labelledby="hs-basic-modal-label">
+                <div id="DeleteModal" className="hs-overlay hs-overlay-open:opacity-100 hs-overlay-open:duration-500 hidden size-full fixed top-0 start-0 z-[80] opacity-0 overflow-x-hidden transition-all overflow-y-auto pointer-events-none" role="dialog" tabIndex={-1} aria-labelledby="hs-basic-modal-label">
                   <div className="sm:max-w-lg sm:w-full m-3 sm:mx-auto">
                     <div className="flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70">
                       <div className="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-700">
                         <h3 id="hs-basic-modal-label" className="font-bold text-gray-800 dark:text-white">
-                          Confirm Deletion 
+                          Confirm Deletion of Mentor: 
                         </h3>
-                        <button type="button" className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600" aria-label="Close" data-hs-overlay="#hs-basic-modal">
+                        <button type="button" className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600" aria-label="Close" data-hs-overlay="#DeleteModal">
                           <span className="sr-only">Close</span>
                           <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M18 6 6 18"></path>
@@ -148,12 +192,13 @@ useEffect(() => {
                         </button>
                       </div>
                       <div className="p-4 overflow-y-auto">
+                        
                         <p className="mt-1 text-gray-800 dark:text-neutral-400">
-                          Are you sure you want to delete this user ?
+                          Are you sure you want to delete {specMentor}  ?
                         </p>
                       </div>
                       <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t dark:border-neutral-700">
-                        <button type="button" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700" data-hs-overlay="#hs-basic-modal">
+                        <button type="button" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700" data-hs-overlay="#DeleteModal">
                           Close
                         </button>
                         <button type="button" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
@@ -175,5 +220,4 @@ useEffect(() => {
 //them ten email sdt vao cai preview
 //edit hien thi het, lam modal
 //delete hien thi modal confirm
-//them nut apply status
 
