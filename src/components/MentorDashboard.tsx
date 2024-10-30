@@ -1,7 +1,109 @@
 import Rating from "@mui/material/Rating";
 import Stack from "@mui/material/Stack";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "./AuthContext";
+import axios from "axios";
+import { Tooltip } from "@mui/material";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLink } from "@fortawesome/free-solid-svg-icons";
+
+interface MentorAppointment {
+  mentorSlotId: number;
+  mentorId: string;
+  startTime: string;
+  endTime: string;
+  bookingPoint: number;
+  isOnline: boolean;
+  room: string;
+  bookings: string;
+  status: string;
+  group: string;
+  class: string;
+  meetUrl: string;
+  skillName: string[];
+}
 
 const MentorDashboard = () => {
+  const authContext = useContext(AuthContext);
+  if (!authContext) {
+    throw new Error("AuthContext is undefined");
+  }
+
+  const { authData } = authContext;
+
+  const [mentorAppointments, setMentorAppointments] = useState<
+    MentorAppointment[]
+  >([]);
+
+  const [point, setPoint] = useState<number>(0);
+
+  useEffect(() => {
+    const getMentorAppointments = async () => {
+      try {
+        // setLoading(true);
+
+        // Make the GET request
+        const response = await axios.get(
+          `https://localhost:7007/api/MentorSlot/get-mentor-appointments-by-mentor-id/${authData?.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+
+        // Set the response data
+        setMentorAppointments(response.data);
+      } catch (error) {}
+    };
+
+    const getPoint = async () => {
+      try {
+        const response = await axios.get(
+          `https://localhost:7007/api/Mentor/${authData?.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+        setPoint(response.data.pointsReceived);
+      } catch (error) {
+      }
+    };
+
+    getMentorAppointments();
+    getPoint();
+  }, []);
+
+  const appointmentsFilter = mentorAppointments.filter(
+    (mentorAppointment) =>
+      mentorAppointment.status === "Approved" &&
+      mentorAppointment.endTime > new Date().toISOString()
+  );
+
+  const calculateTotalHours = () => {
+    let totalHours = 0;
+
+    mentorAppointments
+      .filter((appointment) => appointment.status === "Completed")
+      .map((appointment) => {
+        const start = new Date(appointment.startTime);
+        const end = new Date(appointment.endTime);
+
+        totalHours += (end.getTime() - start.getTime()) / 3600000;
+      });
+
+    return totalHours.toFixed(2);
+  };
+
+  const formatMeetUrl = (meetUrl: string) => {
+    if (!meetUrl.startsWith("http")) {
+      meetUrl = `https://${meetUrl}`;
+    }
+    return meetUrl;
+  };
+
   return (
     <>
       <div className="max-w-[85rem] px-4 py-6 sm:px-6 lg:px-8 lg:py-6 mx-auto h-[100vh]">
@@ -16,7 +118,7 @@ const MentorDashboard = () => {
 
             <div className="text-center">
               <h3 className="text-3xl sm:text-4xl lg:text-[40px] font-semibold text-gray-800">
-                10
+                {appointmentsFilter.length}
               </h3>
             </div>
           </div>
@@ -31,7 +133,10 @@ const MentorDashboard = () => {
 
             <div className="text-center">
               <h3 className="text-3xl sm:text-4xl lg:text-[40px] font-semibold text-gray-800">
-                5
+                {
+                  mentorAppointments.filter((a) => a.status === "Completed")
+                    .length
+                }
               </h3>
             </div>
           </div>
@@ -56,7 +161,9 @@ const MentorDashboard = () => {
               <p className="uppercase font-semibold text-gray-600 text-[15px]">
                 Total hours
               </p>
-              <p className="text-[40px] font-semibold text-gray-800">100,25</p>
+              <p className="text-[40px] font-semibold text-gray-800">
+                {calculateTotalHours()}
+              </p>
             </div>
 
             <div className="bg-[#F5365D] rounded-full size-[70px] flex items-center justify-center">
@@ -81,12 +188,6 @@ const MentorDashboard = () => {
                     <table className="min-w-full divide-y divide-gray-200 text-sm">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th
-                            scope="col"
-                            className="px-6 py-3 text-start font-medium text-gray-500 uppercase"
-                          >
-                            No
-                          </th>
                           <th
                             scope="col"
                             className="px-6 py-3 text-start font-medium text-gray-500 uppercase"
@@ -120,7 +221,7 @@ const MentorDashboard = () => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
-                        <tr>
+                        {/* <tr>
                           <td className="px-6 py-3 text-start whitespace-nowrap font-medium text-gray-800">
                             1
                           </td>
@@ -137,7 +238,6 @@ const MentorDashboard = () => {
                             Set up environment
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-end">
-                            {/* <span className="size-2 inline-block bg-green-500 rounded-full me-2"></span> */}
                             Online
                           </td>
                         </tr>
@@ -159,7 +259,6 @@ const MentorDashboard = () => {
                             Set up environment
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-end">
-                            {/* <span className="size-2 inline-block bg-green-500 rounded-full me-2"></span> */}
                             601
                           </td>
                         </tr>
@@ -181,10 +280,61 @@ const MentorDashboard = () => {
                             Set up environment
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-end">
-                            {/* <span className="size-2 inline-block bg-green-500 rounded-full me-2"></span> */}
                             603
                           </td>
-                        </tr>
+                        </tr> */}
+                        {appointmentsFilter.map((appointment, index) => (
+                          <tr key={appointment.mentorSlotId}>
+                            <td className="px-6 py-4 whitespace-nowrap text-gray-800">
+                              {appointment.group}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-gray-800">
+                              {new Date(appointment.startTime)
+                                .toLocaleDateString("en-GB")
+                                .replace(/\//g, "-")}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-gray-800">
+                              {`${new Date(
+                                appointment.startTime
+                              ).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })} - ${new Date(
+                                appointment.endTime
+                              ).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}`}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-center">
+                              {appointment.skillName.join(", ")}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-end">
+                              {appointment.room ? (
+                                appointment.room
+                              ) : (
+                                <>
+                                  <Tooltip
+                                    title={formatMeetUrl(appointment.meetUrl)}
+                                    arrow
+                                  >
+                                    <a
+                                      href={formatMeetUrl(appointment.meetUrl)}
+                                      target="_blank"
+                                      className="font-medium btn"
+                                    >
+                                      <FontAwesomeIcon
+                                        icon={faLink}
+                                        className="mr-1"
+                                      />
+                                      Online
+                                    </a>
+                                  </Tooltip>
+                                </>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>
@@ -220,7 +370,7 @@ const MentorDashboard = () => {
                 <p className="uppercase font-semibold text-gray-600 text-[15px]">
                   Total points
                 </p>
-                <p className="text-[40px] font-semibold text-gray-800">100</p>
+                <p className="text-[40px] font-semibold text-gray-800">{point}</p>
               </div>
 
               <div className="bg-[#f8c620] rounded-full size-[70px] flex items-center justify-center">

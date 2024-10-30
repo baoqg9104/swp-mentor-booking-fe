@@ -1,10 +1,14 @@
 import {
   faGear,
   faPaperclip,
+  faPenToSquare,
   faPlus,
   faUser,
+  faUserPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import Slider from "@mui/material/Slider";
 
 import "preline/preline";
 import { IStaticMethods } from "preline/preline";
@@ -97,7 +101,7 @@ const StudentGroup = () => {
       try {
         const groupId = localStorage.getItem("groupId");
         const data = groupId;
-        console.log(data);
+        // console.log(data);
         if (data === "") {
           return;
         }
@@ -111,6 +115,7 @@ const StudentGroup = () => {
           }
         );
         setGroup(response.data);
+        setProgress(response.data.progress);
 
         localStorage.setItem("group", JSON.stringify(response.data));
         getGroupTopic();
@@ -271,6 +276,34 @@ const StudentGroup = () => {
   };
 
   const [members, setMembers] = useState<Member[]>([]);
+
+  const [openProgress, setOpenProgress] = useState<boolean>(false);
+
+  const [progress, setProgress] = useState<number>(0);
+
+  const updateProgress = async () => {
+    try {
+      const data = {
+        groupId: group?.groupId,
+        progress: progress,
+      };
+
+      const response = await axios.put(
+        `https://localhost:7007/api/Group/update-progress`,
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
+
+      toast.success("Update progress successful!");
+      setRefresh(!refresh);
+    } catch (error) {
+      toast.error("Update progress failed!");
+    }
+  };
 
   return (
     <>
@@ -572,7 +605,7 @@ const StudentGroup = () => {
         {group !== null && (
           <>
             <div className="flex">
-              <div className="w-[50%]">
+              <div className="w-[33%]">
                 <div className="flex w-[280px]">
                   <div className="w-[90%]">
                     <h1 className="text-[21px] font-medium mb-3">
@@ -604,10 +637,13 @@ const StudentGroup = () => {
                         />
                       </div> */}
                       {members.map((member) => (
-                        <div className="size-7 rounded-full ring-2 ring-gray-200 flex items-center justify-center bg-white">
+                        <div
+                          key={member.studentId}
+                          className="size-8 rounded-full ring-2 ring-gray-200 flex items-center justify-center bg-white"
+                        >
                           <FontAwesomeIcon
                             icon={faUser}
-                            className="text-gray-500 size-4"
+                            className="text-gray-500 size-[17px]"
                           />
                         </div>
                       ))}
@@ -626,7 +662,9 @@ const StudentGroup = () => {
                 <div className="mt-7">
                   <h1 className="text-[15px] font-semibold text-[#3c3c3c]">
                     Remaining points:{" "}
-                    <span className="text-[#0c9eff]">{group.walletPoint}</span>
+                    <span className="text-[#0c9eff] text-[16px]">
+                      {group.walletPoint}
+                    </span>
                   </h1>
                 </div>
 
@@ -647,6 +685,18 @@ const StudentGroup = () => {
                     <div className="border-t-2 py-[6px] flex justify-end px-4">
                       <div
                         className="hover:bg-[#ffefe5] size-[30px] rounded-full flex justify-center items-center cursor-pointer"
+                        onClick={() => {
+                          setOpenProgress(true);
+                          setProgress(group?.progress!);
+                        }}
+                      >
+                        <FontAwesomeIcon
+                          icon={faPenToSquare}
+                          className="text-[#595959] text-[18px]"
+                        />
+                      </div>
+                      <div
+                        className="hover:bg-[#ffefe5] size-[30px] rounded-full flex justify-center items-center cursor-pointer"
                         onClick={() => setOpen(true)}
                       >
                         <FontAwesomeIcon
@@ -655,6 +705,94 @@ const StudentGroup = () => {
                         />
                       </div>
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="w-[20%] pt-48">
+                <div className="relative size-40">
+                  <svg
+                    className="rotate-[135deg] size-full"
+                    viewBox="0 0 36 36"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle
+                      cx="18"
+                      cy="18"
+                      r="16"
+                      fill="none"
+                      className="stroke-current text-neutral-700"
+                      strokeWidth="1"
+                      strokeDasharray="75 100"
+                      strokeLinecap="round"
+                    ></circle>
+
+                    <circle
+                      cx="18"
+                      cy="18"
+                      r="16"
+                      fill="none"
+                      className={`stroke-current ${
+                        progress >= 100
+                          ? "text-[#228B22]"
+                          : progress >= 90
+                          ? "text-[#36bb36]"
+                          : progress >= 80
+                          ? "text-[#32CD32]"
+                          : progress >= 70
+                          ? "text-[#7FFF00]"
+                          : progress >= 60
+                          ? "text-[#ADFF2F]"
+                          : progress >= 50
+                          ? "text-[#FFFF00]"
+                          : progress >= 40
+                          ? "text-[#FFD700]"
+                          : progress >= 30
+                          ? "text-[#FFA500]"
+                          : progress >= 20
+                          ? "text-[#FF8C00]"
+                          : progress >= 10
+                          ? "text-[#FF4500]"
+                          : "text-[#FF0000]"
+                      }`}
+                      strokeWidth="2"
+                      // strokeDasharray="56.25 100"
+                      strokeDasharray={`${
+                        (group?.progress! * 56.25) / 75
+                      } ${100}`}
+                      strokeLinecap="round"
+                    ></circle>
+                  </svg>
+
+                  <div className="absolute top-1/2 start-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                    <span
+                      className={`text-4xl font-bold ${
+                        progress >= 100
+                          ? "text-[#228B22]"
+                          : progress >= 90
+                          ? "text-[#36bb36]"
+                          : progress >= 80
+                          ? "text-[#32CD32]"
+                          : progress >= 70
+                          ? "text-[#7FFF00]"
+                          : progress >= 60
+                          ? "text-[#ADFF2F]"
+                          : progress >= 50
+                          ? "text-[#dddd36]"
+                          : progress >= 40
+                          ? "text-[#FFD700]"
+                          : progress >= 30
+                          ? "text-[#FFA500]"
+                          : progress >= 20
+                          ? "text-[#FF8C00]"
+                          : progress >= 10
+                          ? "text-[#FF4500]"
+                          : "text-[#FF0000]"
+                      }`}
+                    >
+                      {group?.progress}
+                      <span className="text-[25px]">%</span>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -730,7 +868,7 @@ const StudentGroup = () => {
                             
                             </tr> */}
                             {members.map((member) => (
-                              <tr>
+                              <tr key={member.studentId}>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
                                   {member.fullName}
                                 </td>
@@ -901,6 +1039,179 @@ const StudentGroup = () => {
                   onClick={() => setOpenSetting(false)}
                 >
                   Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Dialog>
+
+      <Dialog
+        open={openProgress}
+        onClose={setOpenProgress}
+        className="relative z-[100]"
+      >
+        <DialogBackdrop
+          transition
+          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+        />
+
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div className="w-[500px] flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto">
+              <div className="flex justify-between items-center py-3 px-4 border-b">
+                <h2
+                  id="hs-scale-animation-modal-label-setting"
+                  className="font-bold text-gray-800 text-[18px]"
+                >
+                  Update progress
+                </h2>
+                <button
+                  type="button"
+                  className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none"
+                  onClick={() => setOpenProgress(false)}
+                >
+                  <span className="sr-only">Close</span>
+                  <svg
+                    className="shrink-0 size-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M18 6 6 18"></path>
+                    <path d="m6 6 12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <div className="p-4 overflow-y-auto flex flex-col justify-center items-center">
+                <div className="p-5 py-10 px-8 w-full">
+                  <Slider
+                    aria-label="Temperature"
+                    defaultValue={group?.progress}
+                    valueLabelDisplay="auto"
+                    shiftStep={30}
+                    step={10}
+                    marks
+                    min={0}
+                    max={100}
+                    onChange={(e) => {
+                      const target = e.target as HTMLInputElement;
+                      if (target) {
+                        setProgress(Number(target.value));
+                      }
+                    }}
+                  />
+
+                  <div className="w-full flex justify-center">
+                    <div className="relative size-40 mt-6">
+                      <svg
+                        className="rotate-[135deg] size-full"
+                        viewBox="0 0 36 36"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <circle
+                          cx="18"
+                          cy="18"
+                          r="16"
+                          fill="none"
+                          className="stroke-current text-neutral-700"
+                          strokeWidth="1"
+                          strokeDasharray="75 100"
+                          strokeLinecap="round"
+                        ></circle>
+
+                        <circle
+                          cx="18"
+                          cy="18"
+                          r="16"
+                          fill="none"
+                          className={`stroke-current ${
+                            progress >= 100
+                              ? "text-[#228B22]"
+                              : progress >= 90
+                              ? "text-[#36bb36]"
+                              : progress >= 80
+                              ? "text-[#32CD32]"
+                              : progress >= 70
+                              ? "text-[#7FFF00]"
+                              : progress >= 60
+                              ? "text-[#ADFF2F]"
+                              : progress >= 50
+                              ? "text-[#FFFF00]"
+                              : progress >= 40
+                              ? "text-[#FFD700]"
+                              : progress >= 30
+                              ? "text-[#FFA500]"
+                              : progress >= 20
+                              ? "text-[#FF8C00]"
+                              : progress >= 10
+                              ? "text-[#FF4500]"
+                              : "text-[#FF0000]"
+                          }`}
+                          strokeWidth="2"
+                          // strokeDasharray="56.25 100"
+                          strokeDasharray={`${(progress * 56.25) / 75} ${100}`}
+                          strokeLinecap="round"
+                        ></circle>
+                      </svg>
+
+                      <div className="absolute top-1/2 start-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                        <span
+                          className={`text-4xl font-bold ${
+                            progress >= 100
+                              ? "text-[#228B22]"
+                              : progress >= 90
+                              ? "text-[#36bb36]"
+                              : progress >= 80
+                              ? "text-[#32CD32]"
+                              : progress >= 70
+                              ? "text-[#7FFF00]"
+                              : progress >= 60
+                              ? "text-[#ADFF2F]"
+                              : progress >= 50
+                              ? "text-[#c9c92b]"
+                              : progress >= 40
+                              ? "text-[#FFD700]"
+                              : progress >= 30
+                              ? "text-[#FFA500]"
+                              : progress >= 20
+                              ? "text-[#FF8C00]"
+                              : progress >= 10
+                              ? "text-[#FF4500]"
+                              : "text-[#FF0000]"
+                          }`}
+                        >
+                          {progress}
+                          <span className="text-[25px]">%</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t">
+                <button
+                  type="button"
+                  className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                  onClick={() => setOpenProgress(false)}
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenProgress(false);
+                    updateProgress();
+                  }}
+                  className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 sm:ml-3 sm:w-auto"
+                >
+                  Update
                 </button>
               </div>
             </div>

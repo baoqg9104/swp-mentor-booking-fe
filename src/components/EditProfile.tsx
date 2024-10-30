@@ -167,7 +167,11 @@ const EditProfile = () => {
       setRefresh(!refresh);
     } catch (error) {
       console.log(error);
-      toast.error("Update failed!");
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error(error.response.data);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     }
   };
 

@@ -1379,7 +1379,8 @@ const BookingMentor = () => {
                           </option>
                         ))}
                       </select> */}
-                      <div className="grid grid-cols-3 gap-4">
+                      <hr className="mt-3" />
+                      <div className="grid grid-cols-3 gap-4 mt-3">
                         {mentorSkills.map((skill) => (
                           <div
                             key={skill.mentorSkillId}

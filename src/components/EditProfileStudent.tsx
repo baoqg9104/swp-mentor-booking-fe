@@ -1,4 +1,10 @@
-import { faCamera, faEnvelope, faGift, faPhone, faUser } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCamera,
+  faEnvelope,
+  faGift,
+  faPhone,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import "preline/preline";
@@ -26,7 +32,6 @@ interface StudentInformation {
 }
 
 const EditProfileStudent = () => {
-
   const location = useLocation();
 
   useEffect(() => {
@@ -87,7 +92,8 @@ const EditProfileStudent = () => {
   const [phone, setPhone] = useState<string>("");
   const [dateOfBirth, setDateOfBirth] = useState<string>("");
 
-  const handleSave = async () => {
+  const handleSave = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
     try {
       const data = {
         role: authData?.role,
@@ -113,7 +119,11 @@ const EditProfileStudent = () => {
       setRefresh(!refresh);
     } catch (error) {
       console.log(error);
-      toast.error("Update failed!");
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error(error.response.data);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     }
   };
 
@@ -145,9 +155,10 @@ const EditProfileStudent = () => {
                         <FontAwesomeIcon
                           icon={faUser}
                           className={`size-4 mr-2 ${
-                            studentInformation?.gender !== ""
-                              ? ""
-                              : "text-gray-500"
+                            studentInformation?.gender === "" ||
+                            studentInformation?.gender === null
+                              ? "text-gray-500"
+                              : ""
                           }`}
                         />
                         <span
@@ -182,7 +193,7 @@ const EditProfileStudent = () => {
                           {studentInformation?.dateOfBirth === null
                             ? ""
                             : new Date(
-                              studentInformation?.dateOfBirth!
+                                studentInformation?.dateOfBirth!
                               ).toLocaleDateString("en-GB")}
                         </span>
                       </div>
@@ -330,32 +341,33 @@ const EditProfileStudent = () => {
                 </svg>
               </button>
             </div>
-            <div className="p-4 overflow-y-auto flex flex-col justify-center items-center">
-              <div className="w-full flex justify-center flex-col items-center">
-                <div className="size-[120px] border-[3px] border-white bg-gray-200 rounded-full shadow-lg"></div>
 
-                <div className="flex justify-center items-center w-[40%] mt-3">
-                  <div className="w-[50%] flex items-center justify-center cursor-pointer">
-                    <FontAwesomeIcon
-                      icon={faCamera}
-                      className="size-4 mr-1 text-gray-700"
-                    />
-                    Edit
-                  </div>
-                  <div className="w-[50%] flex items-center justify-center cursor-pointer">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 448 512"
-                      className="size-4 inline-block mr-1"
-                    >
-                      <path d="M170.5 51.6L151.5 80l145 0-19-28.4c-1.5-2.2-4-3.6-6.7-3.6l-93.7 0c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6L354.2 80 368 80l48 0 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-8 0 0 304c0 44.2-35.8 80-80 80l-224 0c-44.2 0-80-35.8-80-80l0-304-8 0c-13.3 0-24-10.7-24-24S10.7 80 24 80l8 0 48 0 13.8 0 36.7-55.1C140.9 9.4 158.4 0 177.1 0l93.7 0c18.7 0 36.2 9.4 46.6 24.9zM80 128l0 304c0 17.7 14.3 32 32 32l224 0c17.7 0 32-14.3 32-32l0-304L80 128zm80 64l0 208c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-208c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0l0 208c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-208c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0l0 208c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-208c0-8.8 7.2-16 16-16s16 7.2 16 16z" />
-                    </svg>
-                    Delete
+            <form className="flex flex-col gap-3" onSubmit={handleSave}>
+              <div className="p-4 overflow-y-auto flex flex-col justify-center items-center">
+                <div className="w-full flex justify-center flex-col items-center">
+                  <div className="size-[120px] border-[3px] border-white bg-gray-200 rounded-full shadow-lg"></div>
+
+                  <div className="flex justify-center items-center w-[40%] mt-3">
+                    <div className="w-[50%] flex items-center justify-center cursor-pointer">
+                      <FontAwesomeIcon
+                        icon={faCamera}
+                        className="size-4 mr-1 text-gray-700"
+                      />
+                      Edit
+                    </div>
+                    <div className="w-[50%] flex items-center justify-center cursor-pointer">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 448 512"
+                        className="size-4 inline-block mr-1"
+                      >
+                        <path d="M170.5 51.6L151.5 80l145 0-19-28.4c-1.5-2.2-4-3.6-6.7-3.6l-93.7 0c-2.7 0-5.2 1.3-6.7 3.6zm147-26.6L354.2 80 368 80l48 0 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-8 0 0 304c0 44.2-35.8 80-80 80l-224 0c-44.2 0-80-35.8-80-80l0-304-8 0c-13.3 0-24-10.7-24-24S10.7 80 24 80l8 0 48 0 13.8 0 36.7-55.1C140.9 9.4 158.4 0 177.1 0l93.7 0c18.7 0 36.2 9.4 46.6 24.9zM80 128l0 304c0 17.7 14.3 32 32 32l224 0c17.7 0 32-14.3 32-32l0-304L80 128zm80 64l0 208c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-208c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0l0 208c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-208c0-8.8 7.2-16 16-16s16 7.2 16 16zm80 0l0 208c0 8.8-7.2 16-16 16s-16-7.2-16-16l0-208c0-8.8 7.2-16 16-16s16 7.2 16 16z" />
+                      </svg>
+                      Delete
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="w-full mt-6">
-                <form className="flex flex-col gap-3">
+                <div className="w-full mt-6">
                   <div className="relative">
                     <input
                       value={fullName}
@@ -369,6 +381,7 @@ const EditProfileStudent = () => {
     autofill:pt-6
     autofill:pb-2"
                       placeholder="Full name"
+                      required
                     />
                     <label
                       className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
@@ -388,6 +401,7 @@ const EditProfileStudent = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="relative">
                       <select
+                        required
                         value={gender}
                         onChange={(e) => setGender(e.target.value)}
                         className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
@@ -420,6 +434,7 @@ const EditProfileStudent = () => {
 
                     <div className="relative">
                       <input
+                        required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         type="email"
@@ -449,6 +464,7 @@ const EditProfileStudent = () => {
 
                     <div className="relative">
                       <input
+                        pattern="^(0[1-9][0-9]{8}|(\+84[1-9][0-9]{8}))$"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         type="text"
@@ -505,27 +521,24 @@ const EditProfileStudent = () => {
                       </label>
                     </div>
                   </div>
-                </form>
+                </div>
               </div>
-            </div>
-            <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t">
-              <button
-                type="button"
-                className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
-                data-hs-overlay="#hs-scale-animation-modal"
-              >
-                Close
-              </button>
-              <button
-                onClick={() => {
-                  handleSave();
-                }}
-                type="button"
-                className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
-              >
-                Save changes
-              </button>
-            </div>
+              <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t">
+                <button
+                  type="button"
+                  className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                  data-hs-overlay="#hs-scale-animation-modal"
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                >
+                  Save changes
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -595,7 +608,6 @@ const EditProfileStudent = () => {
                   </div>
                 </div>
               </div> */}
-
             </div>
             <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t">
               <button

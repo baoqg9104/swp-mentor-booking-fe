@@ -1,6 +1,104 @@
-import { Rating, Stack } from "@mui/material";
+import { Rating, Stack, Tooltip } from "@mui/material";
+import axios from "axios";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "./AuthContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLink } from "@fortawesome/free-solid-svg-icons";
+
+interface Group {
+  groupId: string;
+  name: string;
+  swpClassName: string;
+  progress: number;
+}
+
+interface Booking {
+  bookingId: number;
+  groupId: string;
+  groupName: string;
+  mentorSlotId: number;
+  mentorName: string;
+  startTime: string;
+  endTime: string;
+  room: string;
+  isOnline: boolean;
+  meetUrl: string;
+  skillName: string[];
+  bookingTime: string;
+  status: string;
+}
 
 const StudentDashboard = () => {
+  const authContext = useContext(AuthContext);
+  if (!authContext) {
+    throw new Error("AuthContext is undefined");
+  }
+  const { authData, setAuthData } = authContext;
+
+  const [group, setGroup] = useState<Group>();
+
+  const groupId = localStorage.getItem("groupId");
+
+  const [bookings, setBookings] = useState<Booking[]>([]);
+
+  useEffect(() => {
+    const getGroupByGroupId = async () => {
+      try {
+        const data = groupId;
+
+        if (data === "") {
+          return;
+        }
+
+        const response = await axios.get(
+          `https://localhost:7007/api/Group/get/${data}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+
+        setGroup(response.data);
+      } catch (error) {}
+    };
+
+    const getBookings = async () => {
+      try {
+        const groupId = localStorage.getItem("groupId");
+        const response = await axios.get(
+          `https://localhost:7007/api/Booking/get-bookings-by-groupId/${groupId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+
+        setBookings(response.data);
+        // console.log(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getGroupByGroupId();
+    getBookings();
+  }, []);
+
+  const formatMeetUrl = (meetUrl: string) => {
+    if (!meetUrl.startsWith("http")) {
+      meetUrl = `https://${meetUrl}`;
+    }
+    return meetUrl;
+  };
+
+  const bookingsFilter = bookings.filter(
+    (booking) =>
+      booking.status === "Approved" &&
+      booking.endTime > new Date().toISOString()
+  );
+
   return (
     <>
       <div className="h-[90svh] p-5">
@@ -17,8 +115,12 @@ const StudentDashboard = () => {
                 </svg>
               </div>
             </div>
-            <div className=" text-[23px] mt-3 pl-1">No group yet</div>
-            <div className="text-[15px] pl-1 mt-2">No class yet</div>
+            <div className=" text-[23px] mt-3 pl-1">
+              {group?.name ?? "Not joined any group"}
+            </div>
+            <div className="text-[15px] pl-1 mt-2">
+              {group?.swpClassName ?? "No class assigned"}
+            </div>
           </div>
           <div className="bg-[#FFF4DE] p-4  rounded-[15px]">
             <div>
@@ -32,7 +134,7 @@ const StudentDashboard = () => {
                 </svg>
               </div>
             </div>
-            <div className="text-[23px] mt-3 pl-1">0</div>
+            <div className="text-[23px] mt-3 pl-1">{bookingsFilter.length}</div>
             <div className="text-[15px] pl-1 mt-2 capitalize">
               Upcoming appointments
             </div>
@@ -49,7 +151,9 @@ const StudentDashboard = () => {
                 </svg>
               </div>
             </div>
-            <div className="text-[23px] mt-3 pl-1">0</div>
+            <div className="text-[23px] mt-3 pl-1">
+              {bookings.filter((b) => b.status === "Completed").length}
+            </div>
             <div className="text-[15px] pl-1 mt-2 capitalize">
               Completed appointments
             </div>
@@ -62,12 +166,6 @@ const StudentDashboard = () => {
               <table className="min-w-full divide-y divide-gray-200 text-sm">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-start font-medium text-gray-500 uppercase"
-                    >
-                      No
-                    </th>
                     <th
                       scope="col"
                       className="px-6 py-3 text-start font-medium text-gray-500 uppercase"
@@ -101,7 +199,7 @@ const StudentDashboard = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  <tr>
+                  {/* <tr>
                     <td className="px-6 py-3 text-start whitespace-nowrap font-medium text-gray-800">
                       1
                     </td>
@@ -118,7 +216,6 @@ const StudentDashboard = () => {
                       Set up environment
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-end">
-                      {/* <span className="size-2 inline-block bg-green-500 rounded-full me-2"></span> */}
                       Online
                     </td>
                   </tr>
@@ -140,7 +237,6 @@ const StudentDashboard = () => {
                       Set up environment
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-end">
-                      {/* <span className="size-2 inline-block bg-green-500 rounded-full me-2"></span> */}
                       601
                     </td>
                   </tr>
@@ -162,10 +258,61 @@ const StudentDashboard = () => {
                       Set up environment
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-end">
-                      {/* <span className="size-2 inline-block bg-green-500 rounded-full me-2"></span> */}
                       603
                     </td>
-                  </tr>
+                  </tr> */}
+
+                  {bookingsFilter.map((booking, index) => (
+                    <tr key={index}>
+                      <td className="px-6 py-4 whitespace-nowrap text-gray-800">
+                        {booking.mentorName}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-gray-800">
+                        {new Date(booking.startTime)
+                          .toLocaleDateString("en-GB")
+                          .replace(/\//g, "-")}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-gray-800">
+                        {`${new Date(booking.startTime).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })} - ${new Date(booking.endTime).toLocaleTimeString(
+                          [],
+                          {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )}`}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-center">
+                        {booking.skillName.join(", ")}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-end">
+                        {booking.room ? (
+                          booking.room
+                        ) : (
+                          <>
+                            <Tooltip
+                              title={formatMeetUrl(booking.meetUrl)}
+                              arrow
+                            >
+                              <a
+                                href={formatMeetUrl(booking.meetUrl)}
+                                target="_blank"
+                                className="font-medium btn"
+                              >
+                                <FontAwesomeIcon
+                                  icon={faLink}
+                                  className="mr-1"
+                                />
+                                Online
+                              </a>
+                            </Tooltip>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -193,17 +340,64 @@ const StudentDashboard = () => {
                   cy="18"
                   r="16"
                   fill="none"
-                  className="stroke-current text-[#2797F7]"
+                  className={`stroke-current ${
+                    group?.progress! >= 100
+                      ? "text-[#228B22]"
+                      : group?.progress! >= 90
+                      ? "text-[#36bb36]"
+                      : group?.progress! >= 80
+                      ? "text-[#32CD32]"
+                      : group?.progress! >= 70
+                      ? "text-[#7FFF00]"
+                      : group?.progress! >= 60
+                      ? "text-[#ADFF2F]"
+                      : group?.progress! >= 50
+                      ? "text-[#FFFF00]"
+                      : group?.progress! >= 40
+                      ? "text-[#FFD700]"
+                      : group?.progress! >= 30
+                      ? "text-[#FFA500]"
+                      : group?.progress! >= 20
+                      ? "text-[#FF8C00]"
+                      : group?.progress! >= 10
+                      ? "text-[#FF4500]"
+                      : "text-[#FF0000]"
+                  }`}
                   strokeWidth="2"
-                  strokeDasharray="56.25 100"
-                  // strokeDasharray={`${50} 100`}
+                  // strokeDasharray="56.25 100"
+                  strokeDasharray={`${(group?.progress! * 56.25) / 75} ${100}`}
                   strokeLinecap="round"
                 ></circle>
               </svg>
 
               <div className="absolute top-1/2 start-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                <span className="text-4xl font-bold text-[#2797F7]">
-                  75<span className="text-[25px]">%</span>
+                <span
+                  className={`text-4xl font-bold ${
+                    group?.progress! >= 100
+                      ? "text-[#228B22]"
+                      : group?.progress! >= 90
+                      ? "text-[#36bb36]"
+                      : group?.progress! >= 80
+                      ? "text-[#32CD32]"
+                      : group?.progress! >= 70
+                      ? "text-[#7FFF00]"
+                      : group?.progress! >= 60
+                      ? "text-[#ADFF2F]"
+                      : group?.progress! >= 50
+                      ? "text-[#dddd36]"
+                      : group?.progress! >= 40
+                      ? "text-[#FFD700]"
+                      : group?.progress! >= 30
+                      ? "text-[#FFA500]"
+                      : group?.progress! >= 20
+                      ? "text-[#FF8C00]"
+                      : group?.progress! >= 10
+                      ? "text-[#FF4500]"
+                      : "text-[#FF0000]"
+                  }`}
+                >
+                  {group?.progress}
+                  <span className="text-[25px]">%</span>
                 </span>
                 {/* <span className="text-[#2797F7] block">
                   Project
