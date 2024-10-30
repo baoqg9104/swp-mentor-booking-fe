@@ -7,7 +7,6 @@ import {
   Agenda,
   Inject,
 } from "@syncfusion/ej2-react-schedule";
-import { registerLicense } from "@syncfusion/ej2-base";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { TimePicker } from "@mui/x-date-pickers/TimePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -17,12 +16,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import { Dayjs } from "dayjs";
 import axios from "axios";
+import dayjs from "dayjs";
 import { toast } from "react-toastify";
 import { AuthContext } from "./AuthContext";
-
-// registerLicense(
-//   "Ngo9BigBOggjHTQxAR8/V1NDaF5cWGNCf1NpR2ZGfV5ycEVHYVZTQHxcS00DNHVRdkdnWXZcdnRVRGBdV010V0M="
-// );
 
 interface MentorSlot {
   mentorSlotId: string;
@@ -41,7 +37,7 @@ const ManageCalendar = () => {
   const [endTime, setEndTime] = useState<Dayjs | null>(null);
   const [date, setDate] = useState<Dayjs | null>(null);
   const [format, setFormat] = useState<string>("offline");
-  const [point, setPoint] = useState<number>(1); 
+  const [point, setPoint] = useState<number>(1);
   const [room, setRoom] = useState<string>("");
   const [isShowForm, setIsShowForm] = useState<boolean>(true);
 
@@ -50,6 +46,9 @@ const ManageCalendar = () => {
     throw new Error("AuthContext is undefined");
   }
   const { authData } = authContext;
+
+  const [slot, setSlot] = useState<number>();
+  const [numOfSlot, setNumOfSlot] = useState<number>(0);
 
   useEffect(() => {
     const getMentorSlots = async () => {
@@ -69,7 +68,23 @@ const ManageCalendar = () => {
       }
     };
 
+    const getNumOfSlots = async () => {
+      try {
+        const response = await axios.get(
+          `https://localhost:7007/api/Mentor/${authData?.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+        setNumOfSlot(response.data.numOfSlot);
+      } catch (error) {
+      }
+    };
+
     getMentorSlots();
+    getNumOfSlots();
   }, [refresh, authData]);
 
   const data = mentorSlots.map((slot) => ({
@@ -77,7 +92,6 @@ const ManageCalendar = () => {
     Subject: slot.room !== "" ? `Room: ${slot.room}` : "Online",
     StartTime: new Date(slot.startTime),
     EndTime: new Date(slot.endTime),
-    
   }));
 
   const handleAddSlot = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -112,6 +126,11 @@ const ManageCalendar = () => {
       room,
     };
 
+    if (dayjs(mentorSlot.startTime).isBefore(dayjs())) {
+      toast.error("Start time must be in the future");
+      return;
+    } 
+
     try {
       await axios.post(
         "https://localhost:7007/api/MentorSlot/create",
@@ -139,11 +158,11 @@ const ManageCalendar = () => {
               />
             </button>
           </div>
-          
+
           {isShowForm && (
             <form onSubmit={handleAddSlot} className="w-[80%] ml-12">
               <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-6">
-                <div className="sm:col-span-3">
+                {/* <div className="sm:col-span-3">
                   <label className="block text-sm font-medium leading-6 text-gray-900">
                     Start Time
                   </label>
@@ -165,17 +184,70 @@ const ManageCalendar = () => {
                       onChange={(e) => setEndTime(e)}
                     />
                   </div>
-                </div>
+                </div> */}
 
                 <div className="sm:col-span-4">
                   <label className="block text-sm font-medium leading-6 text-gray-900">
                     Date
                   </label>
                   <div className="mt-2">
-                    <DatePicker
-                      value={date}
-                      onChange={(e) => setDate(e)}
-                    />
+                    <DatePicker value={date} onChange={(e) => setDate(e)} />
+                  </div>
+                </div>
+
+                <div className="sm:col-span-3">
+                  <label className="block text-sm font-medium leading-6 text-gray-900">
+                    Slot
+                  </label>
+                  <div className="mt-2">
+                    <select
+                      value={slot}
+                      onChange={(e) => {
+                        setSlot(parseInt(e.target.value));
+                        if (e.target.value === "1") {
+                          setStartTime(dayjs("07:00", "HH:mm"));
+                          setEndTime(dayjs("09:15", "HH:mm"));
+                        } else if (e.target.value === "2") {
+                          setStartTime(dayjs("09:30", "HH:mm"));
+                          setEndTime(dayjs("11:45", "HH:mm"));
+                        } else if (e.target.value === "3") {
+                          setStartTime(dayjs("12:30", "HH:mm"));
+                          setEndTime(dayjs("14:45", "HH:mm"));
+                        } else if (e.target.value === "4") {
+                          setStartTime(dayjs("15:00", "HH:mm"));
+                          setEndTime(dayjs("17:15", "HH:mm"));
+                        } else if (e.target.value === "5") {
+                          setStartTime(dayjs("17:45", "HH:mm"));
+                          setEndTime(dayjs("20:00", "HH:mm"));
+                        } else if (e.target.value === "6") {
+                          setStartTime(dayjs("20:15", "HH:mm"));
+                          setEndTime(dayjs("22:30", "HH:mm"));
+                        }
+                      }}
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
+                    >
+                      <option value=""></option>
+                      <option value="1">
+                        Slot {1} : {"07:00 - 09:15"}
+                      </option>
+                      <option value="2">
+                        Slot {2} : {"09:30 - 11:45"}
+                      </option>
+                      <option value="3">
+                        Slot {3} : {"12:30 - 14:45"}
+                      </option>
+                      <option value="4">
+                        Slot {4} : {"15:00 - 17:15"}
+                      </option>
+                      <option value="5">
+                        Slot {5} : {"17:45 - 20:00"}
+                      </option>
+                      <option value="6">
+                        Slot {6} : {"20:15 - 22:30"}
+                      </option>
+                      {/* <option value="1">Slot {7} : {"07:00 - 09:00"}</option>
+                      <option value="1">Slot {8} : {"07:00 - 09:00"}</option> */}
+                    </select>
                   </div>
                 </div>
 
@@ -223,12 +295,14 @@ const ManageCalendar = () => {
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:max-w-xs sm:text-sm sm:leading-6"
                         required={format === "offline"}
                       >
-                        <option value="" disabled></option>
-                        {Array.from({ length: 11 }, (_, i) => i + 601).map((roomNum) => (
-                          <option key={roomNum} value={roomNum.toString()}>
-                            {roomNum}
-                          </option>
-                        ))}
+                        <option value=""></option>
+                        {Array.from({ length: 11 }, (_, i) => i + 601).map(
+                          (roomNum) => (
+                            <option key={roomNum} value={roomNum.toString()}>
+                              {roomNum}
+                            </option>
+                          )
+                        )}
                       </select>
                     </div>
                   </div>
@@ -247,7 +321,7 @@ const ManageCalendar = () => {
           )}
 
           <div className="pl-10 pt-5 font-medium text-[#6e6e6e]">
-            Number of slots remaining: {10 - mentorSlots.length}
+            Number of slots remaining: {numOfSlot}  
           </div>
 
           <div className="flex flex-col mt-7">
@@ -281,13 +355,19 @@ const ManageCalendar = () => {
                                 .replace(/\//g, "-")}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                              {`${new Date(slot.startTime).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })} - ${new Date(slot.endTime).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              })}`}
+                              {`${new Date(slot.startTime).toLocaleTimeString(
+                                [],
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }
+                              )} - ${new Date(slot.endTime).toLocaleTimeString(
+                                [],
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }
+                              )}`}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                               {slot.isOnline ? "Online" : slot.room}

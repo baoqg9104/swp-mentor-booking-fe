@@ -1,7 +1,7 @@
 import "preline/preline";
 import { IStaticMethods } from "preline/preline";
 import { useContext, useEffect, useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 declare global {
   interface Window {
@@ -30,6 +30,9 @@ import {
 } from "@syncfusion/ej2-react-schedule";
 import { AuthContext } from "./AuthContext";
 import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faLink } from "@fortawesome/free-solid-svg-icons";
+import { Tooltip } from "@mui/material";
 
 interface Booking {
   bookingId: number;
@@ -41,6 +44,7 @@ interface Booking {
   endTime: string;
   room: string;
   isOnline: boolean;
+  meetUrl: string;
   skillName: string;
   bookingTime: string;
   status: string;
@@ -132,6 +136,13 @@ const MyAppointments = () => {
     } else if (args.data.Status === "Completed") {
       args.element.style.backgroundColor = "#bfbfbf";
     }
+  };
+
+  const formatMeetUrl = (meetUrl: string) => {
+    if (!meetUrl.startsWith("http")) {
+      meetUrl = `https://${meetUrl}`;
+    }
+    return meetUrl;
   };
 
   return (
@@ -371,8 +382,26 @@ const MyAppointments = () => {
                             }
                           )}`}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                          {booking.room ? booking.room : "Online"}
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          {booking.room ? (
+                            booking.room
+                          ) : (
+                            <>
+                              <Tooltip title={formatMeetUrl(booking.meetUrl)} arrow > 
+                                <a
+                                  href={formatMeetUrl(booking.meetUrl)}
+                                  target="_blank"
+                                  className="font-medium btn"
+                                >
+                                  <FontAwesomeIcon
+                                    icon={faLink}
+                                    className="mr-1"
+                                  />
+                                  Online
+                                </a>
+                              </Tooltip>
+                            </>
+                          )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 flex justify-center">
                           {booking.status === "Pending" && (
