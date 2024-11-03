@@ -97,9 +97,7 @@ const ManageAppointments = () => {
   useEffect(() => {
     const getMentorAppointments = async () => {
       try {
-        // setLoading(true);
 
-        // Make the GET request
         const response = await axios.get(
           `https://localhost:7007/api/MentorSlot/get-mentor-appointments-by-mentor-id/${authData?.id}`,
           {
@@ -109,9 +107,7 @@ const ManageAppointments = () => {
           }
         );
 
-        // Set the response data
         setMentorAppointments(response.data);
-        // console.log("Mentor appointments", response.data);
       } catch (error) {
         console.log("Can not get mentor appointments", error);
         toast.error("Can not get mentor appointments");
