@@ -97,13 +97,6 @@ const MentorDashboard = () => {
     return totalHours.toFixed(2);
   };
 
-  const formatMeetUrl = (meetUrl: string) => {
-    if (!meetUrl.startsWith("http")) {
-      meetUrl = `https://${meetUrl}`;
-    }
-    return meetUrl;
-  };
-
   return (
     <>
       <div className="max-w-[85rem] px-4 py-6 sm:px-6 lg:px-8 lg:py-6 mx-auto h-[100vh]">
@@ -310,16 +303,14 @@ const MentorDashboard = () => {
                               {appointment.skillName.join(", ")}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-end">
-                              {appointment.room ? (
-                                appointment.room
-                              ) : (
+                              {appointment.isOnline ? (
                                 <>
                                   <Tooltip
-                                    title={formatMeetUrl(appointment.meetUrl)}
+                                    title={appointment.meetUrl}
                                     arrow
                                   >
                                     <a
-                                      href={formatMeetUrl(appointment.meetUrl)}
+                                      href={appointment.meetUrl}
                                       target="_blank"
                                       className="font-medium btn"
                                     >
@@ -331,7 +322,10 @@ const MentorDashboard = () => {
                                     </a>
                                   </Tooltip>
                                 </>
-                              )}
+                              ) : (
+                                "Offline"
+                              )
+                            }
                             </td>
                           </tr>
                         ))}

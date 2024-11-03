@@ -1189,8 +1189,8 @@ const BookingMentor = () => {
                             {mentorAvailability
                               .sort(
                                 (a, b) =>
-                                  new Date(b.startTime).getTime() -
-                                  new Date(a.startTime).getTime()
+                                  new Date(a.startTime).getTime() -
+                                  new Date(b.startTime).getTime()
                               )
                               .map((availability) => (
                                 <tr key={availability.mentorSlotId}>
@@ -1213,9 +1213,7 @@ const BookingMentor = () => {
                                     })}`}
                                   </td>
                                   <td className="text-start px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                                    {availability.room
-                                      ? availability.room
-                                      : "Online"}
+                                    {availability.isOnline ? "Online" : "Offline"}
                                   </td>
                                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex justify-center gap-3">
                                     <button
