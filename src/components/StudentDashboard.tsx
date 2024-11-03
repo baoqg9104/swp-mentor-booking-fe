@@ -288,8 +288,8 @@ const StudentDashboard = () => {
                         {booking.skillName.join(", ")}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-end">
-                        {booking.room ? (
-                          booking.room
+                        {!booking.isOnline ? (
+                         "Offline"
                         ) : (
                           <>
                             <Tooltip

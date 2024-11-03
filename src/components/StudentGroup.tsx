@@ -270,8 +270,9 @@ const StudentGroup = () => {
       toast.success("Add member successful!");
       setRefresh(!refresh);
     } catch (error: any) {
-      // Display response message if available, otherwise show a generic message
-      toast.error(error.response.data!);
+      let errorMessage = error.response?.data || "An error occurred";
+      errorMessage = errorMessage.replace(/^Error:\s*/, "");
+      toast.error(errorMessage);
     }
   };
 
@@ -1064,7 +1065,7 @@ const StudentGroup = () => {
                   id="hs-scale-animation-modal-label-setting"
                   className="font-bold text-gray-800 text-[18px]"
                 >
-                  Update progress
+                  Update project progress
                 </h2>
                 <button
                   type="button"

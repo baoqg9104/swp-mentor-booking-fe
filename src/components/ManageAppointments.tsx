@@ -111,6 +111,7 @@ const ManageAppointments = () => {
 
         // Set the response data
         setMentorAppointments(response.data);
+        // console.log("Mentor appointments", response.data);
       } catch (error) {
         console.log("Can not get mentor appointments", error);
         toast.error("Can not get mentor appointments");
@@ -287,7 +288,7 @@ const ManageAppointments = () => {
                             })}`}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                            {appointment.room ? appointment.room : "Online"}
+                            {appointment.isOnline ? "Online" : "Offline"}
                           </td>
                           <td className="pl-16 py-4 whitespace-nowrap text-sm text-gray-700 text-center">
                             {appointment.status === "Approved" && (

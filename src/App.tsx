@@ -199,7 +199,7 @@ const AppContent = () => {
 
         <Route path="/*" element={<Navigate to="/404" replace />} />
       </Routes>
-      <ToastContainer />
+      <ToastContainer autoClose={1500} />
     </>
   );
 };

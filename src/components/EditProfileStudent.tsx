@@ -105,6 +105,11 @@ const EditProfileStudent = () => {
         dateOfBirth: dateOfBirth,
       };
 
+      if (dateOfBirth >= new Date().toISOString().split("T")[0]) {
+        toast.error("Invalid date of birth!");
+        return;
+      }
+
       const response = await axios.put(
         "https://localhost:7007/api/User/update-user",
         data,
@@ -398,10 +403,9 @@ const EditProfileStudent = () => {
                     </label>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4 mt-4">
                     <div className="relative">
                       <select
-                        required
                         value={gender}
                         onChange={(e) => setGender(e.target.value)}
                         className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
@@ -412,7 +416,7 @@ const EditProfileStudent = () => {
     autofill:pt-6
     autofill:pb-2"
                       >
-                        <option value="" disabled></option>
+                        <option value=""></option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                       </select>

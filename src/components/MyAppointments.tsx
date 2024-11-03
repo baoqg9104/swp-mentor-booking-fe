@@ -138,13 +138,6 @@ const MyAppointments = () => {
     }
   };
 
-  const formatMeetUrl = (meetUrl: string) => {
-    if (!meetUrl.startsWith("http")) {
-      meetUrl = `https://${meetUrl}`;
-    }
-    return meetUrl;
-  };
-
   return (
     <>
       <div className="h-[90vh] py-10 px-20">
@@ -166,7 +159,7 @@ const MyAppointments = () => {
 
               <input
                 className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md pl-10 pr-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-                placeholder="Search mentor, room..."
+                placeholder="Search mentor"
                 value={searchTerm}
                 onChange={handleSearch}
               />
@@ -383,13 +376,13 @@ const MyAppointments = () => {
                           )}`}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          {booking.room ? (
-                            booking.room
+                          {!booking.isOnline ? (
+                            "Offline"
                           ) : (
                             <>
-                              <Tooltip title={formatMeetUrl(booking.meetUrl)} arrow > 
+                              <Tooltip title={booking.meetUrl} arrow > 
                                 <a
-                                  href={formatMeetUrl(booking.meetUrl)}
+                                  href={booking.meetUrl}
                                   target="_blank"
                                   className="font-medium btn"
                                 >
