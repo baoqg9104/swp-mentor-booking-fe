@@ -41,7 +41,7 @@ interface Booking {
   room: string;
   isOnline: boolean;
   meetUrl: string;
-  skillName: string;
+  skillName: string[];
   bookingTime: string;
   status: string;
 }
@@ -365,7 +365,7 @@ const StudentFeedback = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 flex justify-center">
                           {feedbacks.some(
-                            (f) => f.bookingId == booking.bookingId
+                            (f) => f.bookingId == booking.bookingId && f.groupRating !== null
                           ) ? (
                             <span className="text-[#209526]  font-medium w-[100px] h-[35px] flex items-center justify-center bg-[#e7fae3] rounded-[20px] shadow">
                               Rated
@@ -379,7 +379,7 @@ const StudentFeedback = () => {
 
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
                           {feedbacks.some(
-                            (f) => f.bookingId == booking.bookingId
+                            (f) => f.bookingId == booking.bookingId && f.groupRating !== null
                           ) && (
                             <div className="flex gap-2 items-center">
                               <Stack spacing={1}>
@@ -417,7 +417,7 @@ const StudentFeedback = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
                           <button
                             disabled={feedbacks.some(
-                              (f) => f.bookingId == booking.bookingId
+                              (f) => f.bookingId == booking.bookingId && f.groupRating !== null
                             )}
                             type="button"
                             className="bg-[#48D7B9] hover:bg-[#48eac7] px-4 py-[4px] inline-flex items-center gap-x-1 text-sm rounded-lg border border-transparent focus:outline-none disabled:opacity-50 disabled:pointer-events-none text-white"
@@ -632,7 +632,6 @@ const StudentFeedback = () => {
                       Mentor's Feedback
                     </DialogTitle>
                     <div className="mt-2">
-                      {/* <h1 className="mb-3 font-medium">Group: 1 - SE1856</h1> */}
                       <div className="flex">
                         <div className="w-1/3 flex items-center gap-1">
                           <svg
@@ -791,7 +790,6 @@ const StudentFeedback = () => {
                       Group's Feedback
                     </DialogTitle>
                     <div className="mt-2">
-                      {/* <h1 className="mb-3 font-medium">Mentor: {selectedBooking?.mentorName}</h1> */}
                       <div className="flex">
                         <div className="w-1/3 flex items-center gap-1">
                           <svg
