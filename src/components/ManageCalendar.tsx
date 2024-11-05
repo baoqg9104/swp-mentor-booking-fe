@@ -102,8 +102,7 @@ const ManageCalendar = () => {
       !endTime ||
       !date ||
       !format ||
-      !point ||
-      (format === "offline" && !room)
+      !point
     ) {
       return;
     }
@@ -113,33 +112,42 @@ const ManageCalendar = () => {
       return;
     }
 
+    if (numOfSlot <= 0) {
+      toast.error("You have no slot left!");
+      return;
+    }
+
+    const slotStartDateTime = date.hour(startTime.hour()).minute(startTime.minute());
+    const slotEndDateTime = date.hour(endTime.hour()).minute(endTime.minute());
+    
     const mentorSlot = {
       mentorId: authData?.id,
-      startTime: `${date.format("YYYY-MM-DD")}T${startTime.format(
-        "HH:mm:ss.SSS"
-      )}Z`,
-      endTime: `${date.format("YYYY-MM-DD")}T${endTime.format(
-        "HH:mm:ss.SSS"
-      )}Z`,
+      startTime: slotStartDateTime.format("YYYY-MM-DDTHH:mm:ss.SSS"),
+      endTime: slotEndDateTime.format("YYYY-MM-DDTHH:mm:ss.SSS"),
       bookingPoint: point,
       isOnline: format === "online",
       room,
     };
 
-    if (dayjs(mentorSlot.startTime).isBefore(dayjs())) {
-      toast.error("Start time must be in the future");
+    // console.log("Selected start time:", startTime.format("HH:mm"));
+    // console.log("Slot start time:", dayjs(mentorSlot.startTime).format("YYYY-MM-DD HH:mm:ss"));
+    // console.log("Current time:", dayjs().format("YYYY-MM-DD HH:mm:ss"));
+
+    if (slotStartDateTime.isBefore(dayjs())) {
+      toast.error("Can not add slot in the past!");
       return;
-    } 
+    }
 
     try {
       await axios.post(
         "https://localhost:7007/api/MentorSlot/create",
         mentorSlot
       );
-      toast.success("Slot added successfully");
+      toast.success("Slot added successfully!");
       setRefresh(!refresh);
     } catch (error) {
-      toast.error("Failed to add slot");
+      // slot bị trùng 
+      toast.error("Duplicated slot!")
     }
   };
 
@@ -186,7 +194,7 @@ const ManageCalendar = () => {
                   </div>
                 </div> */}
 
-                <div className="sm:col-span-4">
+                <div className="sm:col-span-4 w-[200px]">
                   <label className="block text-sm font-medium leading-6 text-gray-900">
                     Date
                   </label>
@@ -283,7 +291,7 @@ const ManageCalendar = () => {
                   </div>
                 </div>
 
-                {format === "offline" && (
+                {/* {format === "offline" && (
                   <div className="sm:col-span-3">
                     <label className="block text-sm font-medium leading-6 text-gray-900">
                       Room
@@ -306,7 +314,7 @@ const ManageCalendar = () => {
                       </select>
                     </div>
                   </div>
-                )}
+                )} */}
 
                 <div className="sm:col-span-6">
                   <button
@@ -370,7 +378,7 @@ const ManageCalendar = () => {
                               )}`}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                              {slot.isOnline ? "Online" : slot.room}
+                              {slot.isOnline ? "Online" : "Offline"}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
                               {slot.bookingPoint}

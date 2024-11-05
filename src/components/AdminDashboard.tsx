@@ -8,7 +8,7 @@ import { toast } from "react-toastify";
 //const tStyleHeader = 'px-6 py-3 text-start font-medium text-gray-500 uppercase';
 //const tStyleBody = 'px-6 py-3 text-start whitespace-nowrap font-medium text-gray-800';
 //const buttonStyle ='bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded';
-import React, { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
 import "preline/preline";
 import { AuthContext } from "./AuthContext";
@@ -100,31 +100,19 @@ const AdminDashboard = () => {
     return fMentor.applyStatus != true;
   });
 
-  function clickSet(n : string){
-    console.log('n: '+n);
-    setSpecMentor(n);
-    
-    actuallySetting();
-  }
-  
-  function actuallySetting(){
-    console.log('id :' + specMentor);
-    console.log('auth :' + authData?.token)
-  }
-
 const setStatus = async (mentorId: string) => {
   try {
     console.log(authData?.token);
-    const response = await axios.put(
-      `https://localhost:7007/api/Mentor/change-apply-status/${mentorId}`,
+    await axios.put(
+      `https://localhost:7007/api/Mentor/change-apply-status/${mentorId}`, 4 ,
       {
         headers: {
-          Authorization: `Bearer ${authData?.token}`,
+          Authorization: `Bearer ${authData?.token}`
         },
       }
-    );
-
-    console.log(response.data);
+    ).then(response => {
+      console.log(response.data);
+    })
   } catch (error) {
     console.log(error);
     toast.error("An Error has occured");

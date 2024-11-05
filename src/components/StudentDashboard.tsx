@@ -28,6 +28,16 @@ interface Booking {
   status: string;
 }
 
+interface Feedback {
+  bookingId: number;
+  groupRating: number;
+  mentorRating: number;
+  groupFeedback: string;
+  mentorFeedback: string;
+  groupName: string;
+  className: string;
+}
+
 const StudentDashboard = () => {
   const authContext = useContext(AuthContext);
   if (!authContext) {
@@ -40,6 +50,7 @@ const StudentDashboard = () => {
   const groupId = localStorage.getItem("groupId");
 
   const [bookings, setBookings] = useState<Booking[]>([]);
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
 
   useEffect(() => {
     const getGroupByGroupId = async () => {
@@ -82,22 +93,48 @@ const StudentDashboard = () => {
       }
     };
 
+    const getFeedbacks = async () => {
+      try {
+        const response = await axios.get(
+          `https://localhost:7007/api/Feedback/get-feedbacks`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+
+        setFeedbacks(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     getGroupByGroupId();
     getBookings();
+    getFeedbacks();
   }, []);
-
-  const formatMeetUrl = (meetUrl: string) => {
-    if (!meetUrl.startsWith("http")) {
-      meetUrl = `https://${meetUrl}`;
-    }
-    return meetUrl;
-  };
 
   const bookingsFilter = bookings.filter(
     (booking) =>
       booking.status === "Approved" &&
       booking.endTime > new Date().toISOString()
   );
+
+  const filteredFeedbacks = feedbacks.filter((f) =>
+    bookings.some((b) => b.bookingId === f.bookingId) 
+  && f.mentorRating !== null
+  );
+
+  const calculateFeedbackScore = () => {
+    let totalScore = 0;
+
+    filteredFeedbacks.map((feedback) => {
+      totalScore += feedback.mentorRating;
+    });
+
+    return (totalScore / filteredFeedbacks.length).toFixed(1);
+  }
 
   return (
     <>
@@ -288,16 +325,13 @@ const StudentDashboard = () => {
                         {booking.skillName.join(", ")}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-end">
-                        {booking.room ? (
-                          booking.room
+                        {!booking.isOnline ? (
+                          "Offline"
                         ) : (
                           <>
-                            <Tooltip
-                              title={formatMeetUrl(booking.meetUrl)}
-                              arrow
-                            >
+                            <Tooltip title={booking.meetUrl} arrow>
                               <a
-                                href={formatMeetUrl(booking.meetUrl)}
+                                href={booking.meetUrl}
                                 target="_blank"
                                 className="font-medium btn"
                               >
@@ -422,15 +456,14 @@ const StudentDashboard = () => {
               </div>
             </div>
             <div className="text-[23px] mt-3 pl-1">
-              4.5 <span className="text-[18px]">/</span>
+              {+calculateFeedbackScore() || 0} <span className="text-[18px]">/</span>
               <span className="text-[20px]"> 5</span>
             </div>
             <div>
               <Stack spacing={1}>
                 <Rating
-                  name="half-rating-read"
-                  defaultValue={4.5}
-                  precision={0.5}
+                  precision={0.1}
+                  value={+calculateFeedbackScore() || 0}
                   readOnly
                 />
               </Stack>

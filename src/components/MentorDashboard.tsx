@@ -23,6 +23,32 @@ interface MentorAppointment {
   skillName: string[];
 }
 
+interface Booking {
+  bookingId: number;
+  groupId: string;
+  groupName: string;
+  mentorSlotId: number;
+  mentorName: string;
+  startTime: string;
+  endTime: string;
+  room: string;
+  isOnline: boolean;
+  meetUrl: string;
+  skillName: string[];
+  bookingTime: string;
+  status: string;
+}
+
+interface Feedback {
+  bookingId: number;
+  groupRating: number;
+  mentorRating: number;
+  groupFeedback: string;
+  mentorFeedback: string;
+  groupName: string;
+  className: string;
+}
+
 const MentorDashboard = () => {
   const authContext = useContext(AuthContext);
   if (!authContext) {
@@ -36,13 +62,29 @@ const MentorDashboard = () => {
   >([]);
 
   const [point, setPoint] = useState<number>(0);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
 
   useEffect(() => {
+    const getBookings = async () => {
+      try {
+        const response = await axios.get(
+          `https://localhost:7007/api/Booking/get-bookings`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+
+        setBookings(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     const getMentorAppointments = async () => {
       try {
-        // setLoading(true);
-
-        // Make the GET request
         const response = await axios.get(
           `https://localhost:7007/api/MentorSlot/get-mentor-appointments-by-mentor-id/${authData?.id}`,
           {
@@ -52,9 +94,25 @@ const MentorDashboard = () => {
           }
         );
 
-        // Set the response data
         setMentorAppointments(response.data);
       } catch (error) {}
+    };
+
+    const getFeedbacks = async () => {
+      try {
+        const response = await axios.get(
+          `https://localhost:7007/api/Feedback/get-feedbacks`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+
+        setFeedbacks(response.data);
+      } catch (error) {
+        console.log(error);
+      }
     };
 
     const getPoint = async () => {
@@ -68,11 +126,12 @@ const MentorDashboard = () => {
           }
         );
         setPoint(response.data.pointsReceived);
-      } catch (error) {
-      }
+      } catch (error) {}
     };
 
+    getBookings();
     getMentorAppointments();
+    getFeedbacks();
     getPoint();
   }, []);
 
@@ -97,12 +156,24 @@ const MentorDashboard = () => {
     return totalHours.toFixed(2);
   };
 
-  const formatMeetUrl = (meetUrl: string) => {
-    if (!meetUrl.startsWith("http")) {
-      meetUrl = `https://${meetUrl}`;
-    }
-    return meetUrl;
-  };
+  const filteredFeedbacks = feedbacks.filter((f) =>
+    bookings.some(
+      (b) =>
+        b.bookingId === f.bookingId &&
+        mentorAppointments.some((a) => a.mentorSlotId === b.mentorSlotId)
+    ) && f.groupRating !== null
+  );
+
+  const calculateFeedbackScore = () => {
+    let totalScore = 0;
+
+    filteredFeedbacks.map((feedback) => {
+      totalScore += feedback.groupRating;
+    });
+
+    return (totalScore / filteredFeedbacks.length).toFixed(1);
+    // return totalScore;
+  }
 
   return (
     <>
@@ -185,7 +256,7 @@ const MentorDashboard = () => {
               <div className="-m-1.5 overflow-x-auto">
                 <div className="p-1.5 min-w-full inline-block align-middle">
                   <div className="border rounded-lg shadow overflow-hidden">
-                    <table className="min-w-full divide-y divide-gray-200 text-sm">
+                    <table className="min-w-full divide-y divide-gray-200 text-sm bg-white">
                       <thead className="bg-gray-50">
                         <tr>
                           <th
@@ -310,16 +381,11 @@ const MentorDashboard = () => {
                               {appointment.skillName.join(", ")}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-gray-800 text-end">
-                              {appointment.room ? (
-                                appointment.room
-                              ) : (
+                              {appointment.isOnline ? (
                                 <>
-                                  <Tooltip
-                                    title={formatMeetUrl(appointment.meetUrl)}
-                                    arrow
-                                  >
+                                  <Tooltip title={appointment.meetUrl} arrow>
                                     <a
-                                      href={formatMeetUrl(appointment.meetUrl)}
+                                      href={appointment.meetUrl}
                                       target="_blank"
                                       className="font-medium btn"
                                     >
@@ -331,6 +397,8 @@ const MentorDashboard = () => {
                                     </a>
                                   </Tooltip>
                                 </>
+                              ) : (
+                                "Offline"
                               )}
                             </td>
                           </tr>
@@ -370,7 +438,9 @@ const MentorDashboard = () => {
                 <p className="uppercase font-semibold text-gray-600 text-[15px]">
                   Total points
                 </p>
-                <p className="text-[40px] font-semibold text-gray-800">{point}</p>
+                <p className="text-[40px] font-semibold text-gray-800">
+                  {point}
+                </p>
               </div>
 
               <div className="bg-[#f8c620] rounded-full size-[70px] flex items-center justify-center">
@@ -394,16 +464,15 @@ const MentorDashboard = () => {
 
               <div className="text-center">
                 <h3 className="text-3xl sm:text-4xl lg:text-[45px] font-semibold text-gray-800">
-                  4.5 <span className="text-[30px] text-gray-600">/ 5</span>
+                  {+calculateFeedbackScore() || 0} <span className="text-[30px] text-gray-600">/ 5</span>
                 </h3>
               </div>
 
               <div className="flex justify-center mt-[-13px]">
                 <Stack spacing={1}>
                   <Rating
-                    name="half-rating-read"
-                    defaultValue={4.5}
-                    precision={0.5}
+                    precision={0.1}
+                    value={+calculateFeedbackScore() || 0}
                     readOnly
                   />
                 </Stack>
@@ -411,7 +480,7 @@ const MentorDashboard = () => {
 
               <div className="flex justify-center">
                 <span className="text-sm font-semibold text-gray-600 p-3 px-7 bg-[#F4F8FF] rounded-[50px] border-[1px] border-[#dedede] cursor-pointer hover:bg-[#ebebeb]">
-                  Based on 100 ratings
+                  Based on {filteredFeedbacks.length} ratings
                 </span>
               </div>
             </div>

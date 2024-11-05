@@ -221,7 +221,7 @@ const StudentTransactionHistory = () => {
                         )}`}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
-                        Mentor {transaction.mentorName}
+                        Pay for Mentor {transaction.mentorName}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 flex justify-center">
                         <span className="text-[#209526]  font-medium w-[80px] h-[35px] flex items-center justify-center bg-[#e7fae3] rounded-[20px]">
