@@ -16,12 +16,15 @@ declare global {
   }
 }
 
-interface Student{
-  fullName: string;
-  gender: string;
-  email: string;
-  dateOfBirth: string;
-  phone: string;
+interface Student {
+  StudentId: string;
+  Studentname: string;
+  Password: string;
+  Email: number;
+  Phone: number;
+  Gender: number;
+  progress: number;
+  createdDate: string;
 }
 
 export default function ManageStudents(){
@@ -68,14 +71,14 @@ export default function ManageStudents(){
             <div className="px-2 grid grid-cols-1 gap-4 py-2">
                                  
                     {data.map((students) => (
-                      <div key={students.email} className="grid grid-cols-5 py-2 border-4 rounded-lg ">
+                      <div key={students.Email} className="grid grid-cols-5 py-2 border-4 rounded-lg ">
                         <div className="col-span-1 ">
                           <div className="flex justify-center items-center gap-x-2 py-3 px-4">
                             <FontAwesomeIcon icon={faUser} size= '8x' />
                           </div>
                         </div>
                         <div className="col-span-3 border-l px-4">
-                          {students.email}
+                          {students.Email}
                         </div>
                         <div className="col-span-1">
                           <div className="flex justify-end items-center gap-x-2 py-3 px-4">

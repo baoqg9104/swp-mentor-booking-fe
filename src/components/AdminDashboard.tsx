@@ -43,10 +43,27 @@ interface Student {
 }
 
 
+interface Group {
+  groupId: string;
+  name: string;
+  topicId: number;
+  topicName: string;
+  swpClassId: number;
+  swpClassName: string;
+  walletPoint: number;
+  progress: number;
+  createdDate: string;
+}
+
+
 const AdminDashboard = () => {
   const location = useLocation();
   useEffect(() => {
     window.HSStaticMethods.autoInit();
+    getMentors();
+    getStudents();
+    getGroup();
+
   }, [location.pathname]);
   
 
@@ -60,19 +77,24 @@ const AdminDashboard = () => {
 
   const [students, setStudents] = useState<Student[]>([]);
   
-  const [specMentor, setSpecMentor]= useState('');
+  const [group, setGroup] = useState<Group[]>([]);
 
   const getStudents = async () => {
     try {
       const response = await axios.get(
-        `https://localhost:7007/api/Student/all`
+        `https://localhost:7007/api/Student/all`,
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
       );
 
       setStudents(response.data);
       console.log('auth :' + authData?.token)
     } catch (error) {
-      console.log("Can not get mentor list", error);
-      toast.error("Can not get mentor list");
+      console.log("Can not get student list", error);
+      toast.error("Can not get student list");
     }
   }
   
@@ -89,6 +111,7 @@ const AdminDashboard = () => {
       );
 
       setMentors(response.data);
+      pendingMentors;
       console.log('auth :' + authData?.token)
     } catch (error) {
       console.log("Can not get mentor list", error);
@@ -96,10 +119,29 @@ const AdminDashboard = () => {
     }
   }
 
-  const filteredMentors = mentors.filter(fMentor=>{
+  const getGroup = async () => {
+    try {
+      const response = await axios.get(
+        `https://localhost:7007/api/Group/all`,
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
+
+      setGroup(response.data);
+      console.log('auth :' + authData?.token)
+    } catch (error) {
+      console.log("Can not get group list", error);
+      toast.error("Can not get group list");
+    }
+  }
+
+  const pendingMentors = mentors.filter(fMentor=>{
     return fMentor.applyStatus != true;
   });
-
+  
 const setStatus = async (mentorId: string) => {
   try {
     console.log(authData?.token);
@@ -118,11 +160,9 @@ const setStatus = async (mentorId: string) => {
     toast.error("An Error has occured");
   }
 }
-
-
-
   return (
     <>
+    {/*Mentor approval box*/}
       <div className="max-w-[85rem] px-4 py-10 sm:px-6 lg:px-7 lg:py-7 mx-auto h-[90vh]">
         <div className="grid sm:grid-cols-3 lg:grid-cols-3 gap-4 sm:gap-6">
           <div className="flex flex-col bg-white border shadow-sm rounded-xl">
@@ -136,7 +176,7 @@ const setStatus = async (mentorId: string) => {
 
               <div className="mt-1 lg:flex lg:justify-between lg:items-center">
                 <h3 className="text-xl sm:text-2xl font-medium text-gray-800">
-                  10
+                  {pendingMentors.length}
                 </h3>
 
                 <a
@@ -157,7 +197,48 @@ const setStatus = async (mentorId: string) => {
               </div>
             </div>
           </div>
+          {/*Mentor approval box*/}
+          
+          {/*Student box*/}
+          <div className="flex flex-col bg-white border shadow-sm rounded-xl">
+            <div className="p-4 md:p-5">
+              <div className="flex items-center gap-x-2">
+                <p className="text-[14px] uppercase tracking-wide text-gray-500">
+                  Total{" "}
+                  <span className="font-semibold text-[#70b319]">students</span>
+                </p>
+              </div>
 
+              <div className="mt-1 flex items-center gap-x-2">
+                <h3 className="text-xl sm:text-2xl font-medium text-gray-800">
+                  {students.length}
+                </h3>
+              </div>
+            </div>
+          </div>
+          {/*Student box*/}
+
+          {/*Group box*/}
+          <div className="flex flex-col bg-white border shadow-sm rounded-xl">
+            <div className="p-4 md:p-5">
+              <div className="flex items-center gap-x-2">
+                <p className="text-[14px] uppercase tracking-wide text-gray-500">
+                  Total{" "}
+                  <span className="font-semibold text-[#70b319]">groups</span>
+                </p>
+              </div>
+
+              <div className="mt-1 flex items-center gap-x-2">
+                <h3 className="text-xl sm:text-2xl font-medium text-gray-800">
+                  {group.length}
+                </h3>
+              </div>
+            </div>
+          </div>
+          {/*Group box*/}
+
+
+          {/*Student box*/}
           <div className="flex flex-col bg-white border shadow-sm rounded-xl">
             <div className="p-4 md:p-5">
               <div className="flex items-center gap-x-2">
@@ -174,24 +255,7 @@ const setStatus = async (mentorId: string) => {
               </div>
             </div>
           </div>
-
-          <div className="flex flex-col bg-white border shadow-sm rounded-xl">
-            <div className="p-4 md:p-5">
-              <div className="flex items-center gap-x-2">
-                <p className="text-[14px] uppercase tracking-wide text-gray-500">
-                  Total{" "}
-                  <span className="font-semibold text-[#70b319]">groups</span>
-                </p>
-              </div>
-
-              <div className="mt-1 flex items-center gap-x-2">
-                <h3 className="text-xl sm:text-2xl font-medium text-gray-800">
-                  10
-                </h3>
-              </div>
-            </div>
-          </div>
-
+          {/*Student box*/}
           {/* <div className="flex flex-col bg-white border shadow-sm rounded-xl">
             <div className="p-4 md:p-5">
               <div className="flex items-center gap-x-2">
@@ -229,7 +293,7 @@ const setStatus = async (mentorId: string) => {
                       </div>
                       <div className="p-4 overflow-y-auto">
                         <div className="mt-1 text-gray-800 dark:text-neutral-400">
-                          {filteredMentors.map((mentor)=> ( 
+                          {pendingMentors.map((mentor)=> ( 
                             <div key={mentor.mentorId} className="grid grid-cols-5 py-2 border-4 rounded-lg ">
                             <div className="col-span-1 ">
                               <div className="flex justify-center items-center gap-x-2 py-3 px-4">
@@ -260,7 +324,7 @@ const setStatus = async (mentorId: string) => {
                             {/*  Buttons End */}
     
                           </div>
-                            ))};        
+                            ))}        
                         </div>
                       </div>
                       <div className="flex justify-end items-center gap-x-2 py-3 px-4 mt-auto border-t dark:border-neutral-700">
