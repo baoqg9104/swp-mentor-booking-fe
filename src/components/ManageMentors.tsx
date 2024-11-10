@@ -45,7 +45,7 @@ export default function ManageMentors(){
   }
   const location = useLocation();
   
-  const { authData,setAuthData} = authContext;
+  //const { authData,setAuthData} = authContext;
 
   const [specMentor, setSpecMentor]= useState<string>('');
 
@@ -55,19 +55,14 @@ export default function ManageMentors(){
   const getMentors = async () => {
     try {
       const response = await axios.get(
-        `https://localhost:7007/api/Mentor/all`,
-        {
-          headers: {
-            Authorization: `Bearer ${authData?.token}`,
-          },
-        }
+        `https://localhost:7007/api/Mentor/all`
       );
 
       setData(response.data);
       console.log(data);
     } catch (error) {
-      console.log("Can not get classes", error);
-      toast.error("Can not get classes");
+      console.log("Can not get mentor list", error);
+      toast.error("Can not get mentor list");
     }
   }
 
@@ -97,7 +92,7 @@ export default function ManageMentors(){
                     {/* Main Content */}
                     {data.map((mentor)=> ( 
                       
-                      <div className="grid grid-cols-5 py-2 border-4 rounded-lg ">
+                      <div key={mentor.mentorId} className="grid grid-cols-5 py-2 border-4 rounded-lg ">
                         <div className="col-span-1 ">
                           <div className="flex justify-center items-center gap-x-2 py-3 px-4">
                             <FontAwesomeIcon icon={faUser} size= '8x' />
@@ -108,6 +103,10 @@ export default function ManageMentors(){
                           {mentor.email}<br></br>
                           {mentor.gender}<br></br>
                           {mentor.phone}<br></br>
+                          <div>Application Status : {mentor.applyStatus ? 'Approved' : 'Pending'}</div>
+                          
+                          
+                        
                         </div>
                       
                         {/* Buttons  */}
