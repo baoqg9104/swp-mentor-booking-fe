@@ -154,6 +154,7 @@ const setStatus = async (mentorId: string) => {
       }
     ).then(response => {
       console.log(response.data);
+      getMentors();
     })
   } catch (error) {
     console.log(error);
@@ -310,7 +311,7 @@ const setStatus = async (mentorId: string) => {
 
                             </div>
                           
-                            {/* Buttons  */}
+                            {/* Buttons  */}``
                             <div className="col-span-1">
                               <div className="flex justify-end items-center gap-x-2 py-3 px-4">
                                 {/*Change Status*/}
