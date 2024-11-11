@@ -130,7 +130,7 @@ export default function ManageMentors(){
                         {/*  Buttons End */}
 
                       </div>
-                    ))};                   
+                    ))}                
                     {/*  Main Content Ends */}
                 </div>
               {/*  Grid Ends */}
