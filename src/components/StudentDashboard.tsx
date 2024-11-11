@@ -351,6 +351,8 @@ const StudentDashboard = () => {
               </table>
             </div>
           </div>
+
+          {groupId !==  null && groupId !== "" && (
           <div className=" p-4 col-start-3 rounded-[15px] flex bg-[#f4fcff]">
             <div className="relative size-40">
               <svg
@@ -433,15 +435,14 @@ const StudentDashboard = () => {
                   {group?.progress}
                   <span className="text-[25px]">%</span>
                 </span>
-                {/* <span className="text-[#2797F7] block">
-                  Project
-                </span> */}
               </div>
+
             </div>
             <div className="ml-6 font-medium text-[20px] flex items-center">
               Project <br /> Progress
             </div>
           </div>
+                        )}
 
           <div className="bg-[#f8f1fe] p-4 col-start-3 rounded-[15px]">
             <div>

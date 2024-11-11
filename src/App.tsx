@@ -29,6 +29,9 @@ import { useContext } from "react";
 import PuffLoader from "react-spinners/PuffLoader";
 
 import { registerLicense } from "@syncfusion/ej2-base";
+import AdminDashboard from "./components/AdminDashboard";
+import ManageMentors from "./components/ManageMentors";
+import ManageStudents from "./components/ManageStudents";
 registerLicense(
   "Mgo+DSMBMAY9C3t2UlhhQlVMfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTX9TdEBiW3xacHdRQGNY"
 );
@@ -70,7 +73,6 @@ const AppContent = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/404" element={<_404Page />} />
 
-
         <Route
           path="/admin"
           element={
@@ -78,7 +80,26 @@ const AppContent = () => {
               <Admin />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route path="dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="mentors"
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <ManageMentors />
+            </ProtectedRoute>
+          } />
+          <Route path="students"
+          element={
+            <ProtectedRoute allowedRoles={["Admin"]}>
+              <ManageStudents />
+            </ProtectedRoute>
+          } />
+        </Route>
 
         <Route
           path="/mentor"

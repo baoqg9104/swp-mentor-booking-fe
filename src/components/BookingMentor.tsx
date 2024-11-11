@@ -33,7 +33,7 @@ declare global {
 import { useState } from "react";
 import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 import { toast } from "react-toastify";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { AuthContext } from "./AuthContext";
 
 interface Mentor {
@@ -190,6 +190,7 @@ const BookingMentor = () => {
 
     const data = {
       groupId: groupId,
+      studentId: authData?.id,
       mentorSlotId: mentorSlotId,
       mentorSkillIds: mentorSkill,
     };
@@ -206,12 +207,11 @@ const BookingMentor = () => {
           },
         }
       );
-
-      // toast.success("Booked successfully");
+      
       setOpenSuccess(true);
       setBooked([...booked, mentorSlotId]);
-    } catch (error) {
-      toast.warning("Not enough wallet points");
+    } catch (error:any) {
+      toast.error(error.response.data.replace("Error: ", ""), {autoClose: 2000}); 
     }
   };
 
@@ -318,9 +318,6 @@ const BookingMentor = () => {
                 </th>
                 <th scope="col" className="px-6 py-3">
                   Phone
-                </th>
-                <th scope="col" className="px-6 py-3 text-center">
-                  Rating Score
                 </th>
                 <th scope="col" className="px-6 py-3">
                   <span className="sr-only">Action</span>
@@ -436,7 +433,6 @@ const BookingMentor = () => {
                       </th>
                       <td className="px-6 py-4">{mentor.email}</td>
                       <td className="px-6 py-4">{mentor.phone}</td>
-                      <td className="px-6 py-4 text-center"></td>
                       <td className="px-6 py-4 text-right">
                         <span
                           className="cursor-pointer font-medium text-blue-600 hover:underline"

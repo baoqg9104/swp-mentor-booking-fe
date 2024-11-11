@@ -7,12 +7,29 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import AdminDashboard from "./AdminDashboard";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import ManageMentors from "./ManageMentors";
 import ManageStudents from "./ManageStudents";
+import { NavLink, Outlet } from "react-router-dom";
+import { AuthContext } from "./AuthContext";
 
 const Admin = () => {
   const [navLink, setNavLink] = useState<string>("dashboard");
+
+  const authContext = useContext(AuthContext);
+
+  const handleLogout = async () => {
+    if (authContext) {
+      const { logout } = authContext;
+      await logout();
+    }
+  };
+
+  if (!authContext) {
+    throw new Error("AuthContext is undefined");
+  }
+
+  const { authData } = authContext;
 
   return (
     <>
@@ -63,7 +80,12 @@ const Admin = () => {
                     </div>
                   </div>
                   <div className="p-1.5 space-y-0.5">
-                    <div className="cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100">
+                    <div
+                      className="cursor-pointer flex items-center gap-x-3.5 py-2 px-3 rounded-lg text-sm text-gray-800 hover:bg-gray-100 focus:outline-none focus:bg-gray-100"
+                      onClick={() => {
+                        handleLogout();
+                      }}
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 512 512"
@@ -160,7 +182,7 @@ const Admin = () => {
         <div className="relative flex flex-col h-full max-h-full">
           <div className="px-6 pt-4">
             <div className="flex items-center font-bold text-[30px]">
-              <span className="text-[#ff7d2d]">F</span> Booking
+              <span className="text-[#ff7d2d]">SWP</span> Booking
             </div>
           </div>
 
@@ -171,7 +193,8 @@ const Admin = () => {
             >
               <ul className="flex flex-col text-[17px]">
                 <li>
-                  <button
+                  <NavLink
+                    to="/admin/dashboard"
                     onClick={() => setNavLink("dashboard")}
                     className={`${
                       navLink === "dashboard" && "bg-gray-100"
@@ -182,11 +205,12 @@ const Admin = () => {
                       className="text-[16px] mt-[3px]"
                     />
                     Dashboard
-                  </button>
+                  </NavLink>
                 </li>
 
                 <li>
-                  <button
+                  <NavLink
+                    to="/admin/mentors"
                     onClick={() => setNavLink("mentors")}
                     className={`${
                       navLink === "mentors" && "bg-gray-100"
@@ -197,11 +221,12 @@ const Admin = () => {
                       className="text-[18px] mt-[1px]"
                     />
                     Mentors
-                  </button>
+                  </NavLink>
                 </li>
 
                 <li>
-                  <button
+                  <NavLink
+                    to="/admin/students"
                     onClick={() => setNavLink("students")}
                     className={`${
                       navLink === "students" && "bg-gray-100"
@@ -212,7 +237,7 @@ const Admin = () => {
                       className="text-[18px] mt-[1px]"
                     />
                     Students
-                  </button>
+                  </NavLink>
                 </li>
 
                 {/* <li className="hs-accordion" id="projects-accordion">
@@ -365,9 +390,7 @@ const Admin = () => {
 
       {/* Body */}
       <div className="w-full lg:ps-64 bg-[#F9FAFB]">
-        {navLink === "dashboard" && <AdminDashboard />}
-        {navLink === "mentors" && <ManageMentors />}
-        {navLink === "students" && <ManageStudents />}
+        <Outlet />
       </div>
     </>
   );
