@@ -262,7 +262,9 @@ const ManageAppointments = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {mentorAppointments.map((appointment) => {
+                    {mentorAppointments
+                    .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+                    .map((appointment) => {
                       return (
                         <tr key={appointment.mentorSlotId}>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">

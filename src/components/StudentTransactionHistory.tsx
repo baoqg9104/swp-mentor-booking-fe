@@ -14,14 +14,18 @@ interface Transaction {
 
 const StudentTransactionHistory = () => {
   const [refresh, setRefresh] = useState<boolean>(false);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [filteredTransactions, setFilteredTransactions] = useState<
+    Transaction[]
+  >([]);
 
   const authContext = useContext(AuthContext);
   if (!authContext) {
     throw new Error("AuthContext is undefined");
   }
   const { authData, setAuthData } = authContext;
-
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
     const getTransactionByGroupId = async () => {
@@ -44,6 +48,7 @@ const StudentTransactionHistory = () => {
         );
 
         setTransactions(response.data);
+        setFilteredTransactions(response.data);
       } catch (error) {
         // console.log("Can not get group", error);
         // toast.error("Can not get group");
@@ -52,6 +57,23 @@ const StudentTransactionHistory = () => {
 
     getTransactionByGroupId();
   }, [refresh]);
+
+  const handleSearch = () => {
+    if (!startDate || !endDate) return;
+
+    const normalizedStartDate = new Date(startDate);
+    normalizedStartDate.setHours(0, 0, 0, 0);
+    
+    const normalizedEndDate = new Date(endDate);
+    normalizedEndDate.setHours(23, 59, 59, 999);
+
+    const filtered = transactions.filter((transaction) => {
+      const transactionDate = new Date(transaction.dateTime);
+      return transactionDate >= normalizedStartDate && transactionDate <= normalizedEndDate;
+    });
+
+    setFilteredTransactions(filtered);
+};
 
   return (
     <>
@@ -66,14 +88,33 @@ const StudentTransactionHistory = () => {
               className="flex items-center justify-start mb-2"
             >
               <div className="relative">
-                <input type="date" placeholder="Select date start" />
+                <input
+                  type="date"
+                  placeholder="Select date start"
+                  value={startDate ? startDate.toISOString().split("T")[0] : ""}
+                  onChange={(e) =>
+                    setStartDate(
+                      e.target.value ? new Date(e.target.value) : null
+                    )
+                  }
+                />
               </div>
               <span className="mx-4 text-gray-500">to</span>
               <div className="relative">
-                <input type="date" placeholder="Select date end" />
+                <input
+                  type="date"
+                  placeholder="Select date end"
+                  value={endDate ? endDate.toISOString().split("T")[0] : ""}
+                  onChange={(e) =>
+                    setEndDate(e.target.value ? new Date(e.target.value) : null)
+                  }
+                />
               </div>
               <div className="relative ml-5">
                 <button
+                  onClick={() => {
+                    handleSearch();
+                  }}
                   className="flex items-center rounded bg-[#6AD9C2] py-2 px-2.5 border border-transparent text-center text-sm text-white transition-all shadow-sm hover:shadow focus:shadow-none hover:bg-[#58efd0] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                   type="button"
                 >
@@ -183,7 +224,7 @@ const StudentTransactionHistory = () => {
                       </span>
                     </td>
                   </tr> */}
-                  {transactions.map((transaction) => (
+                  {filteredTransactions.map((transaction) => (
                     <tr
                       className="hover:bg-gray-50"
                       key={transaction.bookingId}

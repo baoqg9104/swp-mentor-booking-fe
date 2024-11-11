@@ -354,7 +354,9 @@ const ManageCalendar = () => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
-                        {mentorSlots.map((slot) => (
+                        {mentorSlots
+                        .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+                        .map((slot) => (
                           <tr key={slot.mentorSlotId}>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                               {new Date(slot.startTime)
