@@ -145,9 +145,8 @@ const ManageCalendar = () => {
       );
       toast.success("Slot added successfully!");
       setRefresh(!refresh);
-    } catch (error) {
-      // slot bị trùng 
-      toast.error("Duplicated slot!")
+    } catch (error:any) {
+      toast.error(error.response.data.replace("Error: ", ""), {autoClose: 2000}); 
     }
   };
 

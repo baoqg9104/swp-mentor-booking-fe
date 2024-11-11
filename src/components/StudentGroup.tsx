@@ -231,9 +231,10 @@ const StudentGroup = () => {
 
       localStorage.setItem("groupId", response.data);
 
-      window.location.reload();
 
-      toast.success("Create group successful!");
+
+      // toast.success("Create group successful!");
+      window.location.reload();
 
       setRefresh(!refresh);
     } catch (error) {

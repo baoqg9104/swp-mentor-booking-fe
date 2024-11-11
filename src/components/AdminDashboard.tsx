@@ -91,7 +91,7 @@ const AdminDashboard = () => {
       );
 
       setStudents(response.data);
-      console.log('auth :' + authData?.token)
+      // console.log('auth :' + authData?.token)
     } catch (error) {
       console.log("Can not get student list", error);
       toast.error("Can not get student list");
@@ -112,7 +112,7 @@ const AdminDashboard = () => {
 
       setMentors(response.data);
       pendingMentors;
-      console.log('auth :' + authData?.token)
+      // console.log('auth :' + authData?.token)
     } catch (error) {
       console.log("Can not get mentor list", error);
       toast.error("Can not get mentor list");
@@ -131,7 +131,7 @@ const AdminDashboard = () => {
       );
 
       setGroup(response.data);
-      console.log('auth :' + authData?.token)
+      // console.log('auth :' + authData?.token)
     } catch (error) {
       console.log("Can not get group list", error);
       toast.error("Can not get group list");
@@ -144,7 +144,7 @@ const AdminDashboard = () => {
   
 const setStatus = async (mentorId: string) => {
   try {
-    console.log(authData?.token);
+    // console.log(authData?.token);
     await axios.put(
       `https://localhost:7007/api/Mentor/change-apply-status/${mentorId}`, 4 ,
       {
