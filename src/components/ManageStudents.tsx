@@ -178,11 +178,11 @@ export default function ManageStudents(){
                           </div>
                         </div>
                         <div className="col-span-3 border-l px-4">
-                          ID: {students.studentId}
-                          {students.studentName}<br></br>
-                          {students.email}<br></br>
-                          {students.gender}<br></br>
-                          {students.phone}<br></br>
+                          ID: {students.studentId}<br></br>
+                          Name: {students.studentName}<br></br>
+                          Email: {students.email}<br></br>
+                          Gender: {students.gender}<br></br>
+                          Phone: {students.phone}<br></br>
                         </div>
                          {/* Buttons  */}
                         <div className="col-span-1">

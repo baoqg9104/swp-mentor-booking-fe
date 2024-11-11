@@ -184,11 +184,11 @@ export default function ManageMentors(){
                           </div>
                         </div>
                         <div className="col-span-3 border-l px-4">
-                          {/*mentor.mentorID*/}
-                          Mentor Name: {mentor.mentorName}{/*add preview email, name and gender to the items preview */}<br></br>
-                          Mentor Email: {mentor.email}<br></br>
-                          Mentor Gender: {mentor.gender}<br></br>
-                          Mentor Phone: {mentor.phone}<br></br>
+                          ID: mentor.mentorID <br></br>
+                          Name: {mentor.mentorName}{/*add preview email, name and gender to the items preview */}<br></br>
+                          Email: {mentor.email}<br></br>
+                          Gender: {mentor.gender}<br></br>
+                          Phone: {mentor.phone}<br></br>
                           Meet URL:{mentor.meetUrl}
                           <div>Application Status : {mentor.applyStatus ? 'Approved' : 'Pending'}</div>   
                         </div>
@@ -218,7 +218,7 @@ export default function ManageMentors(){
                           </div>
                         </div>
                       </div> 
-                    ))};                   
+                    ))}                   
                     {/*  Main Content Ends */}
                 </div>
 
