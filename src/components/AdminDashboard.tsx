@@ -154,6 +154,7 @@ const setStatus = async (mentorId: string) => {
       }
     ).then(response => {
       console.log(response.data);
+      getMentors();
     })
   } catch (error) {
     console.log(error);
@@ -236,26 +237,7 @@ const setStatus = async (mentorId: string) => {
             </div>
           </div>
           {/*Group box*/}
-
-
-          {/*Student box*/}
-          <div className="flex flex-col bg-white border shadow-sm rounded-xl">
-            <div className="p-4 md:p-5">
-              <div className="flex items-center gap-x-2">
-                <p className="text-[14px] uppercase tracking-wide text-gray-500">
-                  Total{" "}
-                  <span className="font-semibold text-[#70b319]">students</span>
-                </p>
-              </div>
-
-              <div className="mt-1 flex items-center gap-x-2">
-                <h3 className="text-xl sm:text-2xl font-medium text-gray-800">
-                  100
-                </h3>
-              </div>
-            </div>
-          </div>
-          {/*Student box*/}
+``
           {/* <div className="flex flex-col bg-white border shadow-sm rounded-xl">
             <div className="p-4 md:p-5">
               <div className="flex items-center gap-x-2">
@@ -280,7 +262,7 @@ const setStatus = async (mentorId: string) => {
                       
                       <div className="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-700">
                         <h3 id="hs-full-screen-label" className="font-bold text-gray-800 dark:text-white">
-                          Editing Profile
+                          Approval Pending
                         </h3>
                      
                         <button type="button" className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600" aria-label="Close" data-hs-overlay="#Appointments">
@@ -310,7 +292,7 @@ const setStatus = async (mentorId: string) => {
 
                             </div>
                           
-                            {/* Buttons  */}
+                            {/* Buttons  */}``
                             <div className="col-span-1">
                               <div className="flex justify-end items-center gap-x-2 py-3 px-4">
                                 {/*Change Status*/}
