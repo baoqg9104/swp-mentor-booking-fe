@@ -151,9 +151,10 @@ const StudentFeedback = () => {
       setRefresh((prev) => !prev);
       setOpenGroupFeedback(false);
       toast.success("Feedback submitted successfully");
-    } catch (error) {
-      console.log(error);
-      toast.error("Failed to submit feedback");
+    } catch (error: any) {
+      if (error.response.status === 500) {
+        toast.error("Only leader can send feedback");
+      }
     }
   };
 
