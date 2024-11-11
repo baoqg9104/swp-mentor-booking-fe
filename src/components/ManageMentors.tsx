@@ -1,8 +1,6 @@
-
-
 import axios from 'axios';
 import { toast } from "react-toastify";
-
+import { Dialog, Transition ,DialogPanel,TransitionChild,DialogTitle} from '@headlessui/react'
 import {
   faUser
 } from "@fortawesome/free-solid-svg-icons";
@@ -10,16 +8,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 //const tStyleHeader = 'px-6 py-3 text-start font-medium text-gray-500 uppercase';
 //const tStyleBody = 'px-6 py-3 text-start whitespace-nowrap font-medium text-gray-800';
 //const buttonStyle ='bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded';
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext,Fragment } from 'react';
 import { useLocation } from 'react-router-dom';
 import "preline/preline";
 import { AuthContext } from "./AuthContext";
-import { IStaticMethods } from "preline/preline";
-declare global {
-  interface Window {
-    HSStaticMethods: IStaticMethods;
-  }
-}
+//import { IStaticMethods } from "preline/preline";
+
+
 interface Mentors {
   mentorId: string,
   mentorName: string,
@@ -39,23 +34,64 @@ interface Mentors {
 
 
 export default function ManageMentors(){
+  const location = useLocation();
+  useEffect(() => {
+    window.HSStaticMethods.autoInit();
+    getMentors();
+
+  }, [location.pathname]);
+  
   const authContext = useContext(AuthContext);
   if (!authContext) {
     throw new Error("AuthContext is undefined");
   }
-  const location = useLocation();
-  
-  //const { authData,setAuthData} = authContext;
+  const { authData,setAuthData} = authContext;
+  const [openDel, setDel] = useState<boolean>(false);
+  const [openEdit, setEdit] = useState<boolean>(false);
 
   const [specMentor, setSpecMentor]= useState<string>('');
 
   const [data, setData] = useState<Mentors[]>([]);
   
+  const [fullName, setFullName] = useState<string>("");
+  const [gender, setGender] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [phone, setPhone] = useState<string>("");
+  const [dateOfBirth, setDateOfBirth] = useState<string>("");
+  const [meetUrl, setMeetUrl] = useState<string>("");
+
+  function closeDelModal() {
+    setDel(false)
+  }
+
+  function openDelModal(n :string) {
+    setDel(true)
+    setSpecMentor(n)
+  }
+
+  function closeEditModal() {
+    setEdit(false)
+  }
+
+  function openEditModal(n :Mentors) {
+    setFullName(n.mentorName);
+    setGender(n.gender);
+    setEmail(n.email);
+    setPhone(n.phone);
+    setDateOfBirth(n.dateOfBirth);
+    setSpecMentor(n.mentorId)
+    setEdit(true)
+  }
 
   const getMentors = async () => {
     try {
       const response = await axios.get(
-        `https://localhost:7007/api/Mentor/all`
+        `https://localhost:7007/api/Mentor/all`,
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
       );
 
       setData(response.data);
@@ -66,32 +102,81 @@ export default function ManageMentors(){
     }
   }
 
-  /*const deleteMentor = async () => {
+  const deleteMentor = async (id:string) => {
     try {
       const response = await axios.delete(
-        `https://localhost:7007/api/Mentor/all`,
+        `https://localhost:7007/api/Mentor/delete/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      ).then(response => {
+        console.log(response.data);
+        getMentors();
+      })
+    }catch(err){
+
+    }
+  }
+
+  const handleSave = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    try {
+      const data = {
+        role: "Mentor",
+        id: specMentor,
+        name: fullName,
+        email: email,
+        phone: phone,
+        gender: gender,
+        dateOfBirth: dateOfBirth,
+        meetUrl: meetUrl
+      };
+
+      if (dateOfBirth >= new Date().toISOString().split("T")[0]) {
+        toast.error("Invalid date of birth!");
+        return;
+      }
+      console.log(data);
+      const response = await axios.put(
+        "https://localhost:7007/api/User/update-user",
+        data,
         {
           headers: {
             Authorization: `Bearer ${authData?.token}`,
           },
         }
       );
-  }*/
+      
+      toast.success("Update successful!");
+      getMentors();
+      //setRefresh(!refresh);
+    } catch (error) {
+      console.log(error);
+      if (axios.isAxiosError(error) && error.response) {
+        toast.error(error.response.data);
+        //console.log(data);
+      } else {
+        toast.error("An unexpected error occurred");
+      }
+    }
+  };
 
-  useEffect(() => {
-    window.HSStaticMethods.autoInit();
-    getMentors();
-  }, [location.pathname]);
+  const formatDate = (isoDate: string): string => {
+    const date = new Date(isoDate);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${year}-${month}-${day}`;
+  };
 
-  return (
+  return(
     <>      
             {/*Grid starts*/}
-            
             <div className="px-2 grid grid-cols-1 gap-4 py-2">
-
                     {/* Main Content */}
-                    {data.map((mentor)=> ( 
-                      
+                    {data.map((mentor)=> (   
                       <div key={mentor.mentorId} className="grid grid-cols-5 py-2 border-4 rounded-lg ">
                         <div className="col-span-1 ">
                           <div className="flex justify-center items-center gap-x-2 py-3 px-4">
@@ -99,124 +184,352 @@ export default function ManageMentors(){
                           </div>
                         </div>
                         <div className="col-span-3 border-l px-4">
-                          {mentor.mentorName}{/*add preview email, name and gender to the items preview */}<br></br>
-                          {mentor.email}<br></br>
-                          {mentor.gender}<br></br>
-                          {mentor.phone}<br></br>
-                          <div>Application Status : {mentor.applyStatus ? 'Approved' : 'Pending'}</div>
-                          
-                          
-                        
+                          {/*mentor.mentorID*/}
+                          Mentor Name: {mentor.mentorName}{/*add preview email, name and gender to the items preview */}<br></br>
+                          Mentor Email: {mentor.email}<br></br>
+                          Mentor Gender: {mentor.gender}<br></br>
+                          Mentor Phone: {mentor.phone}<br></br>
+                          Meet URL:{mentor.meetUrl}
+                          <div>Application Status : {mentor.applyStatus ? 'Approved' : 'Pending'}</div>   
                         </div>
-                      
+
                         {/* Buttons  */}
                         <div className="col-span-1">
                           <div className="flex justify-end items-center gap-x-2 py-3 px-4">
+                            <a href='#'>
 
-                            {/* Edit button code */}
-                            <button type="button" className="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none" aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-full-screen-modal" data-hs-overlay="#hs-full-screen-modal">
-                              Edit
-                            </button>
-                            {/* Edit button code */}
+                              {/* Edit button code */}
+                              <button onClick={()=> {
+                                  openEditModal(mentor);
+                                  
+                                }} className="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                                Edit
+                              </button>
+                              {/* Edit button code */}
 
-                            {/*Delete button code */}
-                            <button type="button" onClick={()=>{setSpecMentor(mentor.mentorId)}} className="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none" aria-haspopup="dialog" aria-expanded="false" aria-controls="hs-basic-modal" data-hs-overlay="#DeleteModal">
-                              Delete
-                            </button>
-                            {/*Delete button code */}
-
+                                {/*Delete button code */}
+                                <button onClick={()=> {
+                                  openDelModal(mentor.mentorId);
+                                }} className="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
+                                  Delete
+                                </button>
+                                {/*Delete button code */}
+                            </a>
                           </div>
                         </div>
-                        {/*  Buttons End */}
-
-                      </div>
+                      </div> 
                     ))};                   
                     {/*  Main Content Ends */}
                 </div>
-              {/*  Grid Ends */}
 
+          {/*Del Modal*/}
+          <Transition appear show={openDel} as={Fragment}>
+          <Dialog as="div" className="relative z-[100]" onClose={closeDelModal}>
+            <TransitionChild
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-black/25" />
+            </TransitionChild>
 
-              {/*  Modals Code */}
-              
-                {/* Fullscreen modal for Edit function starts: */}
-                <div id="hs-full-screen-modal" className="hs-overlay hidden size-full fixed top-0 start-0 z-[80] overflow-x-hidden overflow-y-auto pointer-events-none" role="dialog" tabIndex={-1} aria-labelledby="hs-full-screen-label">
-                  <div className="hs-overlay-open:mt-0 hs-overlay-open:opacity-100 hs-overlay-open:duration-500 mt-10 opacity-0 transition-all max-w-full max-h-full h-full">
-                    <div className="flex flex-col bg-white pointer-events-auto max-w-full max-h-full h-full dark:bg-neutral-800">
-                      
-                      <div className="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-700">
-                        <h3 id="hs-full-screen-label" className="font-bold text-gray-800 dark:text-white">
-                          Editing Profile
-                        </h3>
-                     
-                        <button type="button" className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600" aria-label="Close" data-hs-overlay="#hs-full-screen-modal">
-                          <span className="sr-only">Close</span>
-                          <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 6 6 18"></path>
-                            <path d="m6 6 12 12"></path>
-                          </svg>
-                        </button>
-                      </div>
-                      <div className="p-4 overflow-y-auto">
-                        <p className="mt-1 text-gray-800 dark:text-neutral-400">
-                          Edit Body
-                        </p>
-                      </div>
-                      <div className="flex justify-end items-center gap-x-2 py-3 px-4 mt-auto border-t dark:border-neutral-700">
-                        <button type="button" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700" data-hs-overlay="#hs-full-screen-modal">
-                          Close
-                        </button>
-                        <button type="button" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                          Save changes
-                        </button>
-                      </div>  
+            <div className="fixed inset-0 overflow-y-auto">
+              <div className="flex min-h-full items-center justify-center p-4 text-center">
+                <TransitionChild
+                  as={Fragment}
+                  enter="ease-out duration-300"
+                  enterFrom="opacity-0 scale-95"
+                  enterTo="opacity-100 scale-100"
+                  leave="ease-in duration-200"
+                  leaveFrom="opacity-100 scale-100"
+                  leaveTo="opacity-0 scale-95"
+                >
+                  <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                    <DialogTitle
+                      as="h3"
+                      className="text-lg font-medium leading-6 text-gray-900"
+                    >
+                      Confirm Deleting {specMentor}
+                    </DialogTitle>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500">
+                        Are you sure you want to delete selected mentor
+                      </p>
                     </div>
-                  </div>
-                </div>
-                {/* Fullscreen Modal for Edit ends */}
 
-                {/*  Basic Modal for Delete starts */}
-                <div id="DeleteModal" className="hs-overlay hs-overlay-open:opacity-100 hs-overlay-open:duration-500 hidden size-full fixed top-0 start-0 z-[80] opacity-0 overflow-x-hidden transition-all overflow-y-auto pointer-events-none" role="dialog" tabIndex={-1} aria-labelledby="hs-basic-modal-label">
-                  <div className="sm:max-w-lg sm:w-full m-3 sm:mx-auto">
-                    <div className="flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto dark:bg-neutral-800 dark:border-neutral-700 dark:shadow-neutral-700/70">
-                      <div className="flex justify-between items-center py-3 px-4 border-b dark:border-neutral-700">
-                        <h3 id="hs-basic-modal-label" className="font-bold text-gray-800 dark:text-white">
-                          Confirm Deletion of Mentor: 
-                        </h3>
-                        <button type="button" className="size-8 inline-flex justify-center items-center gap-x-2 rounded-full border border-transparent bg-gray-100 text-gray-800 hover:bg-gray-200 focus:outline-none focus:bg-gray-200 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-700 dark:hover:bg-neutral-600 dark:text-neutral-400 dark:focus:bg-neutral-600" aria-label="Close" data-hs-overlay="#DeleteModal">
-                          <span className="sr-only">Close</span>
-                          <svg className="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 6 6 18"></path>
-                            <path d="m6 6 12 12"></path>
-                          </svg>
-                        </button>
-                      </div>
-                      <div className="p-4 overflow-y-auto">
-                        
-                        <p className="mt-1 text-gray-800 dark:text-neutral-400">
-                          Are you sure you want to delete {specMentor}  ?
-                        </p>
-                      </div>
-                      <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t dark:border-neutral-700">
-                        <button type="button" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-800 dark:border-neutral-700 dark:text-white dark:hover:bg-neutral-700 dark:focus:bg-neutral-700" data-hs-overlay="#DeleteModal">
-                          Close
-                        </button>
-                        <button type="button" className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                          Delete
-                        </button>
-                      </div>
+                    <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t">
+                      <button
+                        type="button"
+                        className="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                        onClick={()=> 
+                          {
+                            deleteMentor(specMentor)
+                            closeDelModal()             
+                          }}
+                      >
+                        Confirm Delete
+                      </button>
                     </div>
-                  </div>
-                </div>
-                {/*  Basic Modal for Delete ends */}
-
-              {/*  Modals Code ends */}
-            
-    </>
     
-    );
+                  </DialogPanel>
+                </TransitionChild>
+              </div>
+            </div>
+          </Dialog>
+          </Transition>
+          {/*Delete Modal*/}
+
+          {/*Edit Modal*/}
+          <Transition appear show={openEdit} as={Fragment}>
+            <Dialog as="div" className="relative z-[100]" onClose={closeEditModal}>
+              <TransitionChild
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <div className="fixed inset-0 bg-black/25" />
+              </TransitionChild>
+
+              <div className="fixed inset-0 overflow-y-auto">
+                <div className="flex min-h-full items-center justify-center p-4 text-center">
+                  <TransitionChild
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0 scale-95"
+                    enterTo="opacity-100 scale-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100 scale-100"
+                    leaveTo="opacity-0 scale-95"
+                  >
+                    <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                      <DialogTitle
+                        as="h3"
+                        className="text-lg font-medium leading-6 text-gray-900"
+                      >
+                        Confirm Deleting {specMentor}
+                      </DialogTitle>
+                      <form className="flex flex-col gap-3" onSubmit={handleSave}>
+                        <div className="p-4 overflow-y-auto flex flex-col justify-center items-center">                     
+                          <div className="w-full mt-6">
+                            <div className="relative">
+                              <input
+                                value={fullName}
+                                onChange={(e) => setFullName(e.target.value)}
+                                type="text"
+                                className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+                                focus:pt-6
+                                focus:pb-2
+                                [&:not(:placeholder-shown)]:pt-6
+                                [&:not(:placeholder-shown)]:pb-2
+                                autofill:pt-6
+                                autofill:pb-2"
+                                placeholder="Full name"
+                                required
+                              />
+                              <label
+                                className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
+                                peer-focus:scale-90
+                                peer-focus:translate-x-0.5
+                                peer-focus:-translate-y-1.5
+                                peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
+                                peer-[:not(:placeholder-shown)]:scale-90
+                                peer-[:not(:placeholder-shown)]:translate-x-0.5
+                                peer-[:not(:placeholder-shown)]:-translate-y-1.5
+                                peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+                                >
+                                Full name
+                              </label>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 mt-4">
+                              <div className="relative">
+                                <select
+                                  value={gender}
+                                  onChange={(e) => setGender(e.target.value)}
+                                  className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+                                  focus:pt-6
+                                  focus:pb-2
+                                  [&:not(:placeholder-shown)]:pt-6
+                                  [&:not(:placeholder-shown)]:pb-2
+                                  autofill:pt-6
+                                  autofill:pb-2"
+                                >
+                                  <option value=""></option>
+                                  <option value="Male">Male</option>
+                                  <option value="Female">Female</option>
+                                </select>
+
+                                <label
+                                  className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
+                                  peer-focus:scale-90
+                                  peer-focus:translate-x-0.5
+                                  peer-focus:-translate-y-1.5
+                                  peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
+                                  peer-[:not(:placeholder-shown)]:scale-90
+                                  peer-[:not(:placeholder-shown)]:translate-x-0.5
+                                  peer-[:not(:placeholder-shown)]:-translate-y-1.5
+                                  peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+                                >
+                                  Gender
+                                </label>
+                              </div>
+
+                              <div className="relative">
+                                <input
+                                  required
+                                  value={email}
+                                  onChange={(e) => setEmail(e.target.value)}
+                                  type="email"
+                                  className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+                                  focus:pt-6
+                                  focus:pb-2
+                                  [&:not(:placeholder-shown)]:pt-6
+                                  [&:not(:placeholder-shown)]:pb-2
+                                  autofill:pt-6
+                                  autofill:pb-2"
+                                  placeholder="Email"
+                                />
+                                <label
+                                  className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
+                                  peer-focus:scale-90
+                                  peer-focus:translate-x-0.5
+                                  peer-focus:-translate-y-1.5
+                                  peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
+                                  peer-[:not(:placeholder-shown)]:scale-90
+                                  peer-[:not(:placeholder-shown)]:translate-x-0.5
+                                  peer-[:not(:placeholder-shown)]:-translate-y-1.5
+                                  peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+                                >
+                                  Email
+                                </label>
+                              </div>
+
+                              <div className="relative">
+                                <input
+                                  pattern="^(0[1-9][0-9]{8}|(\+84[1-9][0-9]{8}))$"
+                                  value={phone}
+                                  onChange={(e) => setPhone(e.target.value)}
+                                  type="text"
+                                  className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+                                  focus:pt-6
+                                  focus:pb-2
+                                  [&:not(:placeholder-shown)]:pt-6
+                                  [&:not(:placeholder-shown)]:pb-2
+                                  autofill:pt-6
+                                  autofill:pb-2"
+                                  placeholder="Phone"
+                                />
+                                <label
+                                  className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
+                                  peer-focus:scale-90
+                                  peer-focus:translate-x-0.5
+                                  peer-focus:-translate-y-1.5
+                                  peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
+                                  peer-[:not(:placeholder-shown)]:scale-90
+                                  peer-[:not(:placeholder-shown)]:translate-x-0.5
+                                  peer-[:not(:placeholder-shown)]:-translate-y-1.5
+                                  peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+                                >
+                                  Phone
+                                </label>
+                              </div>
+
+                              <div className="relative">
+                                <input
+                                  value={formatDate(dateOfBirth)}
+                                  onChange={(e) => setDateOfBirth(e.target.value)}
+                                  type="date"
+                                  className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+                                  focus:pt-6
+                                  focus:pb-2
+                                  [&:not(:placeholder-shown)]:pt-6
+                                  [&:not(:placeholder-shown)]:pb-2
+                                  autofill:pt-6
+                                  autofill:pb-2"
+                                  placeholder="Date of Birth"
+                                />
+                                <label
+                                  className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
+                                  peer-focus:scale-90
+                                  peer-focus:translate-x-0.5
+                                  peer-focus:-translate-y-1.5
+                                  peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
+                                  peer-[:not(:placeholder-shown)]:scale-90
+                                  peer-[:not(:placeholder-shown)]:translate-x-0.5
+                                  peer-[:not(:placeholder-shown)]:-translate-y-1.5
+                                  peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+                                >
+                                  Date of Birth
+                                </label>
+                              </div>
+                              <div className="relative">
+                                <input
+                                  value={meetUrl}
+                                  onChange={(e) => setMeetUrl(e.target.value)}
+                                  type="text"
+                                  className="mt-4 peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+                                  focus:pt-6
+                                  focus:pb-2
+                                  [&:not(:placeholder-shown)]:pt-6
+                                  [&:not(:placeholder-shown)]:pb-2
+                                  autofill:pt-6
+                                  autofill:pb-2"
+                                  placeholder="Meet URL"
+                                />
+                                <label
+                                  className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
+                                  peer-focus:scale-90
+                                  peer-focus:translate-x-0.5
+                                  peer-focus:-translate-y-1.5
+                                  peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
+                                  peer-[:not(:placeholder-shown)]:scale-90
+                                  peer-[:not(:placeholder-shown)]:translate-x-0.5
+                                  peer-[:not(:placeholder-shown)]:-translate-y-1.5
+                                  peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+                                >
+                                  Meet URL
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t">
+                          <button
+                            type="button"
+                            className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                            onClick={()=> 
+                              {
+                                closeEditModal()             
+                              }}
+                          >
+                            Close
+                          </button>
+                          <button
+                            type="submit"
+                            className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
+                          >
+                            Save changes
+                          </button>
+                        </div>
+                      </form>
+                    </DialogPanel>
+                  </TransitionChild>
+                </div>
+              </div>
+            </Dialog>
+          </Transition>
+          {/*Edit Modal*/}
+               
+    </>  
+  );
 }
 
-//them ten email sdt vao cai preview
-//edit hien thi het, lam modal
-//delete hien thi modal confirm
 
