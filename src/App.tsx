@@ -32,6 +32,7 @@ import { registerLicense } from "@syncfusion/ej2-base";
 import AdminDashboard from "./components/AdminDashboard";
 import ManageMentors from "./components/ManageMentors";
 import ManageStudents from "./components/ManageStudents";
+import StudentClass from "./components/StudentClass";
 registerLicense(
   "Mgo+DSMBMAY9C3t2UlhhQlVMfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTX9TdEBiW3xacHdRQGNY"
 );
@@ -165,6 +166,14 @@ const AppContent = () => {
             element={
               <ProtectedRoute allowedRoles={["Student"]}>
                 <StudentDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="class"
+            element={
+              <ProtectedRoute allowedRoles={["Student"]}>
+                <StudentClass />
               </ProtectedRoute>
             }
           />
