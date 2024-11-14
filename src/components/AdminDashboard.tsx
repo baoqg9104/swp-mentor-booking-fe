@@ -177,7 +177,7 @@ const setStatus = async (mentorId: string) => {
 
               <div className="mt-1 lg:flex lg:justify-between lg:items-center">
                 <h3 className="text-xl sm:text-2xl font-medium text-gray-800">
-                  {pendingMentors.length}
+                  {mentors.length}
                 </h3>
 
                 <a
@@ -191,7 +191,7 @@ const setStatus = async (mentorId: string) => {
 
                   <span className="inline-block text-xs font-semibold text-orange-700">
                     <button  onClick={()=>getMentors()} data-hs-overlay="#Appointments">
-                      appointments pending
+                      {pendingMentors.length} approval pending
                     </button>
                   </span>
                 </a>

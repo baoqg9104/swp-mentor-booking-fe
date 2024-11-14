@@ -15,6 +15,7 @@ interface AuthData {
   fullName: string;
   role: string;
   groupId: string;
+  swpClassId: number;
   token: string;
 }
 
@@ -24,6 +25,7 @@ interface CustomJwtPayload extends JwtPayload {
   fullName: string;
   role: string;
   groupId: string;
+  swpClassId: number;
 }
 
 interface AuthContextProps {
@@ -57,6 +59,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               fullName: decodedToken.fullName,
               role: decodedToken.role,
               groupId: decodedToken.groupId,
+              swpClassId: decodedToken.swpClassId,
               token: token,
             });
           } else {
@@ -91,6 +94,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         fullName: decodedToken.fullName,
         role: decodedToken.role,
         groupId: decodedToken.groupId,
+        swpClassId: decodedToken.swpClassId,
         token: token,
       };
 

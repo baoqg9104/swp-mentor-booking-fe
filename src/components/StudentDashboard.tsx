@@ -51,8 +51,26 @@ const StudentDashboard = () => {
 
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+  const [swpClassName, setSwpClassName] = useState<string>("");
 
   useEffect(() => {
+    const getSwpClassByClassId = async () => {
+      try {
+        const response = await axios.get(
+          `https://localhost:7007/api/SwpClass/get/${authData?.swpClassId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+
+        setSwpClassName(response.data.name);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
     const getGroupByGroupId = async () => {
       try {
         const data = groupId;
@@ -110,6 +128,7 @@ const StudentDashboard = () => {
       }
     };
 
+    getSwpClassByClassId();
     getGroupByGroupId();
     getBookings();
     getFeedbacks();
@@ -156,7 +175,7 @@ const StudentDashboard = () => {
               {group?.name ?? "Not joined any group"}
             </div>
             <div className="text-[15px] pl-1 mt-2">
-              {group?.swpClassName ?? "No class assigned"}
+              {swpClassName === "" ? "No class assigned" : swpClassName}
             </div>
           </div>
           <div className="bg-[#FFF4DE] p-4  rounded-[15px]">

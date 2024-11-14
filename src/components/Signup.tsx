@@ -17,6 +17,14 @@ interface SignupDto {
   email: string;
   password: string;
   role: string;
+  swpClassId?: number;
+}
+
+interface SwpClass {
+  swpClassId: number;
+  name: string;
+  semesterId: number;
+  status: string;
 }
 
 const Signup = () => {
@@ -25,6 +33,8 @@ const Signup = () => {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [role, setRole] = useState<string>("");
+  const [swpClass, setSwpClass] = useState<SwpClass[]>([]);
+  const [swpClassId, setSwpClassId] = useState<number | undefined>(undefined);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     try {
@@ -39,7 +49,10 @@ const Signup = () => {
         email,
         password,
         role,
+        swpClassId,
       };
+
+      console.log(data);
 
       const response = await axios.post(
         "https://localhost:7007/api/auth/register",
@@ -51,6 +64,22 @@ const Signup = () => {
       toast.error("Email already exists!");
     }
   };
+
+  useEffect(() => {
+    const getClass = async () => {
+      try {
+        const response = await axios.get(
+          "https://localhost:7007/api/SwpClass/all"
+        );
+
+        setSwpClass(response.data);
+      } catch (error) {
+        console.log("Can not get class", error);
+      }
+    }
+
+    getClass();
+  }, []);
 
   const location = useLocation();
 
@@ -205,9 +234,9 @@ const Signup = () => {
                 </button>
               </div>
 
-              <div className="flex justify-between">
+              <div className="flex justify-between gap-x-3">
                 <select
-                  className="mt-4 w-full h-[50px] bg-[#f7f7f7] pl-3 rounded-[10px] text-[16px] text-[#5B5B5B]"
+                  className="mt-4 w-[50%] h-[50px] bg-[#f7f7f7] pl-3 rounded-[10px] text-[16px] text-[#5B5B5B]"
                   defaultValue=""
                   required
                   onChange={(e) => setRole(e.target.value)}
@@ -219,24 +248,24 @@ const Signup = () => {
                   <option value="student">Student</option>
                 </select>
 
-                {/* <select
-                className="mt-4 w-[47%] h-[50px] bg-[#f7f7f7] pl-2 rounded-[10px] text-[16px] text-[#5B5B5B] disabled:text-[#888888]"
+                <select
+                className="mt-4 w-[50%] h-[50px] bg-[#f7f7f7] pl-2 rounded-[10px] text-[16px] text-[#5B5B5B] disabled:text-[#888888]"
                 defaultValue=""
                 required
                 disabled={role === "mentor"}
                 value={role === "mentor" ? "" : undefined}
+                onChange={(e) => setSwpClassId(Number(e.target.value))}
               >
                 <option value="" disabled>
                   Select class
                 </option>
-                <option value="class-1">Class 1</option>
-                <option value="class-2">Class 2</option>
-                <option value="class-3">Class 3</option>
-                <option value="class-4">Class 4</option>
-                <option value="class-5">Class 5</option>
-              </select> */}
+                {swpClass.map((item) => (
+                  <option key={item.swpClassId} value={item.swpClassId}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
               </div>
-
               <button
                 type="submit"
                 className="mt-5 w-full h-[50px] bg-[#F56965] pl-5 rounded-[10px] text-[20px] text-[white] font-semibold"

@@ -8,6 +8,7 @@ import {
   faPenToSquare,
   faUser,
   faUserGroup,
+  faUsersRectangle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useState } from "react";
@@ -168,6 +169,7 @@ const Student = () => {
                 aria-current="page"
               >
                 {navLink === "dashboard" && "Dashboard"}
+                {navLink === "class" && "Class"}
                 {navLink === "group" && "Group"}
                 {navLink === "booking-mentor" && "Booking Mentor"}
                 {navLink === "my-appoinments" && "My Appointments"}
@@ -223,6 +225,23 @@ const Student = () => {
                       className="text-[16px] mt-[3px]"
                     />
                     Dashboard
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/student/class"
+                    onClick={() => setNavLink("class")}
+                    className={({ isActive }) =>
+                      `${
+                        isActive ? "bg-gray-100" : ""
+                      } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`
+                    }
+                  >
+                    <FontAwesomeIcon
+                      icon={faUsersRectangle}
+                      className="text-[16px] mt-[3px]"
+                    />
+                    Class
                   </NavLink>
                 </li>
                 <li>

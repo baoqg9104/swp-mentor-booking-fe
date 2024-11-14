@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
 
 interface Transaction {
+  transactionId: number;
   bookingId: number;
   type: string;
   point: number;
@@ -227,7 +228,7 @@ const StudentTransactionHistory = () => {
                   {filteredTransactions.map((transaction) => (
                     <tr
                       className="hover:bg-gray-50"
-                      key={transaction.bookingId}
+                      key={transaction.transactionId}
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
                         {transaction.type}

@@ -293,7 +293,7 @@ const BookingMentor = () => {
 
             <input
               className="w-full bg-transparent placeholder:text-slate-400 text-slate-700 text-sm border border-slate-200 rounded-md pl-10 pr-3 py-2 transition duration-300 ease focus:outline-none focus:border-slate-400 hover:border-slate-300 shadow-sm focus:shadow"
-              placeholder="Search mentor, email..."
+              placeholder="Search by name, email..."
               value={searchTerm}
               onChange={handleSearch}
             />
