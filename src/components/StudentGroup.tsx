@@ -1,14 +1,20 @@
 import {
+  faCircleXmark,
   faGear,
   faPaperclip,
   faPenToSquare,
   faPlus,
   faUser,
   faUserPlus,
+  faUserShield,
+  faUserXmark,
+  faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Slider from "@mui/material/Slider";
+import Select from "react-select";
+import { MultiValue } from "react-select";
 
 import "preline/preline";
 import { IStaticMethods } from "preline/preline";
@@ -27,6 +33,10 @@ import {
 import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthContext } from "./AuthContext";
+import makeAnimated from "react-select/animated";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+
+const animatedComponents = makeAnimated();
 
 declare global {
   interface Window {
@@ -44,6 +54,8 @@ interface Group {
   walletPoint: number;
   progress: number;
   createdDate: string;
+  status: boolean;
+  leaderId: string;
 }
 
 interface Class {
@@ -75,6 +87,18 @@ interface Member {
   phone: string;
 }
 
+interface Student {
+  studentId: string;
+  studentName: string;
+  email: string;
+  phone: string;
+  gender: string;
+  dateOfBirth: string;
+  groupId: string;
+  groupName: string;
+  swpClassId: number;
+}
+
 const StudentGroup = () => {
   const location = useLocation();
 
@@ -95,30 +119,56 @@ const StudentGroup = () => {
   const [group, setGroup] = useState<Group | null>(null);
   const [classes, setClasses] = useState<Class[]>([]);
   const [topics, setTopics] = useState<Topic[]>([]);
+  const [students, setStudents] = useState<Student[]>([]);
+  const [options, setOptions] = useState<any[]>([]);
+  const [openLeaveGroup, setOpenLeaveGroup] = useState<boolean>(false);
+
+  const [selectedMembers, setSelectedMembers] = useState<MultiValue<any>>([]);
+
+  useEffect(() => {
+    const studentOptions = students
+      .filter(
+        (student) =>
+          student.swpClassId === Number(authData?.swpClassId) &&
+          student.groupId === null &&
+          student.studentId != authData?.id
+      )
+      .map((student) => ({
+        value: student.email,
+        label: `${student.studentName} | ${student.email}`,
+      }));
+    setOptions(studentOptions);
+  }, [students]);
 
   useEffect(() => {
     const getGroup = async () => {
       try {
-        const groupId = localStorage.getItem("groupId");
-        const data = groupId;
-        // console.log(data);
-        if (data === "") {
-          return;
-        }
-
         const response = await axios.get(
-          `https://localhost:7007/api/Group/get/${data}`,
+          `https://localhost:7007/api/Student/${authData?.id}`,
           {
             headers: {
               Authorization: `Bearer ${authData?.token}`,
             },
           }
         );
-        setGroup(response.data);
-        setProgress(response.data.progress);
 
-        localStorage.setItem("group", JSON.stringify(response.data));
-        getGroupTopic();
+        const groupId = response.data.groupId;
+
+        if (groupId === null) {
+          return;
+        }
+
+        const groupResponse = await axios.get(
+          `https://localhost:7007/api/Group/get/${groupId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+
+        setGroup(groupResponse.data);
+        setProgress(groupResponse.data.progress);
       } catch (error) {
         // console.log("Can not get group", error);
         // toast.error("Can not get group");
@@ -127,7 +177,21 @@ const StudentGroup = () => {
 
     const getMembers = async () => {
       try {
-        const groupId = localStorage.getItem("groupId");
+        const studentResponse = await axios.get(
+          `https://localhost:7007/api/Student/${authData?.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+
+        const groupId = studentResponse.data.groupId;
+
+        if (groupId === null) {
+          return;
+        }
+
         const response = await axios.get(
           `https://localhost:7007/api/Group/get-members/${groupId}`,
           {
@@ -144,30 +208,54 @@ const StudentGroup = () => {
       }
     };
 
+    const getStudents = async () => {
+      try {
+        const response = await axios.get(
+          `https://localhost:7007/api/Student/all`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+        setStudents(response.data);
+
+        // const studentOptions = response.data.map((student: any) => ({
+        //   value: student.id,
+        //   label: `${student.studentName}`
+        // }));
+
+        // setOptions(studentOptions);
+      } catch (error) {
+        console.log("Can not get students", error);
+        // toast.error("Can not get group");
+      }
+    };
+
     getGroup();
     getMembers();
+    getStudents();
   }, [refresh]);
 
-  const getGroupTopic = async () => {
-    try {
-      const groupDataString = localStorage.getItem("group"); // Lấy dữ liệu nhóm từ localStorage
+  useEffect(() => {
+    const getGroupTopic = async () => {
+      try {
+        const response = await axios.get(
+          `https://localhost:7007/api/Topic/get/${group?.topicId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
 
-      // Chuyển đổi chuỗi JSON thành đối tượng
-      const groupData = groupDataString ? JSON.parse(groupDataString) : null;
-      const response = await axios.get(
-        `https://localhost:7007/api/Topic/get/${groupData.topicId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${authData?.token}`,
-          },
-        }
-      );
-
-      setGroupTopic(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+        setGroupTopic(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    getGroupTopic();
+  }, [group]);
 
   const [groupTopic, setGroupTopic] = useState<GroupTopic | null>(null);
 
@@ -205,18 +293,26 @@ const StudentGroup = () => {
   };
 
   const [name, setName] = useState<string>("");
-  const [classId, setClassId] = useState<number>(0);
   const [topicId, setTopicId] = useState<number>(0);
 
   const handleCreateGroup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
+      const members = [
+        ...selectedMembers,
+        {
+          value: authData?.email,
+          label: `${authData?.fullName} | ${authData?.email}`,
+        },
+      ];
+
       const data = {
         leaderId: authData?.id,
         name,
         topicId,
-        swpClassId: classId,
+        swpClassId: authData?.swpClassId,
+        memberEmails: members.map((member: any) => member.value),
       };
 
       const response = await axios.post(
@@ -231,15 +327,12 @@ const StudentGroup = () => {
 
       localStorage.setItem("groupId", response.data);
 
-
-
       // toast.success("Create group successful!");
       window.location.reload();
 
       setRefresh(!refresh);
-    } catch (error) {
-      console.log(error);
-      toast.error("Dupplicate topic in the same class!");
+    } catch (error: any) {
+      toast.error(error.response.data);
     }
   };
 
@@ -248,13 +341,14 @@ const StudentGroup = () => {
   const addMember = async (e: React.FormEvent) => {
     try {
       e.preventDefault();
-      const groupId = localStorage.getItem("groupId");
+
       const data = {
-        groupId: groupId,
-        email: email,
+        groupId: group?.groupId,
+        leaderId: authData?.id,
+        emails: selectedMembers.map((member: any) => member.value),
       };
 
-      if (email === "") {
+      if (selectedMembers == null || selectedMembers.length == 0) {
         return;
       }
 
@@ -270,6 +364,7 @@ const StudentGroup = () => {
 
       toast.success("Add member successful!");
       setRefresh(!refresh);
+      setSelectedMembers([]);
     } catch (error: any) {
       let errorMessage = error.response?.data || "An error occurred";
       errorMessage = errorMessage.replace(/^Error:\s*/, "");
@@ -307,9 +402,34 @@ const StudentGroup = () => {
     }
   };
 
+  const leaveGroup = async () => {
+    try {
+      const response = await axios.put(
+        `https://localhost:7007/api/Group/leave-group?studentId=${authData?.id}`
+      );
+
+      window.location.reload();
+    } catch (error: any) {
+      toast.error(error.response.data);
+    }
+  };
+
+  const deleteMember = async (studentId: string) => {
+    try {
+      const response = await axios.put(
+        `https://localhost:7007/api/Group/delete-member?studentId=${studentId}`
+      );
+
+      toast.success("Delete member successful!");
+      setRefresh(!refresh);
+    } catch (error: any) {
+      toast.error(error.response.data);
+    }
+  };
+
   return (
     <>
-      <div className="py-10 px-12 h-[90vh]">
+      <div className="py-10 px-12 h-[100vh]">
         {/* If have not joined group */}
         {group === null && (
           <>
@@ -326,8 +446,8 @@ const StudentGroup = () => {
                 getClasses();
                 getTopics();
                 setName("");
-                setClassId(0);
                 setTopicId(0);
+                setSelectedMembers([]);
               }}
             >
               <FontAwesomeIcon icon={faPlus} className="size-4 mr-1" />
@@ -378,7 +498,7 @@ const StudentGroup = () => {
                         </svg>
                       </button>
                     </div>
-                    <div className="p-4 overflow-y-auto flex flex-col justify-center items-center">
+                    <div className="p-4 flex flex-col justify-center items-center">
                       <div className="w-full px-10 flex flex-col gap-3">
                         <div className="relative">
                           <input
@@ -409,76 +529,6 @@ const StudentGroup = () => {
                             Name
                           </label>
                         </div>
-
-                        <div className="relative">
-                          <select
-                            value={classId}
-                            onChange={(e) =>
-                              setClassId(parseInt(e.target.value))
-                            }
-                            required
-                            className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
-    focus:pt-6
-    focus:pb-2
-    [&:not(:placeholder-shown)]:pt-6
-    [&:not(:placeholder-shown)]:pb-2
-    autofill:pt-6
-    autofill:pb-2"
-                          >
-                            <option value="">Choose class</option>
-                            {/* <option value="SE1849">SE1849</option>
-                            <option value="SE1850">SE1850</option>
-                            <option value="SE1851">SE1851</option>
-                            <option value="SE1854">SE1854</option>
-                            <option value="SE1855">SE1855</option>
-                            <option value="SE1856">SE1856</option>
-                            <option value="SE1857">SE1857</option>
-                            <option value="SE1858">SE1858</option>
-                            <option value="SE1859">SE1859</option>
-                            <option value="SE1860">SE1860</option>
-                            <option value="SE1861">SE1861</option>
-                            <option value="SE1862">SE1862</option>
-                            <option value="SE1863">SE1863</option>
-                            <option value="SE1864">SE1864</option>
-                            <option value="SE1865">SE1865</option>
-                            <option value="SE1866">SE1866</option>
-                            <option value="SE1867">SE1867</option>
-                            <option value="SE1868">SE1868</option>
-                            <option value="SE1870">SE1870</option>
-                            <option value="SE1871">SE1871</option>
-                            <option value="SE1872">SE1872</option>
-                            <option value="SE1874">SE1874</option>
-                            <option value="SE1875">SE1875</option>
-                            <option value="SE1876">SE1876</option>
-                            <option value="SE1878">SE1878</option> */}
-                            {classes.map(
-                              (c) =>
-                                c.status == true && (
-                                  <option
-                                    key={c.swpClassId}
-                                    value={c.swpClassId}
-                                  >
-                                    {c.name}
-                                  </option>
-                                )
-                            )}
-                          </select>
-
-                          <label
-                            className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
-      peer-focus:scale-90
-      peer-focus:translate-x-0.5
-      peer-focus:-translate-y-1.5
-      peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
-      peer-[:not(:placeholder-shown)]:scale-90
-      peer-[:not(:placeholder-shown)]:translate-x-0.5
-      peer-[:not(:placeholder-shown)]:-translate-y-1.5
-      peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
-                          >
-                            Class
-                          </label>
-                        </div>
-
                         <div className="relative">
                           <select
                             value={topicId}
@@ -495,65 +545,6 @@ const StudentGroup = () => {
     autofill:pb-2"
                           >
                             <option value="">Choose topic</option>
-                            {/* <option value="Koi Farm Shop">Koi Farm Shop</option>
-                            <option value="Koi Ordering System in Japan">
-                              Koi Ordering System in Japan
-                            </option>
-                            <option value="Koi Delivery Ordering System">
-                              Koi Delivery Ordering System
-                            </option>
-                            <option value="Koi Pond Construction Ordering System">
-                              Koi Pond Construction Ordering System
-                            </option>
-                            <option value="Feng Shui Koi Consulting System">
-                              Feng Shui Koi Consulting System
-                            </option>
-                            <option value="Koi Veterinary Service Center">
-                              Koi Veterinary Service Center
-                            </option>
-                            <option value="Koi Care System at Home">
-                              Koi Care System at Home
-                            </option>
-                            <option value="Koi Show Management System">
-                              Koi Show Management System
-                            </option>
-                            <option value="Koi Auction System for Breeder">
-                              Koi Auction System for Breeder
-                            </option>
-                            <option value="Koi Breeding Game">
-                              Koi Breeding Game
-                            </option>
-                            <option value="POD Booking System">
-                              POD Booking System
-                            </option>
-                            <option value="SWP Mentor Booking System">
-                              SWP Mentor Booking System
-                            </option>
-                            <option value="Hair Salon Booking App">
-                              Hair Salon Booking App
-                            </option>
-                            <option value="EduToyRent - Edu Toy Rental Platform">
-                              EduToyRent - Edu Toy Rental Platform
-                            </option>
-                            <option value="TicketResell - Unused Ticket Reselling Platform">
-                              TicketResell - Unused Ticket Reselling Platform
-                            </option>
-                            <option value="PawFund - Platform to support">
-                              PawFund - Platform to support
-                            </option>
-                            <option value="EventFlowerExchange - Platform for Reselling Event Flowers">
-                              EventFlowerExchange - Platform for Reselling Event
-                              Flowers
-                            </option>
-                            <option value="Taxi-sharing Platform">
-                              Taxi-sharing Platform
-                            </option>
-                            <option value="Taxi Xanh SM Booking System">
-                              Taxi Xanh SM Booking System
-                            </option>
-                            <option value="STEM KIT Sales System">
-                              STEM KIT Sales System
-                            </option> */}
                             {topics.map(
                               (t) =>
                                 t.status == true && (
@@ -579,7 +570,68 @@ const StudentGroup = () => {
                           </label>
                         </div>
 
-                        <div className="relative"></div>
+                        <h1 className="mt-2 font-medium text-[#474747] text-center">
+                          - Add member -
+                        </h1>
+                        <div className="flex gap-x-3">
+                          <div className="relative w-[100%]">
+                            {/* <select
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
+    focus:pt-6
+    focus:pb-2
+    [&:not(:placeholder-shown)]:pt-6
+    [&:not(:placeholder-shown)]:pb-2
+    autofill:pt-6
+    autofill:pb-2"
+                            >
+                              <option value=""></option>
+                              {students
+                              .filter((student) => student.swpClassId === Number(authData?.swpClassId) && student.groupId === null && student.studentId != authData?.id)
+                              .map((student) => (
+                                <option
+                                  key={student.studentId}
+                                  value={student.email}
+                                >
+                                   {student.studentName} | {student.email}
+                                </option>
+                              ))}
+                            </select> */}
+                            <Select
+                              closeMenuOnSelect={false}
+                              // components={animatedComponents}
+                              options={options}
+                              isMulti
+                              value={selectedMembers}
+                              onChange={(selectedOptions) =>
+                                setSelectedMembers(
+                                  selectedOptions as MultiValue<any>
+                                )
+                              }
+                              placeholder="Select members..."
+                            />
+                            {/* <label
+                              className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
+      peer-focus:scale-90
+      peer-focus:translate-x-0.5
+      peer-focus:-translate-y-1.5
+      peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
+      peer-[:not(:placeholder-shown)]:scale-90
+      peer-[:not(:placeholder-shown)]:translate-x-0.5
+      peer-[:not(:placeholder-shown)]:-translate-y-1.5
+      peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
+                            >
+                              Email
+                            </label> */}
+                          </div>
+                          {/* <button
+                            type="button"
+                            className="flex items-center justify-center cursor-pointer border border-[blue] py-3 rounded-md w-[23%] text-blue-500 font-semibold hover:bg-blue-50"
+                          >
+                            Add
+                          </button> */}
+                        </div>
                       </div>
                     </div>
                     <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t">
@@ -607,7 +659,7 @@ const StudentGroup = () => {
         {group !== null && (
           <>
             <div className="flex">
-              <div className="w-[33%]">
+              <div className="w-[50%]">
                 <div className="flex w-[280px]">
                   <div className="w-[90%]">
                     <h1 className="text-[21px] font-medium mb-3">
@@ -653,8 +705,19 @@ const StudentGroup = () => {
                   </div>
                   <div>
                     <div
-                      className="cursor-pointer flex justify-center items-center size-9 rounded-full bg-[#ffffff] hover:bg-[#e2e2e2] shadow"
-                      onClick={() => setOpenSetting(true)}
+                      className={`cursor-pointer flex justify-center items-center size-9 rounded-full 
+  bg-[#ffffff] shadow 
+  ${
+    authData?.id === group.leaderId
+      ? "hover:bg-[#e2e2e2]"
+      : "bg-gray-300 cursor-not-allowed opacity-50"
+  }`}
+                      onClick={() => {
+                        if (authData?.id == group.leaderId) {
+                          setSelectedMembers([]);
+                          setOpenSetting(true);
+                        }
+                      }}
                     >
                       <FontAwesomeIcon icon={faGear} className="size-4" />
                     </div>
@@ -663,6 +726,16 @@ const StudentGroup = () => {
 
                 <div className="mt-7">
                   <h1 className="text-[15px] font-semibold text-[#3c3c3c]">
+                    Status:{" "}
+                    <span
+                      className={`text-[16px] ${
+                        group.status ? "text-green-600" : "text-red-600"
+                      }`}
+                    >
+                      {group.status ? "Approved" : "Disabled"}
+                    </span>
+                  </h1>
+                  <h1 className="mt-2 text-[15px] font-semibold text-[#3c3c3c]">
                     Remaining points:{" "}
                     <span className="text-[#0c9eff] text-[16px]">
                       {group.walletPoint}
@@ -686,10 +759,16 @@ const StudentGroup = () => {
                     </div>
                     <div className="border-t-2 py-[6px] flex justify-end px-4">
                       <div
-                        className="hover:bg-[#ffefe5] size-[30px] rounded-full flex justify-center items-center cursor-pointer"
+                        className={`hover:bg-[#ffefe5] size-[30px] rounded-full flex justify-center items-center cursor-pointer ${
+                          authData?.id == group.leaderId
+                            ? "hover:bg-[#e2e2e2]"
+                            : "cursor-not-allowed opacity-50 bg-white hover:bg-white"
+                        }`}
                         onClick={() => {
-                          setOpenProgress(true);
-                          setProgress(group?.progress!);
+                          if (authData?.id == group.leaderId) {
+                            setOpenProgress(true);
+                            setProgress(group?.progress!);
+                          }
                         }}
                       >
                         <FontAwesomeIcon
@@ -709,98 +788,110 @@ const StudentGroup = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+                <div className="mt-7">
+                  <h1 className="uppercase text-[13px] font-semibold text-[#4B6883]">
+                    Project progress
+                  </h1>
+                  <div className="pt-4 rounded-lg flex justify-center w-[300px]">
+                    <div className="relative size-40">
+                      <svg
+                        className="rotate-[135deg] size-full"
+                        viewBox="0 0 36 36"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <circle
+                          cx="18"
+                          cy="18"
+                          r="16"
+                          fill="none"
+                          className="stroke-current text-neutral-700"
+                          strokeWidth="1"
+                          strokeDasharray="75 100"
+                          strokeLinecap="round"
+                        ></circle>
 
-              <div className="w-[20%] pt-48">
-                <div className="relative size-40">
-                  <svg
-                    className="rotate-[135deg] size-full"
-                    viewBox="0 0 36 36"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      cx="18"
-                      cy="18"
-                      r="16"
-                      fill="none"
-                      className="stroke-current text-neutral-700"
-                      strokeWidth="1"
-                      strokeDasharray="75 100"
-                      strokeLinecap="round"
-                    ></circle>
+                        <circle
+                          cx="18"
+                          cy="18"
+                          r="16"
+                          fill="none"
+                          className={`stroke-current ${
+                            progress >= 100
+                              ? "text-[#228B22]"
+                              : progress >= 90
+                              ? "text-[#36bb36]"
+                              : progress >= 80
+                              ? "text-[#32CD32]"
+                              : progress >= 70
+                              ? "text-[#7FFF00]"
+                              : progress >= 60
+                              ? "text-[#ADFF2F]"
+                              : progress >= 50
+                              ? "text-[#FFFF00]"
+                              : progress >= 40
+                              ? "text-[#FFD700]"
+                              : progress >= 30
+                              ? "text-[#FFA500]"
+                              : progress >= 20
+                              ? "text-[#FF8C00]"
+                              : progress >= 10
+                              ? "text-[#FF4500]"
+                              : "text-[#FF0000]"
+                          }`}
+                          strokeWidth="2"
+                          // strokeDasharray="56.25 100"
+                          strokeDasharray={`${
+                            (group?.progress! * 56.25) / 75
+                          } ${100}`}
+                          strokeLinecap="round"
+                        ></circle>
+                      </svg>
 
-                    <circle
-                      cx="18"
-                      cy="18"
-                      r="16"
-                      fill="none"
-                      className={`stroke-current ${
-                        progress >= 100
-                          ? "text-[#228B22]"
-                          : progress >= 90
-                          ? "text-[#36bb36]"
-                          : progress >= 80
-                          ? "text-[#32CD32]"
-                          : progress >= 70
-                          ? "text-[#7FFF00]"
-                          : progress >= 60
-                          ? "text-[#ADFF2F]"
-                          : progress >= 50
-                          ? "text-[#FFFF00]"
-                          : progress >= 40
-                          ? "text-[#FFD700]"
-                          : progress >= 30
-                          ? "text-[#FFA500]"
-                          : progress >= 20
-                          ? "text-[#FF8C00]"
-                          : progress >= 10
-                          ? "text-[#FF4500]"
-                          : "text-[#FF0000]"
-                      }`}
-                      strokeWidth="2"
-                      // strokeDasharray="56.25 100"
-                      strokeDasharray={`${
-                        (group?.progress! * 56.25) / 75
-                      } ${100}`}
-                      strokeLinecap="round"
-                    ></circle>
-                  </svg>
-
-                  <div className="absolute top-1/2 start-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-                    <span
-                      className={`text-4xl font-bold ${
-                        progress >= 100
-                          ? "text-[#228B22]"
-                          : progress >= 90
-                          ? "text-[#36bb36]"
-                          : progress >= 80
-                          ? "text-[#32CD32]"
-                          : progress >= 70
-                          ? "text-[#7FFF00]"
-                          : progress >= 60
-                          ? "text-[#ADFF2F]"
-                          : progress >= 50
-                          ? "text-[#dddd36]"
-                          : progress >= 40
-                          ? "text-[#FFD700]"
-                          : progress >= 30
-                          ? "text-[#FFA500]"
-                          : progress >= 20
-                          ? "text-[#FF8C00]"
-                          : progress >= 10
-                          ? "text-[#FF4500]"
-                          : "text-[#FF0000]"
-                      }`}
-                    >
-                      {group?.progress}
-                      <span className="text-[25px]">%</span>
-                    </span>
+                      <div className="absolute top-1/2 start-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                        <span
+                          className={`text-4xl font-bold ${
+                            progress >= 100
+                              ? "text-[#228B22]"
+                              : progress >= 90
+                              ? "text-[#36bb36]"
+                              : progress >= 80
+                              ? "text-[#32CD32]"
+                              : progress >= 70
+                              ? "text-[#7FFF00]"
+                              : progress >= 60
+                              ? "text-[#ADFF2F]"
+                              : progress >= 50
+                              ? "text-[#dddd36]"
+                              : progress >= 40
+                              ? "text-[#FFD700]"
+                              : progress >= 30
+                              ? "text-[#FFA500]"
+                              : progress >= 20
+                              ? "text-[#FF8C00]"
+                              : progress >= 10
+                              ? "text-[#FF4500]"
+                              : "text-[#FF0000]"
+                          }`}
+                        >
+                          {group?.progress}
+                          <span className="text-[25px]">%</span>
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="bg-white rounded-lg p-5 px-16 shadow">
+              <div className="bg-white rounded-lg p-5 px-16 shadow h-[400px]">
                 <div className="flex flex-col">
                   <div className="-m-1.5 overflow-x-auto">
+                    <div className="flex justify-end">
+                      <button
+                        onClick={() => setOpenLeaveGroup(true)}
+                        className="text-[14px] bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-1 px-2 border border-blue-500 hover:border-transparent rounded"
+                      >
+                        Leave group
+                      </button>
+                    </div>
                     <div className="p-1.5 min-w-full inline-block align-middle">
                       <div className="overflow-hidden">
                         <p className="text-center mb-3 font-medium">
@@ -873,12 +964,34 @@ const StudentGroup = () => {
                               <tr key={member.studentId}>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
                                   {member.fullName}
+                                  {member.studentId == group.leaderId && (
+                                    <FontAwesomeIcon
+                                      icon={faUserShield}
+                                      className="ml-2"
+                                    />
+                                  )}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                                   {member.email}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                                   {member.phone}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                  {member.studentId != authData?.id &&
+                                    group.leaderId == authData?.id && (
+                                      <button
+                                        onClick={() =>
+                                          deleteMember(member.studentId)
+                                        }
+                                        className="hover:bg-blue-100 rounded-full size-[24px] flex items-center justify-center"
+                                      >
+                                        <FontAwesomeIcon
+                                          icon={faXmark}
+                                          className="size-[14px]"
+                                        />
+                                      </button>
+                                    )}
                                 </td>
                               </tr>
                             ))}
@@ -890,6 +1003,7 @@ const StudentGroup = () => {
                 </div>
               </div>
             </div>
+            <div className="w-[20%] mt-10"></div>
           </>
         )}
       </div>
@@ -990,14 +1104,14 @@ const StudentGroup = () => {
                   </svg>
                 </button>
               </div>
-              <div className="p-4 overflow-y-auto flex flex-col justify-center items-center">
+              <div className="p-4 flex flex-col justify-center items-center">
                 <h1 className="mb-2 font-medium text-[#474747]">
                   - Add member -
                 </h1>
                 <form className="w-full mb-5" onSubmit={addMember}>
                   <div className="flex gap-3">
-                    <div className="relative w-[80%]">
-                      <input
+                    <div className="relative w-[100%]">
+                      {/* <input
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         type="email"
@@ -1022,7 +1136,19 @@ const StudentGroup = () => {
       peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
                       >
                         Email
-                      </label>
+                      </label> */}
+                      <Select
+                        closeMenuOnSelect={false}
+                        // components={animatedComponents}
+                        options={options}
+                        isMulti
+                        value={selectedMembers}
+                        onChange={(selectedOptions) =>
+                          setSelectedMembers(selectedOptions as MultiValue<any>)
+                        }
+                        className="text-start"
+                        placeholder="Select members..."
+                      />
                     </div>
 
                     <button
@@ -1214,6 +1340,68 @@ const StudentGroup = () => {
                   className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 sm:ml-3 sm:w-auto"
                 >
                   Update
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Dialog>
+
+      <Dialog
+        open={openLeaveGroup}
+        onClose={setOpenLeaveGroup}
+        className="relative z-[100]"
+      >
+        <DialogBackdrop
+          transition
+          className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+        />
+
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div className="px-5 flex flex-col bg-white border shadow-sm rounded-xl pointer-events-auto">
+              <div className="w-[400px] p-4 overflow-y-auto flex flex-col justify-center items-center">
+                <div className="sm:flex sm:items-start">
+                  <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:size-10">
+                    <ExclamationTriangleIcon
+                      aria-hidden="true"
+                      className="size-6 text-red-600"
+                    />
+                  </div>
+                  <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                    <DialogTitle
+                      as="h3"
+                      className="text-base font-semibold text-gray-900"
+                    >
+                      Leave group
+                    </DialogTitle>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500">
+                        {group?.leaderId == authData?.id
+                          ? "You are the group leader, if you leave the group the group will be deleted."
+                          : "Are you sure you want to leave this group?"}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end items-center py-3 px-4 border-t">
+                <button
+                  type="button"
+                  className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none"
+                  onClick={() => setOpenLeaveGroup(false)}
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenLeaveGroup(false);
+                    leaveGroup();
+                  }}
+                  className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 sm:ml-3 sm:w-auto"
+                >
+                  Leave
                 </button>
               </div>
             </div>
