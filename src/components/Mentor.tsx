@@ -2,11 +2,15 @@ import {
   faBell,
   faCalendarCheck,
   faCalendarDays,
+  faCircleCheck,
+  faCircleXmark,
   faCommentDots,
   faHistory,
   faHouse,
   faPenToSquare,
   faUser,
+  faUserGroup,
+  faUsersRectangle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useContext, useState } from "react";
@@ -16,6 +20,7 @@ import { IStaticMethods } from "preline/preline";
 import { useEffect } from "react";
 import { useLocation, NavLink, Outlet } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
+import axios from "axios";
 
 declare global {
   interface Window {
@@ -47,6 +52,22 @@ const Mentor = () => {
 
   const { authData } = authContext;
 
+  const [mentorStatus, setMentorStatus] = useState<boolean>(false);
+
+  useEffect(() => {
+    const getMentor = async () => {
+      try {
+        const response = await axios.get(
+          `https://localhost:7007/api/Mentor/${authData?.id}`
+        );
+
+        setMentorStatus(response.data.applyStatus);
+      } catch (error) {}
+    };
+
+    getMentor();
+  }, []);
+
   return (
     <>
       <header className="sticky top-0 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-[48] w-full bg-white border-b text-sm py-2.5 lg:ps-[260px]">
@@ -59,8 +80,24 @@ const Mentor = () => {
 
           <div className="w-full flex items-center justify-end ms-auto md:justify-between gap-x-1 md:gap-x-3">
             <div className="hidden md:block"></div>
-
             <div className="flex flex-row items-center justify-end gap-3 pr-2">
+              <div className="flex justify-center items-center mr-5 gap-x-[6px]">
+                {mentorStatus ? (
+                  <FontAwesomeIcon
+                    icon={faCircleCheck}
+                    className="size-[18px] text-green-400"
+                  />
+                ) : (
+                  <FontAwesomeIcon
+                    icon={faCircleXmark}
+                    className="size-[18px] text-yellow-400"
+                  />
+                )}
+
+                <span className="font-medium mt-[2px] text-[15px]">
+                  {mentorStatus ? "Verified" : "Not verified"}
+                </span>
+              </div>
               <button
                 type="button"
                 className="size-[45px] bg-[#e6eef6] relative inline-flex justify-center items-center gap-x-2 text-sm font-semibold rounded-full border border-transparent text-gray-800 hover:bg-gray-200 focus:outline-none disabled:opacity-50 disabled:pointer-events-none"
@@ -68,7 +105,6 @@ const Mentor = () => {
                 <FontAwesomeIcon className="text-[22px]" icon={faBell} />
                 <span className="sr-only">Notifications</span>
               </button>
-
               <div className="hs-dropdown [--placement:bottom-right] relative inline-flex">
                 <button
                   id="hs-dropdown-account"
@@ -224,6 +260,24 @@ const Mentor = () => {
                       className="text-[16px] mt-[3px]"
                     />
                     Dashboard
+                  </NavLink>
+                </li>
+
+                <li>
+                  <NavLink
+                    to="/mentor/class"
+                    onClick={() => setNavLink("class")}
+                    className={({ isActive }) =>
+                      `${
+                        isActive ? "bg-gray-100" : ""
+                      } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`
+                    }
+                  >
+                    <FontAwesomeIcon
+                      icon={faUsersRectangle}
+                      className="text-[16px] mt-[3px]"
+                    />
+                    Manage Class
                   </NavLink>
                 </li>
 

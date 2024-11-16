@@ -33,6 +33,7 @@ import AdminDashboard from "./components/AdminDashboard";
 import ManageMentors from "./components/ManageMentors";
 import ManageStudents from "./components/ManageStudents";
 import StudentClass from "./components/StudentClass";
+import MentorClass from "./components/MentorClass";
 registerLicense(
   "Mgo+DSMBMAY9C3t2UlhhQlVMfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTX9TdEBiW3xacHdRQGNY"
 );
@@ -82,24 +83,30 @@ const AppContent = () => {
             </ProtectedRoute>
           }
         >
-          <Route path="dashboard"
-          element={
-            <ProtectedRoute allowedRoles={["Admin"]}>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } />
-          <Route path="mentors"
-          element={
-            <ProtectedRoute allowedRoles={["Admin"]}>
-              <ManageMentors />
-            </ProtectedRoute>
-          } />
-          <Route path="students"
-          element={
-            <ProtectedRoute allowedRoles={["Admin"]}>
-              <ManageStudents />
-            </ProtectedRoute>
-          } />
+          <Route
+            path="dashboard"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="mentors"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <ManageMentors />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="students"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <ManageStudents />
+              </ProtectedRoute>
+            }
+          />
         </Route>
 
         <Route
@@ -115,6 +122,15 @@ const AppContent = () => {
             element={
               <ProtectedRoute allowedRoles={["Mentor"]}>
                 <MentorDashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="class"
+            element={
+              <ProtectedRoute allowedRoles={["Mentor"]}>
+                <MentorClass />
               </ProtectedRoute>
             }
           />
