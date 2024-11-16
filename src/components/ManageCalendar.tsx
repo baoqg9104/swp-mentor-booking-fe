@@ -89,7 +89,7 @@ const ManageCalendar = () => {
 
   const data = mentorSlots.map((slot) => ({
     Id: slot.mentorSlotId,
-    Subject: slot.room !== "" ? `Room: ${slot.room}` : "Online",
+    Subject: slot.isOnline ? "Online" : "Offline",
     StartTime: new Date(slot.startTime),
     EndTime: new Date(slot.endTime),
   }));
@@ -145,6 +145,10 @@ const ManageCalendar = () => {
       );
       toast.success("Slot added successfully!");
       setRefresh(!refresh);
+      setDate(null);
+      setSlot(undefined);
+      setFormat("offline");
+      setPoint(1);
     } catch (error:any) {
       toast.error(error.response.data.replace("Error: ", ""), {autoClose: 2000}); 
     }
