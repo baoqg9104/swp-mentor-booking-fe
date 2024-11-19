@@ -27,7 +27,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Rating, Stack, Tooltip } from "@mui/material";
 import { toast } from "react-toastify";
-import axios from "axios";
+import axiosInstance from "./axiosInstance";
 import { AuthContext } from "./AuthContext";
 
 interface MentorAppointment {
@@ -107,7 +107,7 @@ const MentorFeedback = () => {
   useEffect(() => {
     const getBookings = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Booking/get-bookings`,
           {
             headers: {
@@ -124,7 +124,7 @@ const MentorFeedback = () => {
 
     const getMentorAppointments = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/MentorSlot/get-mentor-appointments-by-mentor-id/${authData?.id}`,
           {
             headers: {
@@ -142,7 +142,7 @@ const MentorFeedback = () => {
 
     const getFeedbacks = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Feedback/get-feedbacks`,
           {
             headers: {
@@ -168,7 +168,7 @@ const MentorFeedback = () => {
         return;
       }
 
-      await axios.post(
+      await axiosInstance.post(
         `https://localhost:7007/api/Feedback/submit`,
         {
           bookingId: selectedBooking?.bookingId,

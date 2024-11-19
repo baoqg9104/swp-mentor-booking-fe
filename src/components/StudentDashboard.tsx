@@ -1,9 +1,9 @@
 import { Rating, Stack, Tooltip } from "@mui/material";
-import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLink } from "@fortawesome/free-solid-svg-icons";
+import axiosInstance from "./axiosInstance";
 
 interface Group {
   groupId: string;
@@ -56,7 +56,7 @@ const StudentDashboard = () => {
   useEffect(() => {
     const getSwpClassByClassId = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/SwpClass/get/${authData?.swpClassId}`,
           {
             headers: {
@@ -79,7 +79,7 @@ const StudentDashboard = () => {
           return;
         }
 
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Group/get/${data}`,
           {
             headers: {
@@ -95,7 +95,7 @@ const StudentDashboard = () => {
     const getBookings = async () => {
       try {
         const groupId = localStorage.getItem("groupId");
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Booking/get-bookings-by-groupId/${groupId}`,
           {
             headers: {
@@ -113,7 +113,7 @@ const StudentDashboard = () => {
 
     const getFeedbacks = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Feedback/get-feedbacks`,
           {
             headers: {

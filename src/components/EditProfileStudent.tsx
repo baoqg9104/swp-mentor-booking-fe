@@ -15,6 +15,7 @@ import { useLocation } from "react-router-dom";
 import Select from "react-select";
 import { AuthContext } from "./AuthContext";
 import { toast } from "react-toastify";
+import axiosInstance from "./axiosInstance";
 import axios from "axios";
 
 declare global {
@@ -53,7 +54,7 @@ const EditProfileStudent = () => {
   useEffect(() => {
     const getStudentById = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Student/${authData?.id}`,
           {
             headers: {
@@ -110,7 +111,7 @@ const EditProfileStudent = () => {
         return;
       }
 
-      const response = await axios.put(
+      const response = await axiosInstance.put(
         "https://localhost:7007/api/User/update-user",
         data,
         {

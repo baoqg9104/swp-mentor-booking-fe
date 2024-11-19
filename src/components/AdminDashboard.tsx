@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUser
 } from "@fortawesome/free-solid-svg-icons";
-import axios from 'axios';
 import { toast } from "react-toastify";
 //const tStyleHeader = 'px-6 py-3 text-start font-medium text-gray-500 uppercase';
 //const tStyleBody = 'px-6 py-3 text-start whitespace-nowrap font-medium text-gray-800';
@@ -12,6 +11,7 @@ import { useEffect, useState, useContext } from 'react';
 import { useLocation } from 'react-router-dom';
 import "preline/preline";
 import { AuthContext } from "./AuthContext";
+import axios from "axios";
 
 
 interface Mentors {

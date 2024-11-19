@@ -29,7 +29,7 @@ import {
   WorkWeek,
 } from "@syncfusion/ej2-react-schedule";
 import { AuthContext } from "./AuthContext";
-import axios from "axios";
+import axiosInstance from "./axiosInstance";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLink } from "@fortawesome/free-solid-svg-icons";
 import { Tooltip } from "@mui/material";
@@ -66,7 +66,7 @@ const MyAppointments = () => {
     // .filter((booking) => booking.status === "Approved")
     .map((booking) => ({
       Id: booking.mentorSlotId,
-      Subject: booking.room !== "" ? `Room: ${booking.room}` : "Online",
+      Subject: booking.isOnline ? "Online" : "Offline",
       StartTime: new Date(booking.startTime),
       EndTime: new Date(booking.endTime),
       Status: booking.status,
@@ -82,7 +82,7 @@ const MyAppointments = () => {
     const getBookings = async () => {
       try {
         const groupId = localStorage.getItem("groupId");
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Booking/get-bookings-by-groupId/${groupId}`,
           {
             headers: {

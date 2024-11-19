@@ -1,6 +1,5 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { AuthContext } from "./AuthContext";
-import axios from "axios";
 import {
   Dialog,
   DialogBackdrop,
@@ -8,6 +7,7 @@ import {
   DialogTitle,
 } from "@headlessui/react";
 import { toast } from "react-toastify";
+import axiosInstance from "./axiosInstance";
 
 interface Student {
   studentId: string;
@@ -66,7 +66,7 @@ const StudentClass = () => {
   useEffect(() => {
     const getStudents = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Student/all`,
           {
             headers: {
@@ -83,7 +83,7 @@ const StudentClass = () => {
 
     const getGroups = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Group/all`,
           {
             headers: {
@@ -100,7 +100,7 @@ const StudentClass = () => {
 
     const getClasses = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/SwpClass/all`,
           {
             headers: {
@@ -117,7 +117,7 @@ const StudentClass = () => {
 
     const getRequests = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           "https://localhost:7007/api/RequestToMoveClass/get-all"
         );
 
@@ -179,7 +179,7 @@ const StudentClass = () => {
         reason: reason,
       };
 
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `https://localhost:7007/api/RequestToMoveClass/create`,
         data
       );

@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "./axiosInstance";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
 
@@ -36,7 +36,7 @@ const MentorTransactionHistory = () => {
           return;
         }
 
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Transaction/get-transactions-by-mentorId/${data}`,
           {
             headers: {

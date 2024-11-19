@@ -20,7 +20,7 @@ import { IStaticMethods } from "preline/preline";
 import { useEffect } from "react";
 import { useLocation, NavLink, Outlet } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
-import axios from "axios";
+import axiosInstance from "./axiosInstance";
 
 declare global {
   interface Window {
@@ -57,7 +57,7 @@ const Mentor = () => {
   useEffect(() => {
     const getMentor = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Mentor/${authData?.id}`
         );
 

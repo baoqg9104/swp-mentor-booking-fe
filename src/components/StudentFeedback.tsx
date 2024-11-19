@@ -27,8 +27,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Rating, Stack, Tooltip } from "@mui/material";
 import { toast } from "react-toastify";
-import axios from "axios";
 import { AuthContext } from "./AuthContext";
+import axiosInstance from "./axiosInstance";
 
 interface Booking {
   bookingId: number;
@@ -91,7 +91,7 @@ const StudentFeedback = () => {
     const getBookings = async () => {
       try {
         const groupId = localStorage.getItem("groupId");
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Booking/get-bookings-by-groupId/${groupId}`,
           {
             headers: {
@@ -108,7 +108,7 @@ const StudentFeedback = () => {
 
     const getFeedbacks = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Feedback/get-feedbacks`,
           {
             headers: {
@@ -133,7 +133,7 @@ const StudentFeedback = () => {
         return;
       }
 
-      await axios.post(
+      await axiosInstance.post(
         `https://localhost:7007/api/Feedback/submit`,
         {
           bookingId: selectedBooking?.bookingId,
