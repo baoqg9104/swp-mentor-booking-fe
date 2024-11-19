@@ -1,6 +1,7 @@
-import axios from "axios";
+
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
+import axiosInstance from "./axiosInstance";
 
 interface Transaction {
   transactionId: number;
@@ -39,7 +40,7 @@ const StudentTransactionHistory = () => {
           return;
         }
 
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Transaction/get-transactions-by-groupId/${data}`,
           {
             headers: {

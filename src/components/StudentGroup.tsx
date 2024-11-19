@@ -30,11 +30,11 @@ import {
   DialogPanel,
   DialogTitle,
 } from "@headlessui/react";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { AuthContext } from "./AuthContext";
 import makeAnimated from "react-select/animated";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import axiosInstance from "./axiosInstance";
 
 const animatedComponents = makeAnimated();
 
@@ -143,7 +143,7 @@ const StudentGroup = () => {
   useEffect(() => {
     const getGroup = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Student/${authData?.id}`,
           {
             headers: {
@@ -158,7 +158,7 @@ const StudentGroup = () => {
           return;
         }
 
-        const groupResponse = await axios.get(
+        const groupResponse = await axiosInstance.get(
           `https://localhost:7007/api/Group/get/${groupId}`,
           {
             headers: {
@@ -177,7 +177,7 @@ const StudentGroup = () => {
 
     const getMembers = async () => {
       try {
-        const studentResponse = await axios.get(
+        const studentResponse = await axiosInstance.get(
           `https://localhost:7007/api/Student/${authData?.id}`,
           {
             headers: {
@@ -192,7 +192,7 @@ const StudentGroup = () => {
           return;
         }
 
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Group/get-members/${groupId}`,
           {
             headers: {
@@ -210,7 +210,7 @@ const StudentGroup = () => {
 
     const getStudents = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Student/all`,
           {
             headers: {
@@ -240,7 +240,7 @@ const StudentGroup = () => {
   useEffect(() => {
     const getGroupTopic = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Topic/get/${group?.topicId}`,
           {
             headers: {
@@ -261,7 +261,7 @@ const StudentGroup = () => {
 
   const getClasses = async () => {
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `https://localhost:7007/api/SwpClass/all`,
         {
           headers: {
@@ -279,7 +279,7 @@ const StudentGroup = () => {
 
   const getTopics = async () => {
     try {
-      const response = await axios.get(`https://localhost:7007/api/Topic/all`, {
+      const response = await axiosInstance.get(`https://localhost:7007/api/Topic/all`, {
         headers: {
           Authorization: `Bearer ${authData?.token}`,
         },
@@ -315,7 +315,7 @@ const StudentGroup = () => {
         memberEmails: members.map((member: any) => member.value),
       };
 
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         `https://localhost:7007/api/Group/create`,
         data,
         {
@@ -352,7 +352,7 @@ const StudentGroup = () => {
         return;
       }
 
-      const response = await axios.put(
+      const response = await axiosInstance.put(
         `https://localhost:7007/api/Group/add-member/`,
         data,
         {
@@ -385,7 +385,7 @@ const StudentGroup = () => {
         progress: progress,
       };
 
-      const response = await axios.put(
+      const response = await axiosInstance.put(
         `https://localhost:7007/api/Group/update-progress`,
         data,
         {
@@ -404,7 +404,7 @@ const StudentGroup = () => {
 
   const leaveGroup = async () => {
     try {
-      const response = await axios.put(
+      const response = await axiosInstance.put(
         `https://localhost:7007/api/Group/leave-group?studentId=${authData?.id}`
       );
 
@@ -416,7 +416,7 @@ const StudentGroup = () => {
 
   const deleteMember = async (studentId: string) => {
     try {
-      const response = await axios.put(
+      const response = await axiosInstance.put(
         `https://localhost:7007/api/Group/delete-member?studentId=${studentId}`
       );
 

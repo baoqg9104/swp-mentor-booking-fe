@@ -7,7 +7,7 @@ import {
   faLink,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import axios from "axios";
+import axiosInstance from "./axiosInstance";
 
 import "preline/preline";
 import { IStaticMethods } from "preline/preline";
@@ -17,6 +17,7 @@ import { useLocation } from "react-router-dom";
 import Select from "react-select";
 import { AuthContext } from "./AuthContext";
 import { toast } from "react-toastify";
+import axios from "axios";
 
 const levels = [
   { value: "1", label: "Beginner" },
@@ -80,7 +81,7 @@ const EditProfile = () => {
     const getMentorById = async () => {
       try {
         // Make the GET request
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Mentor/${authData?.id}`,
           {
             headers: {
@@ -114,7 +115,7 @@ const EditProfile = () => {
 
     const getMentorSkills = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Skills/mentorskill/${authData?.id}`,
           {
             headers: {
@@ -164,7 +165,7 @@ const EditProfile = () => {
         return;
       }
 
-      const response = await axios.put(
+      const response = await axiosInstance.put(
         "https://localhost:7007/api/User/update-user",
         data,
         {
@@ -208,7 +209,7 @@ const EditProfile = () => {
 
   const getSkills = async () => {
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         "https://localhost:7007/api/Skills/all",
         {
           headers: {
@@ -234,7 +235,7 @@ const EditProfile = () => {
   const handleAddSkill = async (e: any) => {
     try {
       e.preventDefault();
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         "https://localhost:7007/api/Skills/addskill",
         {
           mentorId: authData?.id,
@@ -261,7 +262,7 @@ const EditProfile = () => {
 
   const handleDeleteSkill = async (mentorSkillId: number) => {
     try {
-      const response = await axios.delete(
+      const response = await axiosInstance.delete(
         `https://localhost:7007/api/Skills/mentorskill/delete/${mentorSkillId}`,
         {
           headers: {

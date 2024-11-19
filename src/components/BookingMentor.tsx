@@ -33,7 +33,7 @@ declare global {
 import { useState } from "react";
 import { Dialog, DialogBackdrop, DialogPanel } from "@headlessui/react";
 import { toast } from "react-toastify";
-import axios, { AxiosError } from "axios";
+import axiosInstance from "./axiosInstance";
 import { AuthContext } from "./AuthContext";
 
 interface Mentor {
@@ -120,7 +120,7 @@ const BookingMentor = () => {
   useEffect(() => {
     const getMentors = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Mentor/all`,
           {
             headers: {
@@ -140,7 +140,7 @@ const BookingMentor = () => {
 
   const getMentorProfile = async (mentorId: string) => {
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `https://localhost:7007/api/Mentor/${mentorId}`,
         {
           headers: {
@@ -155,7 +155,7 @@ const BookingMentor = () => {
 
   const getMentorSkills = async (mentorId: string) => {
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `https://localhost:7007/api/Skills/mentorskill/${mentorId}`,
         {
           headers: {
@@ -172,7 +172,7 @@ const BookingMentor = () => {
 
   const getMentorAvailability = async (mentorId: string) => {
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `https://localhost:7007/api/MentorSlot/get-by-mentor-id/${mentorId}`,
         {
           headers: {
@@ -198,7 +198,7 @@ const BookingMentor = () => {
     // console.log(data);
 
     try {
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         "https://localhost:7007/api/Booking/create",
         data,
         {
@@ -217,7 +217,7 @@ const BookingMentor = () => {
 
   const getBookings = async (groupId: string | null) => {
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `https://localhost:7007/api/Booking/get-bookings-by-groupId/${groupId}`,
         {
           headers: {

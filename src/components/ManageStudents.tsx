@@ -9,8 +9,8 @@ import { useLocation } from 'react-router-dom';
 import "preline/preline";
 import { IStaticMethods } from "preline/preline";
 import { useEffect, useState, useContext, Fragment} from 'react';
-import axios from 'axios';
 import { AuthContext } from "./AuthContext";
+import axios from "axios";
 
 declare global {
   interface Window {

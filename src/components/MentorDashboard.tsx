@@ -2,7 +2,7 @@ import Rating from "@mui/material/Rating";
 import Stack from "@mui/material/Stack";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
-import axios from "axios";
+import axiosInstance from "./axiosInstance";
 import { Tooltip } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLink } from "@fortawesome/free-solid-svg-icons";
@@ -68,7 +68,7 @@ const MentorDashboard = () => {
   useEffect(() => {
     const getBookings = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Booking/get-bookings`,
           {
             headers: {
@@ -85,7 +85,7 @@ const MentorDashboard = () => {
 
     const getMentorAppointments = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/MentorSlot/get-mentor-appointments-by-mentor-id/${authData?.id}`,
           {
             headers: {
@@ -100,7 +100,7 @@ const MentorDashboard = () => {
 
     const getFeedbacks = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Feedback/get-feedbacks`,
           {
             headers: {
@@ -117,7 +117,7 @@ const MentorDashboard = () => {
 
     const getPoint = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Mentor/${authData?.id}`,
           {
             headers: {

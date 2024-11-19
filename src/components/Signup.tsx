@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import "preline/preline";
 import { IStaticMethods } from "preline/preline";
 import { toast } from "react-toastify";
-import axios from "axios";
+import axiosInstance from "./axiosInstance";
 
 declare global {
   interface Window {
@@ -54,7 +54,7 @@ const Signup = () => {
 
       console.log(data);
 
-      const response = await axios.post(
+      const response = await axiosInstance.post(
         "https://localhost:7007/api/auth/register",
         data
       );
@@ -68,7 +68,7 @@ const Signup = () => {
   useEffect(() => {
     const getClass = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           "https://localhost:7007/api/SwpClass/all"
         );
 

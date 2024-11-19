@@ -84,6 +84,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       );
 
       const token = response.data.accessToken;
+
+      if (authData) {
+        localStorage.setItem('logout', Date.now().toString());
+      }
+
       localStorage.setItem("authToken", token);
 
       const decodedToken = jwtDecode<CustomJwtPayload>(token);
@@ -110,6 +115,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     localStorage.removeItem("authToken");
+    localStorage.removeItem("groupId");
     setAuthData(null);
   };
 

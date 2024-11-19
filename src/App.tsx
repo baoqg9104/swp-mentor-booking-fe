@@ -34,6 +34,7 @@ import ManageMentors from "./components/ManageMentors";
 import ManageStudents from "./components/ManageStudents";
 import StudentClass from "./components/StudentClass";
 import MentorClass from "./components/MentorClass";
+import { setupAxiosInterceptors } from "./components/axiosInstance";
 registerLicense(
   "Mgo+DSMBMAY9C3t2UlhhQlVMfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTX9TdEBiW3xacHdRQGNY"
 );
@@ -49,6 +50,7 @@ const App = () => {
 };
 
 const AppContent = () => {
+  setupAxiosInterceptors();
   const authContext = useContext(AuthContext);
 
   if (!authContext) {

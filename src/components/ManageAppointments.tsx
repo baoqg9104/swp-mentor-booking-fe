@@ -121,7 +121,7 @@ const ManageAppointments = () => {
     // .filter((appointment) => appointment.status === "Approved")
     .map((appointment) => ({
       Id: appointment.mentorSlotId,
-      Subject: appointment.room !== "" ? `Room: ${appointment.room}` : "Online",
+      Subject: appointment.isOnline ? "Online" : "Offline",
       StartTime: new Date(appointment.startTime),
       EndTime: new Date(appointment.endTime),
       Status: appointment.status,

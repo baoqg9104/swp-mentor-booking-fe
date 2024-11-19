@@ -1,4 +1,4 @@
-import axios from "axios";
+import axiosInstance from "./axiosInstance";
 import { Fragment, useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
 import {
@@ -48,7 +48,7 @@ const MentorClass = () => {
   useEffect(() => {
     const getStudents = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           "https://localhost:7007/api/Student/all"
         );
         setStudents(response.data);
@@ -59,7 +59,7 @@ const MentorClass = () => {
 
     const getMentor = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Mentor/${authData?.id}`
         );
 
@@ -71,7 +71,7 @@ const MentorClass = () => {
 
     const getGroups = async () => {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           `https://localhost:7007/api/Group/all`
         );
         setGroups(response.data);
@@ -88,7 +88,7 @@ const MentorClass = () => {
   const updateStatusGroup = async (groupId: string, status: boolean) => {
 
     try {
-      await axios.put("https://localhost:7007/api/Group/update-status", {
+      await axiosInstance.put("https://localhost:7007/api/Group/update-status", {
         groupId: groupId,
         status: status,
       });
