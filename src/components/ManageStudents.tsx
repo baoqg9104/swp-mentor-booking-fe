@@ -307,7 +307,7 @@ export default function ManageStudents(){
                       as="h3"
                       className="text-lg font-medium leading-6 text-gray-900"
                     >
-                      Confirm Deleting {specStu}
+                      Student Details {specStu}
                     </DialogTitle>
                     <form className="flex flex-col gap-3" onSubmit={handleSave}>
                       <div className="p-4 overflow-y-auto flex flex-col justify-center items-center">                     
