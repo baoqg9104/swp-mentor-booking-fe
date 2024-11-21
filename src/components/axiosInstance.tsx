@@ -11,7 +11,7 @@ export const setupAxiosInterceptors = () => {
     (response) => response,
     (error) => {
       if (error.response && error.response.status === 401) {
-        toast.error("Your session has expired. Please login again.");
+        // toast.error("Your session has expired. Please login again.");
         localStorage.removeItem("authToken");
         navigate("/login");
       }

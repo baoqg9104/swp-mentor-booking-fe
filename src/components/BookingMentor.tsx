@@ -690,7 +690,7 @@ const BookingMentor = () => {
                       <FontAwesomeIcon
                         icon={faGift}
                         className={`size-4 mr-2 ${
-                          selectedMentor?.dateOfBirth != ""
+                          selectedMentor?.dateOfBirth != "" && selectedMentor?.dateOfBirth != null
                             ? ""
                             : "text-gray-500"
                         }`}
@@ -702,7 +702,7 @@ const BookingMentor = () => {
                             : "text-gray-500"
                         }`}
                       >
-                        {selectedMentor?.dateOfBirth === ""
+                        {selectedMentor?.dateOfBirth === "" || selectedMentor?.dateOfBirth == null
                           ? ""
                           : new Date(
                               selectedMentor?.dateOfBirth!

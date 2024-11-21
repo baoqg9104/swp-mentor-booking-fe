@@ -151,7 +151,7 @@ const EditProfile = () => {
         email: email,
         phone: phone,
         gender: gender,
-        dateOfBirth: dateOfBirth,
+        dateOfBirth: dateOfBirth == "" ? null : dateOfBirth,
         meetUrl: meetUrl,
       };
 
@@ -301,19 +301,19 @@ const EditProfile = () => {
                         <FontAwesomeIcon
                           icon={faUser}
                           className={`size-4 mr-2 ${
-                            mentorInformation?.gender !== ""
+                            mentorInformation?.gender !== "" && mentorInformation?.gender != null
                               ? ""
                               : "text-gray-500"
                           }`}
                         />
                         <span
                           className={`${
-                            mentorInformation?.gender !== ""
+                            mentorInformation?.gender !== "" && mentorInformation?.gender != null
                               ? ""
                               : "text-gray-500"
                           }`}
                         >
-                          {mentorInformation?.gender === ""
+                          {mentorInformation?.gender === "" || mentorInformation?.gender == null
                             ? "Gender"
                             : mentorInformation?.gender}
                         </span>
@@ -323,20 +323,20 @@ const EditProfile = () => {
                         <FontAwesomeIcon
                           icon={faGift}
                           className={`size-4 mr-2 ${
-                            mentorInformation?.dateOfBirth != null
+                            mentorInformation?.dateOfBirth != null && mentorInformation.dateOfBirth !== ""
                               ? ""
                               : "text-gray-500"
                           }`}
                         />
                         <span
                           className={`${
-                            mentorInformation?.dateOfBirth != ""
+                            mentorInformation?.dateOfBirth != "" && mentorInformation?.dateOfBirth != null
                               ? ""
                               : "text-gray-500"
                           }`}
                         >
                           {mentorInformation?.dateOfBirth === null
-                            ? ""
+                            ? "Date of birth"
                             : new Date(
                                 mentorInformation?.dateOfBirth!
                               ).toLocaleDateString("en-GB")}
@@ -371,7 +371,7 @@ const EditProfile = () => {
                             mentorInformation?.phone ? "" : "text-gray-500"
                           }`}
                         >
-                          {mentorInformation?.phone === ""
+                          {mentorInformation?.phone === "" || mentorInformation?.phone == null
                             ? "Phone"
                             : mentorInformation?.phone}
                         </span>
@@ -388,7 +388,7 @@ const EditProfile = () => {
                             mentorInformation?.meetUrl ? "" : "text-gray-500"
                           }`}
                         >
-                          {mentorInformation?.meetUrl === ""
+                          {!mentorInformation?.meetUrl
                             ? "Meet URL"
                             : mentorInformation?.meetUrl}
                         </span>
