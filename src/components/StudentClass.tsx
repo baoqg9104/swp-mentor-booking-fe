@@ -276,7 +276,13 @@ const StudentClass = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredStudents.map((student) => (
+            {filteredStudents
+            .sort((a, b) => {
+              if (a.groupId === null || a.groupId === undefined) return 1; 
+              if (b.groupId === null || b.groupId === undefined) return -1; 
+              return a.groupId.localeCompare(b.groupId); 
+            })
+            .map((student) => (
               <tr
                 key={student.studentId}
                 className="bg-white border-b  hover:bg-gray-50 "

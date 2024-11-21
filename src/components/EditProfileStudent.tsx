@@ -103,7 +103,7 @@ const EditProfileStudent = () => {
         email: email,
         phone: phone,
         gender: gender,
-        dateOfBirth: dateOfBirth,
+        dateOfBirth: dateOfBirth == "" ? null : dateOfBirth,
       };
 
       if (dateOfBirth >= new Date().toISOString().split("T")[0]) {
@@ -169,12 +169,12 @@ const EditProfileStudent = () => {
                         />
                         <span
                           className={`${
-                            studentInformation?.gender !== ""
+                            studentInformation?.gender !== "" && studentInformation?.gender != null
                               ? ""
                               : "text-gray-500"
                           }`}
                         >
-                          {studentInformation?.gender === ""
+                          {studentInformation?.gender === "" || studentInformation?.gender == null
                             ? "Gender"
                             : studentInformation?.gender}
                         </span>
@@ -191,13 +191,13 @@ const EditProfileStudent = () => {
                         />
                         <span
                           className={`${
-                            studentInformation?.dateOfBirth != ""
+                            studentInformation?.dateOfBirth != null
                               ? ""
                               : "text-gray-500"
                           }`}
                         >
                           {studentInformation?.dateOfBirth === null
-                            ? ""
+                            ? "Date of birth"
                             : new Date(
                                 studentInformation?.dateOfBirth!
                               ).toLocaleDateString("en-GB")}
@@ -232,7 +232,7 @@ const EditProfileStudent = () => {
                             studentInformation?.phone ? "" : "text-gray-500"
                           }`}
                         >
-                          {studentInformation?.phone === ""
+                          {studentInformation?.phone === "" || studentInformation?.phone == null
                             ? "Phone"
                             : studentInformation?.phone}
                         </span>

@@ -3,12 +3,32 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 import PasswordReset from "./PasswordReset";
+import axios from "axios";
+import { toast } from "react-toastify";
+import PuffLoader from "react-spinners/PuffLoader";
 
 const ForgotPassword = () => {
   const [state, setState] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
 
-  const handleForgotPassword = () => {
-    setState("password-reset");
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    try {
+      e.preventDefault();
+      setState("loading");
+      const response = await axios.post(
+        "https://localhost:7007/api/User/generate-otp",
+        {
+          recipientEmail: email,
+        }
+      );
+
+      toast.success("Email has been sent successfully");
+      setState("password-reset");
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response.data);
+      setState("");
+    }
   };
 
   return (
@@ -21,20 +41,23 @@ const ForgotPassword = () => {
             </div>
 
             <div className="h-2/4 px-[70px]">
-              <input
-                type="email"
-                className="w-full h-[55px] bg-[#f7f7f7] pl-5 rounded-[10px] text-[18px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
-                placeholder="Email"
-                required
-              />
+              <form onSubmit={handleForgotPassword}>
+                <input
+                  type="email"
+                  className="w-full h-[55px] bg-[#f7f7f7] pl-5 rounded-[10px] text-[18px] placeholder:text-[#808080] text-[#5B5B5B] placeholder:font-normal"
+                  placeholder="Email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
 
-              <button
-                type="submit"
-                className="mt-5 w-full h-[55px] bg-[#F56965] pl-5 rounded-[10px] text-[21px] text-[white] font-semibold"
-                onClick={() => handleForgotPassword()}
-              >
-                Send
-              </button>
+                <button
+                  type="submit"
+                  className="mt-5 w-full h-[55px] bg-[#F56965] pl-5 rounded-[10px] text-[21px] text-[white] font-semibold"
+                >
+                  Send
+                </button>
+              </form>
 
               <div className="text-center mt-10 text-[18px]">
                 <Link to={"/login"}>
@@ -51,8 +74,12 @@ const ForgotPassword = () => {
         </div>
       )}
 
-      {state === "password-reset" && (
-        <PasswordReset />
+      {state === "password-reset" && <PasswordReset email={email} />}
+
+      {state === "loading" && (
+        <div className="w-full h-[90vh] flex items-center justify-center">
+          <PuffLoader color="#ff9000" size={100} />
+        </div>
       )}
     </>
   );

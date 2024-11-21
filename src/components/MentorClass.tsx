@@ -49,7 +49,12 @@ const MentorClass = () => {
     const getStudents = async () => {
       try {
         const response = await axiosInstance.get(
-          "https://localhost:7007/api/Student/all"
+          "https://localhost:7007/api/Student/all",
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
         );
         setStudents(response.data);
       } catch (error) {
@@ -60,7 +65,12 @@ const MentorClass = () => {
     const getMentor = async () => {
       try {
         const response = await axiosInstance.get(
-          `https://localhost:7007/api/Mentor/${authData?.id}`
+          `https://localhost:7007/api/Mentor/${authData?.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
         );
 
         setMentor(response.data);
@@ -72,7 +82,12 @@ const MentorClass = () => {
     const getGroups = async () => {
       try {
         const response = await axiosInstance.get(
-          `https://localhost:7007/api/Group/all`
+          `https://localhost:7007/api/Group/all`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
         );
         setGroups(response.data);
       } catch (error) {
@@ -86,18 +101,25 @@ const MentorClass = () => {
   }, [refresh]);
 
   const updateStatusGroup = async (groupId: string, status: boolean) => {
-
     try {
-      await axiosInstance.put("https://localhost:7007/api/Group/update-status", {
-        groupId: groupId,
-        status: status,
-      });
+      await axiosInstance.put(
+        "https://localhost:7007/api/Group/update-status",
+        {
+          groupId: groupId,
+          status: status,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${authData?.token}`,
+          },
+        }
+      );
       setRefresh(!refresh);
       toast.success("Update status successfully");
     } catch (error: any) {
       toast.error(error.respone.data);
     }
-  }
+  };
 
   // Gom nhóm học sinh
   const groupedStudents = students.reduce<Record<string, Student[]>>(
@@ -174,48 +196,54 @@ const MentorClass = () => {
                           (student) => student.swpClassId === mentor?.swpClassId
                         )
                         .map((student, index) => (
-                          <>
-                            <tr
-                              key={student.studentId}
-                              className="hover:bg-gray-50"
+                          <tr
+                            key={student.studentId}
+                            className={`hover:bg-gray-50`}
+                          >
+                            <td className="px-4 py-2 border-gray-200">
+                              {group === "No Group"
+                                ? "No Group"
+                                : index === 0
+                                ? groups.find((g) => g.groupId == group)?.name
+                                : ""}
+                            </td>
+
+                            <td className="px-4 py-2 border-l-[1px] border-gray-200">
+                              {index === 0 && student.groupId != null
+                                ? groups.find(
+                                    (g) => g.groupId === student.groupId
+                                  )?.status
+                                  ? "Activated"
+                                  : "Disabled"
+                                : group === "No Group"
+                                ? ""
+                                : ""}
+                            </td>
+                            <td className="px-4 py-2 border-l-[1px] border-gray-200">
+                              {index === 0 &&
+                                group !== "No Group" &&
+                                groups.find(
+                                  (g) => g.groupId === student.groupId
+                                )?.topicName}
+                            </td>
+                            <td className="px-4 py-2 border-l-[1px] text-center border-gray-200">
+                              {index === 0 &&
+                                group !== "No Group" &&
+                                groups.find(
+                                  (g) => g.groupId === student.groupId
+                                )?.walletPoint}
+                            </td>
+
+                            <td
+                              className={`border border-gray-200 px-4 py-2 ${
+                                groups.find(
+                                  (g) => g.leaderId === student.studentId
+                                ) && "font-medium"
+                              }`}
                             >
-                              {/* Hiển thị tên nhóm chỉ ở hàng đầu tiên của mỗi cụm nhóm */}
-                              <td className="px-4 py-2">
-                                {index === 0
-                                  ? groups.find((g) => g.groupId == group)?.name
-                                  : ""}
-                              </td>
-                              <td className="px-4 py-2 border-l-[1px]">
-                                {index === 0
-                                  ? groups.find(
-                                      (g) => g.groupId === student.groupId
-                                    )?.status
-                                    ? "Activated"
-                                    : "Disabled"
-                                  : ""}
-                              </td>
-                              <td className="px-4 py-2 border-l-[1px]">
-                                {index === 0 &&
-                                  groups.find(
-                                    (g) => g.groupId === student.groupId
-                                  )?.topicName}
-                              </td>
-                              <td className="px-4 py-2 border-l-[1px] text-center">
-                                {index === 0 &&
-                                  groups.find(
-                                    (g) => g.groupId === student.groupId
-                                  )?.walletPoint}
-                              </td>
-                              <td
-                                className={`border border-gray-200 px-4 py-2 ${
-                                  groups.find(
-                                    (g) => g.leaderId === student.studentId
-                                  ) && "font-medium"
-                                }`}
-                              >
-                                {student.studentName}
-                              </td>
-                              <td className="border border-gray-200 px-4 py-2">
+                              {student.studentName}
+                            </td>
+                            <td className="border border-gray-200 px-4 py-2">
                                 {student.email}
                               </td>
                               <td className="border border-gray-200 px-4 py-2">
@@ -235,8 +263,7 @@ const MentorClass = () => {
                                   Delete
                                 </button>
                               </td> */}
-                            </tr>
-                          </>
+                          </tr>
                         ))}
                     </Fragment>
                   ))}
@@ -329,14 +356,20 @@ const MentorClass = () => {
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
                                   {group.status == false ? (
                                     <button
-                                    onClick={() => updateStatusGroup(group.groupId, true)}
-                                     className="text-[15px] bg-transparent hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-4 border border-green-500 hover:border-transparent rounded">
+                                      onClick={() =>
+                                        updateStatusGroup(group.groupId, true)
+                                      }
+                                      className="text-[15px] bg-transparent hover:bg-green-500 text-green-700 font-semibold hover:text-white py-2 px-4 border border-green-500 hover:border-transparent rounded"
+                                    >
                                       Approve
                                     </button>
                                   ) : (
                                     <button
-                                    onClick={() => updateStatusGroup(group.groupId, false)}
-                                     className="text-[15px] bg-transparent hover:bg-red-500 text-red-700 font-semibold hover:text-white py-2 px-4 border border-red-500 hover:border-transparent rounded">
+                                      onClick={() =>
+                                        updateStatusGroup(group.groupId, false)
+                                      }
+                                      className="text-[15px] bg-transparent hover:bg-red-500 text-red-700 font-semibold hover:text-white py-2 px-4 border border-red-500 hover:border-transparent rounded"
+                                    >
                                       Disable
                                     </button>
                                   )}
