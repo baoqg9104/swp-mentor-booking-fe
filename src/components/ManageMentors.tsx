@@ -85,12 +85,8 @@ export default function ManageMentors(){
   }
 
   function openEditModal(n :Mentors) {
-    setFullName(n.mentorName);
-    setGender(n.gender);
-    setEmail(n.email);
-    setPhone(n.phone);
-    setDateOfBirth(n.dateOfBirth);
-    setSpecMentor(n.mentorId)
+    setSpecMentor(n.mentorId),
+    getMentorSlots(n.mentorId),
     setEdit(true)
   }
 
@@ -174,10 +170,10 @@ export default function ManageMentors(){
     }
   };
 
-    const getMentorSlots = async () => {
+    const getMentorSlots = async (id : string) => {
       try {
         const response = await axios.get(
-          `https://localhost:7007/api/MentorSlot/get-by-mentor-id/${authData?.id}`,
+          `https://localhost:7007/api/MentorSlot/get-by-mentor-id/${id}`,
           {
             headers: {
               Authorization: `Bearer ${authData?.token}`,
@@ -337,16 +333,14 @@ export default function ManageMentors(){
                     leaveFrom="opacity-100 scale-100"
                     leaveTo="opacity-0 scale-95"
                   >
-                    <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                    <DialogPanel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                       <DialogTitle
                         as="h3"
                         className="text-lg font-medium leading-6 text-gray-900"
                       >
-                        Confirm Deleting {specMentor}
+                        Schdedule for {specMentor}
                       </DialogTitle>
-                      <form className="flex flex-col gap-3" onSubmit={handleSave}>
                         <div className="p-4 overflow-y-auto flex flex-col justify-center items-center">                     
-                        <div className="flex flex-col mt-7">
                             <div className="-m-1.5 overflow-x-auto bg-white shadow">
                               <div className="p-1.5 min-w-full inline-block align-middle">
                                 <div className="overflow-hidden">
@@ -405,7 +399,7 @@ export default function ManageMentors(){
                                 </div>
                               </div>
                             </div>
-                        </div>
+                        
                             
                               
                         <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t">
@@ -421,7 +415,7 @@ export default function ManageMentors(){
                           </button>
                           </div>
                         </div>
-                      </form>
+
                     </DialogPanel>
                   </TransitionChild>
                 </div>
