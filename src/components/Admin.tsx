@@ -1,6 +1,9 @@
 import {
   faBell,
+  faBook,
+  faDoorOpen,
   faHouse,
+  faList,
   faUser,
   faUserGraduate,
   faUserTie,
@@ -239,6 +242,39 @@ const Admin = () => {
                     Students
                   </NavLink>
                 </li>
+
+                <li>
+                  <NavLink
+                    to="/admin/class"
+                    onClick={() => setNavLink("class")}
+                    className={`${
+                      navLink === "class" && "bg-gray-100"
+                    } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                  >
+                    <FontAwesomeIcon
+                      icon={faDoorOpen}
+                      className="text-[18px] mt-[1px]"
+                    />
+                    Manage Class
+                  </NavLink>
+                </li>
+
+                <li>
+                  <NavLink
+                    to="/admin/topics"
+                    onClick={() => setNavLink("topics")}
+                    className={`${
+                      navLink === "topics" && "bg-gray-100"
+                    } w-full flex gap-x-3.5 py-3 px-2.5 text-gray-800 rounded-lg hover:bg-gray-100 focus:outline-none focus:bg-gray-100`}
+                  >
+                    <FontAwesomeIcon
+                      icon={faBook}
+                      className="text-[18px] mt-[1px]"
+                    />
+                    Manage Topics
+                  </NavLink>
+                </li>
+
 
                 {/* <li className="hs-accordion" id="projects-accordion">
                   <button

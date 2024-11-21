@@ -12,6 +12,7 @@ import { useEffect, useState, useContext,Fragment } from 'react';
 import { useLocation } from 'react-router-dom';
 import "preline/preline";
 import { AuthContext } from "./AuthContext";
+import axiosInstance from './axiosInstance';
 //import { IStaticMethods } from "preline/preline";
 
 
@@ -30,6 +31,16 @@ interface Mentors {
   applyStatus: true,
   mentorSkills: null,
   mentorSlots: null
+}
+
+interface MentorSlot {
+  mentorSlotId: string;
+  mentorId: string;
+  startTime: string;
+  endTime: string;
+  bookingPoint: number;
+  isOnline: boolean;
+  room: string;
 }
 
 
@@ -52,7 +63,7 @@ export default function ManageMentors(){
   const [specMentor, setSpecMentor]= useState<string>('');
 
   const [data, setData] = useState<Mentors[]>([]);
-  
+  const [mentorSlots, setMentorSlots] = useState<MentorSlot[]>([]);
   const [fullName, setFullName] = useState<string>("");
   const [gender, setGender] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -85,12 +96,12 @@ export default function ManageMentors(){
 
   const getMentors = async () => {
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `https://localhost:7007/api/Mentor/all`,
         {
           headers: {
             Authorization: `Bearer ${authData?.token}`,
-          },
+          }
         }
       );
 
@@ -104,7 +115,7 @@ export default function ManageMentors(){
 
   const deleteMentor = async (id:string) => {
     try {
-      const response = await axios.delete(
+      const response = await axiosInstance.delete(
         `https://localhost:7007/api/Mentor/delete/${id}`,
         {
           headers: {
@@ -139,7 +150,7 @@ export default function ManageMentors(){
         return;
       }
       console.log(data);
-      const response = await axios.put(
+      const response = await axiosInstance.put(
         "https://localhost:7007/api/User/update-user",
         data,
         {
@@ -163,6 +174,23 @@ export default function ManageMentors(){
     }
   };
 
+    const getMentorSlots = async () => {
+      try {
+        const response = await axios.get(
+          `https://localhost:7007/api/MentorSlot/get-by-mentor-id/${authData?.id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authData?.token}`,
+            },
+          }
+        );
+        setMentorSlots(response.data);
+      } catch (error) {
+        console.log("Can not get mentor slots", error);
+        toast.error("Can not get mentor slots");
+      }
+    };
+
   const formatDate = (isoDate: string): string => {
     const date = new Date(isoDate);
     const day = String(date.getDate()).padStart(2, "0");
@@ -184,7 +212,7 @@ export default function ManageMentors(){
                           </div>
                         </div>
                         <div className="col-span-3 border-l px-4">
-                          ID: mentor.mentorID <br></br>
+                          ID: {mentor.mentorId} <br></br>
                           Name: {mentor.mentorName}{/*add preview email, name and gender to the items preview */}<br></br>
                           Email: {mentor.email}<br></br>
                           Gender: {mentor.gender}<br></br>
@@ -203,7 +231,7 @@ export default function ManageMentors(){
                                   openEditModal(mentor);
                                   
                                 }} className="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                                Edit
+                                View
                               </button>
                               {/* Edit button code */}
 
@@ -318,189 +346,68 @@ export default function ManageMentors(){
                       </DialogTitle>
                       <form className="flex flex-col gap-3" onSubmit={handleSave}>
                         <div className="p-4 overflow-y-auto flex flex-col justify-center items-center">                     
-                          <div className="w-full mt-6">
-                            <div className="relative">
-                              <input
-                                value={fullName}
-                                onChange={(e) => setFullName(e.target.value)}
-                                type="text"
-                                className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
-                                focus:pt-6
-                                focus:pb-2
-                                [&:not(:placeholder-shown)]:pt-6
-                                [&:not(:placeholder-shown)]:pb-2
-                                autofill:pt-6
-                                autofill:pb-2"
-                                placeholder="Full name"
-                                required
-                              />
-                              <label
-                                className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
-                                peer-focus:scale-90
-                                peer-focus:translate-x-0.5
-                                peer-focus:-translate-y-1.5
-                                peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
-                                peer-[:not(:placeholder-shown)]:scale-90
-                                peer-[:not(:placeholder-shown)]:translate-x-0.5
-                                peer-[:not(:placeholder-shown)]:-translate-y-1.5
-                                peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
-                                >
-                                Full name
-                              </label>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4 mt-4">
-                              <div className="relative">
-                                <select
-                                  value={gender}
-                                  onChange={(e) => setGender(e.target.value)}
-                                  className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
-                                  focus:pt-6
-                                  focus:pb-2
-                                  [&:not(:placeholder-shown)]:pt-6
-                                  [&:not(:placeholder-shown)]:pb-2
-                                  autofill:pt-6
-                                  autofill:pb-2"
-                                >
-                                  <option value=""></option>
-                                  <option value="Male">Male</option>
-                                  <option value="Female">Female</option>
-                                </select>
-
-                                <label
-                                  className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
-                                  peer-focus:scale-90
-                                  peer-focus:translate-x-0.5
-                                  peer-focus:-translate-y-1.5
-                                  peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
-                                  peer-[:not(:placeholder-shown)]:scale-90
-                                  peer-[:not(:placeholder-shown)]:translate-x-0.5
-                                  peer-[:not(:placeholder-shown)]:-translate-y-1.5
-                                  peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
-                                >
-                                  Gender
-                                </label>
-                              </div>
-
-                              <div className="relative">
-                                <input
-                                  required
-                                  value={email}
-                                  onChange={(e) => setEmail(e.target.value)}
-                                  type="email"
-                                  className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
-                                  focus:pt-6
-                                  focus:pb-2
-                                  [&:not(:placeholder-shown)]:pt-6
-                                  [&:not(:placeholder-shown)]:pb-2
-                                  autofill:pt-6
-                                  autofill:pb-2"
-                                  placeholder="Email"
-                                />
-                                <label
-                                  className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
-                                  peer-focus:scale-90
-                                  peer-focus:translate-x-0.5
-                                  peer-focus:-translate-y-1.5
-                                  peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
-                                  peer-[:not(:placeholder-shown)]:scale-90
-                                  peer-[:not(:placeholder-shown)]:translate-x-0.5
-                                  peer-[:not(:placeholder-shown)]:-translate-y-1.5
-                                  peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
-                                >
-                                  Email
-                                </label>
-                              </div>
-
-                              <div className="relative">
-                                <input
-                                  pattern="^(0[1-9][0-9]{8}|(\+84[1-9][0-9]{8}))$"
-                                  value={phone}
-                                  onChange={(e) => setPhone(e.target.value)}
-                                  type="text"
-                                  className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
-                                  focus:pt-6
-                                  focus:pb-2
-                                  [&:not(:placeholder-shown)]:pt-6
-                                  [&:not(:placeholder-shown)]:pb-2
-                                  autofill:pt-6
-                                  autofill:pb-2"
-                                  placeholder="Phone"
-                                />
-                                <label
-                                  className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
-                                  peer-focus:scale-90
-                                  peer-focus:translate-x-0.5
-                                  peer-focus:-translate-y-1.5
-                                  peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
-                                  peer-[:not(:placeholder-shown)]:scale-90
-                                  peer-[:not(:placeholder-shown)]:translate-x-0.5
-                                  peer-[:not(:placeholder-shown)]:-translate-y-1.5
-                                  peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
-                                >
-                                  Phone
-                                </label>
-                              </div>
-
-                              <div className="relative">
-                                <input
-                                  value={formatDate(dateOfBirth)}
-                                  onChange={(e) => setDateOfBirth(e.target.value)}
-                                  type="date"
-                                  className="peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
-                                  focus:pt-6
-                                  focus:pb-2
-                                  [&:not(:placeholder-shown)]:pt-6
-                                  [&:not(:placeholder-shown)]:pb-2
-                                  autofill:pt-6
-                                  autofill:pb-2"
-                                  placeholder="Date of Birth"
-                                />
-                                <label
-                                  className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
-                                  peer-focus:scale-90
-                                  peer-focus:translate-x-0.5
-                                  peer-focus:-translate-y-1.5
-                                  peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
-                                  peer-[:not(:placeholder-shown)]:scale-90
-                                  peer-[:not(:placeholder-shown)]:translate-x-0.5
-                                  peer-[:not(:placeholder-shown)]:-translate-y-1.5
-                                  peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
-                                >
-                                  Date of Birth
-                                </label>
-                              </div>
-                              <div className="relative">
-                                <input
-                                  value={meetUrl}
-                                  onChange={(e) => setMeetUrl(e.target.value)}
-                                  type="text"
-                                  className="mt-4 peer p-4 block w-full border-gray-200 rounded-lg text-sm placeholder:text-transparent focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none
-                                  focus:pt-6
-                                  focus:pb-2
-                                  [&:not(:placeholder-shown)]:pt-6
-                                  [&:not(:placeholder-shown)]:pb-2
-                                  autofill:pt-6
-                                  autofill:pb-2"
-                                  placeholder="Meet URL"
-                                />
-                                <label
-                                  className="absolute top-0 start-0 p-4 h-full text-sm truncate pointer-events-none transition ease-in-out duration-100 border border-transparent  origin-[0_0] peer-disabled:opacity-50 peer-disabled:pointer-events-none
-                                  peer-focus:scale-90
-                                  peer-focus:translate-x-0.5
-                                  peer-focus:-translate-y-1.5
-                                  peer-focus:text-gray-500 dark:peer-focus:text-neutral-500
-                                  peer-[:not(:placeholder-shown)]:scale-90
-                                  peer-[:not(:placeholder-shown)]:translate-x-0.5
-                                  peer-[:not(:placeholder-shown)]:-translate-y-1.5
-                                  peer-[:not(:placeholder-shown)]:text-gray-500 dark:peer-[:not(:placeholder-shown)]:text-neutral-500 dark:text-neutral-500"
-                                >
-                                  Meet URL
-                                </label>
+                        <div className="flex flex-col mt-7">
+                            <div className="-m-1.5 overflow-x-auto bg-white shadow">
+                              <div className="p-1.5 min-w-full inline-block align-middle">
+                                <div className="overflow-hidden">
+                                  <table className="min-w-full divide-y divide-gray-200">
+                                    <thead>
+                                      <tr>
+                                        <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
+                                          Date
+                                        </th>
+                                        <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
+                                          Time
+                                        </th>
+                                        <th className="px-6 py-3 text-start text-xs font-medium text-gray-500 uppercase">
+                                          Room
+                                        </th>
+                                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                                          Point
+                                        </th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-200">
+                                      {mentorSlots
+                                      .sort((a, b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime())
+                                      .map((slot) => (
+                                        <tr key={slot.mentorSlotId}>
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                            {new Date(slot.startTime)
+                                              .toLocaleDateString("en-GB")
+                                              .replace(/\//g, "-")}
+                                          </td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                            {`${new Date(slot.startTime).toLocaleTimeString(
+                                              [],
+                                              {
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                              }
+                                            )} - ${new Date(slot.endTime).toLocaleTimeString(
+                                              [],
+                                              {
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                              }
+                                            )}`}
+                                          </td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800">
+                                            {slot.isOnline ? "Online" : "Offline"}
+                                          </td>
+                                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-800 text-center">
+                                            {slot.bookingPoint}
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
                               </div>
                             </div>
-                          </div>
                         </div>
+                            
+                              
                         <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t">
                           <button
                             type="button"
@@ -512,12 +419,7 @@ export default function ManageMentors(){
                           >
                             Close
                           </button>
-                          <button
-                            type="submit"
-                            className="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none"
-                          >
-                            Save changes
-                          </button>
+                          </div>
                         </div>
                       </form>
                     </DialogPanel>

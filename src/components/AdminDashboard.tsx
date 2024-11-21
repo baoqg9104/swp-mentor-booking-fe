@@ -12,6 +12,7 @@ import { useLocation } from 'react-router-dom';
 import "preline/preline";
 import { AuthContext } from "./AuthContext";
 import axios from "axios";
+import axiosInstance from "./axiosInstance";
 
 
 interface Mentors {
@@ -29,6 +30,8 @@ interface Mentors {
   applyStatus: true,
   mentorSkills: null,
   mentorSlots: null
+  swpClassId: null,
+  swpClass: null
 }
 
 interface Student {
@@ -62,7 +65,7 @@ const AdminDashboard = () => {
     window.HSStaticMethods.autoInit();
     getMentors();
     getStudents();
-    getGroup();
+    //getGroup();
 
   }, [location.pathname]);
   
@@ -81,12 +84,12 @@ const AdminDashboard = () => {
 
   const getStudents = async () => {
     try {
-      const response = await axios.get(
-        `https://localhost:7007/api/Student/all`,
+      const response = await axiosInstance.get(
+        `https://localhost:7007/api/Student/all`,       
         {
           headers: {
             Authorization: `Bearer ${authData?.token}`,
-          },
+          }
         }
       );
 
@@ -101,12 +104,12 @@ const AdminDashboard = () => {
 
   const getMentors = async () => {
     try {
-      const response = await axios.get(
+      const response = await axiosInstance.get(
         `https://localhost:7007/api/Mentor/all`,
         {
           headers: {
             Authorization: `Bearer ${authData?.token}`,
-          },
+          }
         }
       );
 
@@ -119,15 +122,10 @@ const AdminDashboard = () => {
     }
   }
 
-  const getGroup = async () => {
+  /*const getGroup = async () => {
     try {
-      const response = await axios.get(
-        `https://localhost:7007/api/Group/all`,
-        {
-          headers: {
-            Authorization: `Bearer ${authData?.token}`,
-          },
-        }
+      const response = await axiosIn.get(
+        `https://localhost:7007/api/Group/all`
       );
 
       setGroup(response.data);
@@ -136,7 +134,7 @@ const AdminDashboard = () => {
       console.log("Can not get group list", error);
       toast.error("Can not get group list");
     }
-  }
+  }*/
 
   const pendingMentors = mentors.filter(fMentor=>{
     return fMentor.applyStatus != true;
@@ -145,12 +143,13 @@ const AdminDashboard = () => {
 const setStatus = async (mentorId: string) => {
   try {
     // console.log(authData?.token);
-    await axios.put(
+    await axiosInstance.put(
       `https://localhost:7007/api/Mentor/change-apply-status/${mentorId}`, 4 ,
       {
         headers: {
           Authorization: `Bearer ${authData?.token}`
-        },
+          
+        }
       }
     ).then(response => {
       console.log(response.data);
@@ -158,6 +157,7 @@ const setStatus = async (mentorId: string) => {
     })
   } catch (error) {
     console.log(error);
+    console.log(authData?.token)
     toast.error("An Error has occured");
   }
 }
@@ -237,7 +237,6 @@ const setStatus = async (mentorId: string) => {
             </div>
           </div>
           {/*Group box*/}
-``
           {/* <div className="flex flex-col bg-white border shadow-sm rounded-xl">
             <div className="p-4 md:p-5">
               <div className="flex items-center gap-x-2">
@@ -283,7 +282,7 @@ const setStatus = async (mentorId: string) => {
                               </div>
                             </div>
                             <div className="col-span-3 border-l px-4">
-                              {mentor.mentorId}
+                              {mentor.mentorId}<br></br>
                               {mentor.mentorName}{/*add preview email, name and gender to the items preview */}<br></br>
                               {mentor.email}<br></br>
                               {mentor.gender}<br></br>
@@ -292,7 +291,7 @@ const setStatus = async (mentorId: string) => {
 
                             </div>
                           
-                            {/* Buttons  */}``
+                            {/* Buttons  */}
                             <div className="col-span-1">
                               <div className="flex justify-end items-center gap-x-2 py-3 px-4">
                                 {/*Change Status*/}
@@ -304,7 +303,6 @@ const setStatus = async (mentorId: string) => {
                               </div>
                             </div>
                             {/*  Buttons End */}
-    
                           </div>
                             ))}        
                         </div>
