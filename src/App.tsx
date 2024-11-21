@@ -24,6 +24,7 @@ import StudentFeedback from "./components/StudentFeedback";
 import StudentTransactionHistory from "./components/StudentTransactionHistory";
 import EditProfileStudent from "./components/EditProfileStudent";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ManageClass from "./components/ManageClass";
 import { useContext } from "react";
 
 import PuffLoader from "react-spinners/PuffLoader";
@@ -34,6 +35,7 @@ import ManageMentors from "./components/ManageMentors";
 import ManageStudents from "./components/ManageStudents";
 import StudentClass from "./components/StudentClass";
 import MentorClass from "./components/MentorClass";
+import ManageTopics from "./components/ManageTopics";
 import { setupAxiosInterceptors } from "./components/axiosInstance";
 registerLicense(
   "Mgo+DSMBMAY9C3t2UlhhQlVMfV5AQmBIYVp/TGpJfl96cVxMZVVBJAtUQF1hTX9TdEBiW3xacHdRQGNY"
@@ -109,7 +111,28 @@ const AppContent = () => {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="class"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <ManageClass />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="topics"
+            element={
+              <ProtectedRoute allowedRoles={["Admin"]}>
+                <ManageTopics />
+              </ProtectedRoute>
+            }
+          />
+
         </Route>
+          
+       
 
         <Route
           path="/mentor"
