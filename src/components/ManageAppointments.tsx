@@ -767,7 +767,7 @@ const ManageAppointments = () => {
                             icon={faUsersRectangle}
                             className="size-[18px]"
                           />
-                          {selectedAppointment?.room ? selectedAppointment?.room : "Online"}
+                          {selectedAppointment?.isOnline ? "Online" : "Offline"}
                         </div>
                       </div>
                     </div>
