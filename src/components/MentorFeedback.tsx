@@ -136,7 +136,7 @@ const MentorFeedback = () => {
         setMentorAppointments(response.data);
       } catch (error) {
         console.log("Can not get mentor appointments", error);
-        toast.error("Can not get mentor appointments");
+        // toast.error("Can not get mentor appointments");
       }
     };
 

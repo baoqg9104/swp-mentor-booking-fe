@@ -1347,7 +1347,7 @@ const BookingMentor = () => {
                             icon={faUsersRectangle}
                             className="size-[18px]"
                           />
-                          {selectedSlot?.room! ? selectedSlot?.room! : "Online"}
+                          {selectedSlot?.isOnline! ? "Online" : "Offline"}
                         </div>
                         <div className="w-1/3 flex items-center gap-1">
                           {/* <FontAwesomeIcon
