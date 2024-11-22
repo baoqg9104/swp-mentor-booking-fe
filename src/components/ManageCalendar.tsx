@@ -146,7 +146,7 @@ const ManageCalendar = () => {
       toast.success("Slot added successfully!");
       setRefresh(!refresh);
       setDate(null);
-      setSlot(undefined);
+      setSlot(0);
       setFormat("offline");
       setPoint(1);
     } catch (error:any) {

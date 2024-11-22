@@ -188,6 +188,11 @@ export default function ManageMentors(){
     };
 
   const formatDate = (isoDate: string): string => {
+
+    if (!isoDate) {
+      return "";
+    }
+
     const date = new Date(isoDate);
     const day = String(date.getDate()).padStart(2, "0");
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -207,7 +212,7 @@ export default function ManageMentors(){
                             <FontAwesomeIcon icon={faUser} size= '8x' />
                           </div>
                         </div>
-                        <div className="col-span-3 border-l px-4">
+                        <div className="col-span-2 border-l px-4">
                           ID: {mentor.mentorId} <br></br>
                           Name: {mentor.mentorName}{/*add preview email, name and gender to the items preview */}<br></br>
                           Email: {mentor.email}<br></br>
@@ -218,16 +223,15 @@ export default function ManageMentors(){
                         </div>
 
                         {/* Buttons  */}
-                        <div className="col-span-1">
+                        <div className="col-span-2">
                           <div className="flex justify-end items-center gap-x-2 py-3 px-4">
-                            <a href='#'>
 
                               {/* Edit button code */}
                               <button onClick={()=> {
                                   openEditModal(mentor);
                                   
                                 }} className="py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none">
-                                View
+                                View schedule
                               </button>
                               {/* Edit button code */}
 
@@ -238,7 +242,6 @@ export default function ManageMentors(){
                                   Delete
                                 </button>
                                 {/*Delete button code */}
-                            </a>
                           </div>
                         </div>
                       </div> 
